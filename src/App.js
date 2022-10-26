@@ -9,6 +9,10 @@ import Contacts from "./scenes/contacts";
 import Form from "./scenes/form";
 import FAQ from "./scenes/faq";
 import OrderDetails from "./scenes/orderDetails";
+import TableTypes from "./scenes/tableTypes";
+import CreateTable from "./scenes/tables/create";
+import UpdateTable from "./scenes/tables/update";
+import Tables from "./scenes/tables";
 import Checkout from "./scenes/checkout";
 import Geography from "./scenes/geography";
 import { CssBaseline, ThemeProvider } from "@mui/material";
@@ -30,6 +34,10 @@ function App() {
               <Route path="/" element={<Dashboard />} />
               <Route path="/team" element={<Team />} />
               <Route path="/orderDetails" element={<OrderDetails />} />
+              <Route path="/tableTypes" element={<TableTypes />} />
+              <Route path="/tables" element={<Tables />} />
+              <Route path="/tables/create" element={<CreateTable />} />
+              <Route path="/tables/update/:id" element={<UpdateTable />} />
               <Route path="/checkout" element={<Checkout />} />
               <Route path="/contacts" element={<Contacts />} />
               <Route path="/invoices" element={<Invoices />} />

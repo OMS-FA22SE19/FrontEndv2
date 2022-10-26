@@ -1,102 +1,83 @@
 import { Box, Stack, Button } from "@mui/material";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import { tokens } from "../../theme";
+import { mockDataContacts } from "../../data/mockData";
+import { fetchData } from "../../services/orderDetailsServices";
 import Header from "../../components/Header";
 import { useTheme } from "@mui/material";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
-import { setIn } from "formik";
-import { DryTwoTone } from "@mui/icons-material";
 
-const OrderDetails = () => {
+const TableTypes = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const [APIData, setAPIData] = useState([]);
 
   useEffect(() => {
+    const fetchData = async () => {
+      let response = await axios.get(`https://localhost:7246/api/v1/TableTypes`);
+      setAPIData(response.data["data"]);
+    };
     fetchData();
   }, []);
-
-  const fetchData = async () => {
-    let response = await axios.get(
-      `https://localhost:7246/api/v1/OrderDetails`
-    );
-    setAPIData(response.data["data"]);
-  };
 
   const updateStatus = async (id, status) => {
     var requestBody = { id: id, status: status };
     await axios
-      .put(`https://localhost:7246/api/v1/OrderDetails/` + id, requestBody)
-      .then(() => fetchData());
+      .put(`https://localhost:7246/api/v1/TableTypes/` + id, requestBody)
+      .then(() => window.location.reload());
+  };
+
+  const deleteTable = async (id) => {
+    await axios
+      .put(`https://localhost:7246/api/v1/TableTypes/` + id)
+      .then(() => window.location.reload());
   };
 
   const columns = [
-    { field: "tableId", headerName: "Table ID" },
+    { field: "id", headerName: "ID" },
+    { field: "name", headerName: "Name", flex: 1 },
     {
-      field: "phoneNumber",
-      headerName: "Phone Number",
-      flex: 1
+      field: "chargePerSeat",
+      headerName: "Charge per seat",
+      type: "number",
+      flex: 1,
     },
     {
-      field: "date",
-      headerName: "Date",
-      flex: 1,
-      renderCell: (params) => {
-        const currentRow = params.row;
-        return <div>{new Date(currentRow["date"]).toLocaleTimeString()}</div>;
+        field: "canBeCombined",
+        headerName: "Can Be Combined",
+        type: "boolean",
+        flex: 1,
       },
-    },
-    {
-      field: "foodName",
-      headerName: "Food",
-      headerAlign: "left",
-      align: "left",
-      flex: 1,
-    },
-    {
-      field: "status",
-      headerName: "Status",
-      flex: 1,
-    },
+      {
+        field: "isDeleted",
+        headerName: "Is Deleted",
+        type: "boolean",
+        flex: 1,
+      },
     {
       field: "options",
       headerName: "Options",
       renderCell: (params) => {
-        const onClick = (e) => {
-          const currentRow = params.row;
-          return alert(JSON.stringify(currentRow, null, 4));
-        };
-
         const currentRow = params.row;
-        let optionButton = <Button></Button>;
-        if (currentRow["status"] === "Received") {
-          optionButton = (
-            <Button
-              variant="outlined"
-              color="info"
-              size="small"
-              onClick={() => updateStatus(currentRow["id"], "Processing")}
-            >
-              Process
-            </Button>
-          );
-        }
-        if (currentRow["status"] === "Processing") {
-          optionButton = (
+        return (
+          <Stack direction="row" spacing={2}>
             <Button
               variant="outlined"
               color="warning"
               size="small"
-              onClick={() => updateStatus(currentRow["id"], "Served")}
+              onClick={() => updateStatus(currentRow["id"], "Processing")}
             >
-              Serve
+              Update
             </Button>
-          );
-        }
-        return (
-          <Stack direction="row" spacing={2}>
-            {optionButton}
+            <Button
+              variant="outlined"
+              color="error"
+              size="small"
+              onClick={() => deleteTable(currentRow["id"])}
+            >
+              Delete
+            </Button>
           </Stack>
         );
       },
@@ -106,7 +87,7 @@ const OrderDetails = () => {
 
   return (
     <Box m="20px">
-      <Header title="ORDER DETAILS" subtitle="List of Order Details" />
+      <Header title="TABLE TYPES" subtitle="List of Table Types" />
       <Box
         m="40px 0 0 0"
         height="75vh"
@@ -149,4 +130,4 @@ const OrderDetails = () => {
   );
 };
 
-export default OrderDetails;
+export default TableTypes;
