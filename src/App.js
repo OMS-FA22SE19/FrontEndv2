@@ -10,6 +10,8 @@ import Form from "./scenes/form";
 import FAQ from "./scenes/faq";
 import OrderDetails from "./scenes/orderDetails";
 import TableTypes from "./scenes/tableTypes";
+import CreateTableType from "./scenes/tableTypes/create";
+import UpdateTableType from "./scenes/tableTypes/update";
 import CreateTable from "./scenes/tables/create";
 import UpdateTable from "./scenes/tables/update";
 import Tables from "./scenes/tables";
@@ -35,6 +37,8 @@ function App() {
               <Route path="/team" element={<Team />} />
               <Route path="/orderDetails" element={<OrderDetails />} />
               <Route path="/tableTypes" element={<TableTypes />} />
+              <Route path="/tableTypes/create" element={<CreateTableType />} />
+              <Route path="/tableTypes/update/:id" element={<UpdateTableType />} />
               <Route path="/tables" element={<Tables />} />
               <Route path="/tables/create" element={<CreateTable />} />
               <Route path="/tables/update/:id" element={<UpdateTable />} />

@@ -76,7 +76,6 @@ const UpdateTable = () => {
     };
     await axios.put(`https://localhost:7246/api/v1/Tables/` + id, requestBody)
     .finally(() => routeChange());
-    
   };
 
   const getTableTypes = async () => {

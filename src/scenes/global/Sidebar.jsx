@@ -154,7 +154,7 @@ const Sidebar = () => {
               Management
             </Typography>
             <Item
-              title="TableTypes"
+              title="Table Types"
               to="/tableTypes"
               icon={<ReceiptOutlinedIcon />}
               selected={selected}
