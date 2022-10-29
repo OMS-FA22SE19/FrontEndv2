@@ -12,6 +12,14 @@ import OrderDetails from "./scenes/orderDetails";
 import TableTypes from "./scenes/tableTypes";
 import CreateTableType from "./scenes/tableTypes/create";
 import UpdateTableType from "./scenes/tableTypes/update";
+import Menus from "./scenes/menus";
+import CreateMenu from "./scenes/menus/create";
+import UpdateMenu from "./scenes/menus/update";
+import AddFood from "./scenes/menus/addFood";
+import MenuFoods from "./scenes/menus/foods";
+import Foods from "./scenes/foods";
+import CreateFoods from "./scenes/foods/create";
+import UpdateFoods from "./scenes/foods/update";
 import CreateTable from "./scenes/tables/create";
 import UpdateTable from "./scenes/tables/update";
 import Tables from "./scenes/tables";
@@ -39,6 +47,14 @@ function App() {
               <Route path="/tableTypes" element={<TableTypes />} />
               <Route path="/tableTypes/create" element={<CreateTableType />} />
               <Route path="/tableTypes/update/:id" element={<UpdateTableType />} />
+              <Route path="/menus" element={<Menus />} />
+              <Route path="/menus/create" element={<CreateMenu />} />
+              <Route path="/menus/update/:id" element={<UpdateMenu />} />
+              <Route path="/menu/:menuId/foods/add" element={<AddFood />} />
+              <Route path="/menus/:menuId/foods" element={<MenuFoods />} />
+              <Route path="/foods" element={<Foods />} />
+              <Route path="/foods/create" element={<CreateFoods />} />
+              <Route path="/foods/update/:id" element={<UpdateFoods />} />
               <Route path="/tables" element={<Tables />} />
               <Route path="/tables/create" element={<CreateTable />} />
               <Route path="/tables/update/:id" element={<UpdateTable />} />

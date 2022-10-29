@@ -8,76 +8,110 @@ import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-const Tables = () => {
+const Foods = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const [APIData, setAPIData] = useState([]);
-  const [editTable, setEditTable] = useState([]);
 
   const fetchData = async () => {
-    let response = await axios.get(`https://localhost:7246/api/v1/Tables`);
+    let response = await axios.get(`https://localhost:7246/api/v1/Foods`);
     setAPIData(response.data["data"]);
   };
-  
+
   useEffect(() => {
     fetchData();
   }, []);
 
-  let navigate = useNavigate(); 
+  let navigate = useNavigate();
 
-  const deleteTable = async (id) => {
-    await axios.delete(`https://localhost:7246/api/v1/Tables/` + id)
-    .then()
-    .finally((e) =>{
-      fetchData()
-    });
- };
+  const deleteFood = async (id) => {
+    await axios
+      .delete(`https://localhost:7246/api/v1/Foods/` + id)
+      .then()
+      .finally((e) => {
+        fetchData();
+      });
+  };
 
   const columns = [
-    { field: "id", headerName: "ID" },
+    { field: "id", headerName: "ID", flex: 0.3 },
     {
-      field: "numOfSeats",
-      headerName: "Num Of Seats",
-      type: "number",
+      field: "name",
+      headerName: "Name",
+      flex: 0.7
     },
     {
-      field: "status",
-      headerName: "Status",
+      field: "description",
+      headerName: "Description",
       flex: 1,
     },
     {
-			field: "tableTypeName",
-      headerName: "Table Type",
+      field: "ingredient",
+      headerName: "Ingredient",
+      flex: 1,
+    },
+    {
+      field: "available",
+      headerName: "Available",
+      type: "boolean",
+      flex: 0.5,
+    },
+    {
+      field: "pictureUrl",
+      headerName: "picture",
+      renderCell: (params) => {
+        const currentRow = params.row;
+        return <img {...srcset(currentRow["pictureUrl"], 250, 200, 2, 2)} alt='Food image'/>;
+      },
+      flex: 1,
+    },
+    {
+      field: "courseTypeName",
+      headerName: "Course Type",
       flex: 1,
       renderCell: (params) => {
         const currentRow = params.row;
-        return currentRow["tableType"]["name"];
+        return currentRow["courseType"]["name"];
+      },
+    },
+    {
+      field: "FoodTypeName",
+      headerName: "Food Type",
+      flex: 1,
+      renderCell: (params) => {
+        const currentRow = params.row;
+        let foodTypes = "";
+        currentRow["types"].map((type) => {
+          foodTypes += type.name + ", ";
+        });
+
+        return <div>{foodTypes.slice(0, -2)}</div>;
       },
     },
     {
       field: "isDeleted",
       headerName: "Is Deleted",
       type: "boolean",
-      flex: 1,
+      flex: 0.5,
     },
     {
       field: "options",
       headerName: "Options",
       renderCell: (params) => {
         const currentRow = params.row;
-				let updateButton = <Button></Button>;
+        let updateButton = <Button></Button>;
         let deleteButton = <Button></Button>;
 
-				updateButton = (
-					<Button
-						variant="outlined"
-						color="warning"
-						size="small"
-						onClick={() => directToUpdateTable(currentRow["id"])}
-					>
-						Update
-					</Button>
-				);
+        updateButton = (
+          <Button
+            variant="outlined"
+            color="warning"
+            size="small"
+            onClick={() => directToUpdateFood(currentRow["id"])}
+          >
+            Update
+          </Button>
+        );
 
         if (!currentRow["isDeleted"]) {
           deleteButton = (
@@ -85,18 +119,17 @@ const Tables = () => {
               variant="outlined"
               color="error"
               size="small"
-              onClick={() => deleteTable(currentRow["id"])}
+              onClick={() => deleteFood(currentRow["id"])}
             >
               Delete
             </Button>
           );
+        } else {
+          deleteButton = null;
         }
-				else {
-					deleteButton = null;
-				}
         return (
           <Stack direction="row" spacing={2}>
-						{updateButton}
+            {updateButton}
             {deleteButton}
           </Stack>
         );
@@ -105,26 +138,26 @@ const Tables = () => {
     },
   ];
 
-  const directToCreateTable = () =>{ 
-    let path = `/tables/create`; 
+  const directToCreateFood = () => {
+    let path = `/foods/create`;
     navigate(path);
-  }
+  };
 
-  const directToUpdateTable = (id) =>{ 
-    let path = `/tables/update/` + id;   
+  const directToUpdateFood = (id) => {
+    let path = `/foods/update/` + id;
     navigate(path);
-  }
+  };
 
   return (
     <Box m="20px">
-      <Header title="TABLES" subtitle="List of Tables" />
+      <Header title="FOODS" subtitle="List of Foods" />
       <Button
-            variant="outlined"
-						color="secondary"
-						size="medium"
-						onClick={directToCreateTable}
-					>
-						Insert
+        variant="outlined"
+        color="secondary"
+        size="medium"
+        onClick={directToCreateFood}
+      >
+        Insert
       </Button>
       <Box
         m="40px 0 0 0"
@@ -168,4 +201,13 @@ const Tables = () => {
   );
 };
 
-export default Tables;
+function srcset(image, width, height, rows = 1, cols = 1) {
+    return {
+      src: `${image}?w=${width * cols}&h=${height * rows}&fit=crop&auto=format`,
+      srcSet: `${image}?w=${width * cols}&h=${
+        height * rows
+      }&fit=crop&auto=format&dpr=2 2x`,
+    };
+  }
+
+export default Foods;
