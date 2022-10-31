@@ -7,7 +7,7 @@ import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-const Menus = () => {
+const Users = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const [APIData, setAPIData] = useState([]);
@@ -19,30 +19,27 @@ const Menus = () => {
   }, []);
 
   const fetchData = async () => {
-    let response = await axios.get(`https://localhost:7246/api/v1/Menus`);
+    let response = await axios.get(`https://localhost:7246/api/v1/Users`);
     setAPIData(response.data["data"]);
   };
 
-  const deleteTable = async (id) => {
+  const deleteUser = async (id) => {
     await axios
-      .delete(`https://localhost:7246/api/v1/Menus/` + id)
+      .delete(`https://localhost:7246/api/v1/Users/` + id)
       .finally(() => fetchData());
   };
 
-  const directToCreateMenu = () => {
-    let path = `/Menus/create`;
+  const directToCreateUser = () => {
+    let path = `/users/create`;
     navigate(path);
   };
 
-  const directToUpdateMenu = (id) => {
-    let path = `/Menus/update/` + id;
+  const directToUpdateUser = (id) => {
+    let path = `/users/update/` + id;
     navigate(path);
   };
 
-  const directToMenuFoods = (id) => {
-    let path = `/Menus/` + id + '/foods';
-    navigate(path);
-  };
+  let index = 0;
 
   const columns = [
     {
@@ -50,46 +47,49 @@ const Menus = () => {
       headerName: "No.",
       renderCell: (index) => index.api.getRowIndex(index.row.id) + 1,
     },
-    { field: "name", headerName: "Name", flex: 1 },
-    { field: "description", headerName: "Description", flex: 2 },
+    { field: "id", headerName: "ID", flex: 1 },
     {
-      field: "isHidden",
-      headerName: "Is Hidden",
-      type: "boolean",
+      field: "userName",
+      headerName: "UserName",
       flex: 1,
+      cellClassName: "name-column--cell",
+    },
+    {
+      field: "fullName",
+      headerName: "FullName",
+      flex: 1,
+      cellClassName: "name-column--cell",
+    },
+    {
+      field: "email",
+      headerName: "Email",
+      flex: 1,
+    },
+    {
+      field: "phoneNumber",
+      headerName: "Phone Number",
+      flex: 0.5,
     },
     {
       field: "isDeleted",
       headerName: "Is Deleted",
       type: "boolean",
-      flex: 1,
+      flex: 0.5,
     },
     {
       field: "options",
       headerName: "Options",
       renderCell: (params) => {
         const currentRow = params.row;
-        let viewFoodButton = <Button></Button>;
         let updateButton = <Button></Button>;
         let deleteButton = <Button></Button>;
-
-        viewFoodButton = (
-          <Button
-            variant="outlined"
-            color="warning"
-            size="small"
-            onClick={() => directToMenuFoods(currentRow["id"])}
-          >
-            View Foods
-          </Button>
-        );
 
         updateButton = (
           <Button
             variant="outlined"
             color="warning"
             size="small"
-            onClick={() => directToUpdateMenu(currentRow["id"])}
+            onClick={() => directToUpdateUser(currentRow["id"])}
           >
             Update
           </Button>
@@ -101,7 +101,7 @@ const Menus = () => {
               variant="outlined"
               color="error"
               size="small"
-              onClick={() => deleteTable(currentRow["id"])}
+              onClick={() => deleteUser(currentRow["id"])}
             >
               Delete
             </Button>
@@ -111,7 +111,6 @@ const Menus = () => {
         }
         return (
           <Stack direction="row" spacing={2}>
-            {viewFoodButton}
             {updateButton}
             {deleteButton}
           </Stack>
@@ -123,12 +122,12 @@ const Menus = () => {
 
   return (
     <Box m="20px">
-      <Header title="Menus" subtitle="List of Menus" />
+      <Header title="USERS" subtitle="List of Users" />
       <Button
         variant="outlined"
         color="secondary"
         size="medium"
-        onClick={directToCreateMenu}
+        onClick={directToCreateUser}
       >
         Insert
       </Button>
@@ -174,4 +173,4 @@ const Menus = () => {
   );
 };
 
-export default Menus;
+export default Users;

@@ -19,6 +19,7 @@ const MenuFoods = () => {
   const colors = tokens(theme.palette.mode);
   const [APIData, setAPIData] = useState([]);
   const { menuId } = useParams();
+  const [menuName, setMenuName] = useState("");
 
   const noButtonRef = React.useRef(null);
   const [promiseArguments, setPromiseArguments] = React.useState(null);
@@ -110,8 +111,16 @@ const MenuFoods = () => {
     setAPIData(response.data["data"]);
   };
 
+  const getMenuInfo = async () => {
+    let response = await axios.get(
+      `https://localhost:7246/api/v1/Menus/` + menuId
+    );
+    setMenuName(response.data["data"]["name"]);
+  };
+
   useEffect(() => {
     fetchData();
+    getMenuInfo();
   }, []);
 
   let navigate = useNavigate();
@@ -134,7 +143,11 @@ const MenuFoods = () => {
   };
 
   const columns = [
-    { field: "id", headerName: "ID", flex: 0.3 },
+    {
+      field: "index",
+      headerName: "No.",
+      renderCell: (index) => index.api.getRowIndex(index.row.id) + 1,
+    },
     {
       field: "name",
       headerName: "Name",
@@ -242,7 +255,7 @@ const MenuFoods = () => {
   return (
     <Box m="20px">
       {renderConfirmDialog()}
-      <Header title="FOODS" subtitle={"List of Foods in MenuId: " + menuId}/>
+      <Header title="FOODS" subtitle={"List of Foods in Menu: " + menuName}/>
       <Button
         variant="outlined"
         color="secondary"

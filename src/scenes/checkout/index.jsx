@@ -28,7 +28,7 @@ const Checkout = () => {
   const confirm = async (id) => {
     await axios
       .post(`https://localhost:7246/api/v1/Orders/` + id + "/Confirm")
-      .then(() => window.location.reload());
+      .then(() => fetchData());
   };
 
   const viewDetails = async (currentRow) => {
@@ -39,7 +39,11 @@ const Checkout = () => {
   };
 
   const orderColumns = [
-    { field: "id", headerName: "ID", flex: 1 },
+    {
+      field: "index",
+      headerName: "No.",
+      renderCell: (index) => index.api.getRowIndex(index.row.id) + 1,
+    },
     { field: "tableId", headerName: "Table ID", flex: 0.5 },
     {
       field: "fullName",
@@ -53,6 +57,10 @@ const Checkout = () => {
       headerName: "Date",
       flex: 1,
       cellClassName: "date-column--cell",
+      renderCell: (params) => {
+          const currentRow = params.row;
+          return <div>{new Date(currentRow["date"]).toLocaleTimeString()}</div>;
+      },
     },
     {
       field: "status",

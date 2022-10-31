@@ -34,7 +34,11 @@ const Foods = () => {
   };
 
   const columns = [
-    { field: "id", headerName: "ID", flex: 0.3 },
+    {
+      field: "index",
+      headerName: "No.",
+      renderCell: (index) => index.api.getRowIndex(index.row.id) + 1,
+    },
     {
       field: "name",
       headerName: "Name",

@@ -34,7 +34,11 @@ const Tables = () => {
  };
 
   const columns = [
-    { field: "id", headerName: "ID" },
+    {
+      field: "index",
+      headerName: "No.",
+      renderCell: (index) => index.api.getRowIndex(index.row.id) + 1,
+    },
     {
       field: "numOfSeats",
       headerName: "Num Of Seats",

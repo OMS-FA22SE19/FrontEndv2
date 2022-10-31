@@ -5,8 +5,6 @@ import Header from "../../components/Header";
 import { useTheme } from "@mui/material";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
-import { setIn } from "formik";
-import { DryTwoTone } from "@mui/icons-material";
 
 const OrderDetails = () => {
   const theme = useTheme();
@@ -32,6 +30,11 @@ const OrderDetails = () => {
   };
 
   const columns = [
+    {
+      field: "index",
+      headerName: "No.",
+      renderCell: (index) => index.api.getRowIndex(index.row.id) + 1,
+    },
     { field: "tableId", headerName: "Table ID" },
     {
       field: "phoneNumber",
@@ -54,6 +57,13 @@ const OrderDetails = () => {
       align: "left",
       flex: 1,
     },
+    // {
+    //   field: "note",
+    //   headerName: "Note",
+    //   headerAlign: "left",
+    //   align: "left",
+    //   flex: 2,
+    // },
     {
       field: "status",
       headerName: "Status",
@@ -63,11 +73,6 @@ const OrderDetails = () => {
       field: "options",
       headerName: "Options",
       renderCell: (params) => {
-        const onClick = (e) => {
-          const currentRow = params.row;
-          return alert(JSON.stringify(currentRow, null, 4));
-        };
-
         const currentRow = params.row;
         let optionButton = <Button></Button>;
         if (currentRow["status"] === "Received") {

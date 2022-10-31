@@ -6,6 +6,7 @@ import { useTheme } from "@mui/material";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import CreateTableType from "./create";
 
 const TableTypes = () => {
   const theme = useTheme();
@@ -40,26 +41,30 @@ const TableTypes = () => {
   }
 
   const columns = [
-    { field: "id", headerName: "ID" },
+    {
+      field: "index",
+      headerName: "No.",
+      renderCell: (index) => index.api.getRowIndex(index.row.id) + 1,
+    },
     { field: "name", headerName: "Name", flex: 1 },
-    { field: "quantity", headerName: "Quantity", flex: 1 },
+    { field: "quantity", headerName: "Quantity", flex: 0.5 },
     {
       field: "chargePerSeat",
       headerName: "Charge per seat",
       type: "number",
-      flex: 1,
+      flex: 0.5,
     },
     {
         field: "canBeCombined",
         headerName: "Can Be Combined",
         type: "boolean",
-        flex: 1,
+        flex: 0.5,
       },
       {
         field: "isDeleted",
         headerName: "Is Deleted",
         type: "boolean",
-        flex: 1,
+        flex: 0.5,
       },
     {
       field: "options",
