@@ -168,6 +168,13 @@ const Sidebar = () => {
               setSelected={setSelected}
             />
             <Item
+              title="Course Types"
+              to="/courseTypes"
+              icon={<ReceiptOutlinedIcon />}
+              selected={selected}
+              setSelected={setSelected}
+            />
+            <Item
               title="Foods"
               to="/foods"
               icon={<ReceiptOutlinedIcon />}

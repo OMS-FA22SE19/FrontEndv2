@@ -127,7 +127,7 @@ const MenuFoods = () => {
 
   const updatePrice = async (currentRow) => { 
     const requestBody = {id: menuId, foodId: currentRow["id"], price: currentRow["price"]};
-    let response = await axios.put(`https://localhost:7246/api/v1/Menus/` + menuId + `/Food/` + currentRow["id"], requestBody)
+    await axios.put(`https://localhost:7246/api/v1/Menus/` + menuId + `/Food/` + currentRow["id"], requestBody)
       .catch(() => {})
       .finally(() => fetchData());
   }

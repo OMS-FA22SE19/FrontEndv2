@@ -90,15 +90,15 @@ const CreateMenu = () => {
             <FormControlLabel
               control={
                 <Checkbox
-                  checked={values.isHidden}
+                  checked={isHidden}
                   onChange={(e) => {
-                    values.isHidden = e.target.isHidden;
                     handleCheckBoxChange(e);
+                    values.isHidden = isHidden;
                   }}
                   color="secondary"
                 />
               }
-              label="Can Be Combined"
+              label="Hidden"
             />
             <Box display="flex" justifyContent="end" mt="20px">
               <Button type="submit" color="secondary" variant="contained">
@@ -114,8 +114,7 @@ const CreateMenu = () => {
 
 const checkoutSchema = yup.object().shape({
   name: yup.string().required("required"),
-  description: yup.string().required("required"),
-  isHidden: yup.boolean().required("required"),
+  description: yup.string().required("required")
 });
 const initialValues = {
   name: "",

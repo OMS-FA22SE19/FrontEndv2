@@ -1,8 +1,7 @@
-import { Box, Stack, Button } from "@mui/material";
+import { Box, Stack, Button, useTheme } from "@mui/material";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import { tokens } from "../../theme";
 import Header from "../../components/Header";
-import { useTheme } from "@mui/material";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 
@@ -23,7 +22,7 @@ const OrderDetails = () => {
   };
 
   const updateStatus = async (id, status) => {
-    var requestBody = { id: id, status: status };
+    let requestBody = { id: id, status: status };
     await axios
       .put(`https://localhost:7246/api/v1/OrderDetails/` + id, requestBody)
       .then(() => fetchData());
@@ -57,13 +56,13 @@ const OrderDetails = () => {
       align: "left",
       flex: 1,
     },
-    // {
-    //   field: "note",
-    //   headerName: "Note",
-    //   headerAlign: "left",
-    //   align: "left",
-    //   flex: 2,
-    // },
+    {
+      field: "note",
+      headerName: "Note",
+      headerAlign: "left",
+      align: "left",
+      flex: 2,
+    },
     {
       field: "status",
       headerName: "Status",

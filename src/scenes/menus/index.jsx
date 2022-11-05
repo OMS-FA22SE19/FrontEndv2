@@ -1,8 +1,7 @@
-import { Box, Stack, Button } from "@mui/material";
+import { Box, Stack, Button, useTheme } from "@mui/material";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import { tokens } from "../../theme";
 import Header from "../../components/Header";
-import { useTheme } from "@mui/material";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -49,6 +48,7 @@ const Menus = () => {
       field: "index",
       headerName: "No.",
       renderCell: (index) => index.api.getRowIndex(index.row.id) + 1,
+      flex: 0.2
     },
     { field: "name", headerName: "Name", flex: 1 },
     { field: "description", headerName: "Description", flex: 2 },
@@ -56,22 +56,22 @@ const Menus = () => {
       field: "isHidden",
       headerName: "Is Hidden",
       type: "boolean",
-      flex: 1,
+      flex: 0.5,
     },
     {
       field: "isDeleted",
       headerName: "Is Deleted",
       type: "boolean",
-      flex: 1,
+      flex: 0.5,
     },
     {
       field: "options",
       headerName: "Options",
       renderCell: (params) => {
         const currentRow = params.row;
-        let viewFoodButton = <Button></Button>;
-        let updateButton = <Button></Button>;
-        let deleteButton = <Button></Button>;
+        let viewFoodButton;
+        let updateButton;
+        let deleteButton;
 
         viewFoodButton = (
           <Button

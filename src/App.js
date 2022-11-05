@@ -26,6 +26,7 @@ import UpdateFoods from "./scenes/foods/update";
 import CreateTable from "./scenes/tables/create";
 import UpdateTable from "./scenes/tables/update";
 import Tables from "./scenes/tables";
+import CourseTypes from "./scenes/courseTypes";
 import Checkout from "./scenes/checkout";
 import Geography from "./scenes/geography";
 import { CssBaseline, ThemeProvider } from "@mui/material";
@@ -64,6 +65,7 @@ function App() {
               <Route path="/tables" element={<Tables />} />
               <Route path="/tables/create" element={<CreateTable />} />
               <Route path="/tables/update/:id" element={<UpdateTable />} />
+              <Route path="/courseTypes" element={<CourseTypes />} />
               <Route path="/checkout" element={<Checkout />} />
               <Route path="/contacts" element={<Contacts />} />
               <Route path="/invoices" element={<Invoices />} />
