@@ -13,20 +13,15 @@ import Users from "./scenes/users";
 import CreateUser from "./scenes/users/create";
 import UpdateUser from "./scenes/users/update";
 import TableTypes from "./scenes/tableTypes";
-import CreateTableType from "./scenes/tableTypes/create";
-import UpdateTableType from "./scenes/tableTypes/update";
 import Menus from "./scenes/menus";
-import CreateMenu from "./scenes/menus/create";
-import UpdateMenu from "./scenes/menus/update";
 import AddFood from "./scenes/menus/addFood";
 import MenuFoods from "./scenes/menus/foods";
 import Foods from "./scenes/foods";
 import CreateFoods from "./scenes/foods/create";
 import UpdateFoods from "./scenes/foods/update";
-import CreateTable from "./scenes/tables/create";
-import UpdateTable from "./scenes/tables/update";
 import Tables from "./scenes/tables";
 import CourseTypes from "./scenes/courseTypes";
+import FoodTypes from "./scenes/foodTypes";
 import Checkout from "./scenes/checkout";
 import Geography from "./scenes/geography";
 import { CssBaseline, ThemeProvider } from "@mui/material";
@@ -49,23 +44,18 @@ function App() {
               <Route path="/team" element={<Team />} />
               <Route path="/orderDetails" element={<OrderDetails />} />
               <Route path="/tableTypes" element={<TableTypes />} />
-              <Route path="/tableTypes/create" element={<CreateTableType />} />
-              <Route path="/tableTypes/update/:id" element={<UpdateTableType />} />
               <Route path="/users" element={<Users />} />
               <Route path="/users/create" element={<CreateUser />} />
               <Route path="/users/update/:id" element={<UpdateUser />} />
               <Route path="/menus" element={<Menus />} />
-              <Route path="/menus/create" element={<CreateMenu />} />
-              <Route path="/menus/update/:id" element={<UpdateMenu />} />
               <Route path="/menu/:menuId/foods/add" element={<AddFood />} />
               <Route path="/menus/:menuId/foods" element={<MenuFoods />} />
               <Route path="/foods" element={<Foods />} />
               <Route path="/foods/create" element={<CreateFoods />} />
               <Route path="/foods/update/:id" element={<UpdateFoods />} />
               <Route path="/tables" element={<Tables />} />
-              <Route path="/tables/create" element={<CreateTable />} />
-              <Route path="/tables/update/:id" element={<UpdateTable />} />
               <Route path="/courseTypes" element={<CourseTypes />} />
+              <Route path="/foodTypes" element={<FoodTypes />} />
               <Route path="/checkout" element={<Checkout />} />
               <Route path="/contacts" element={<Contacts />} />
               <Route path="/invoices" element={<Invoices />} />

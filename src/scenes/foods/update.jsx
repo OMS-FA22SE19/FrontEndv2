@@ -11,16 +11,12 @@ import InputLabel from "@mui/material/InputLabel";
 import FormControl from "@mui/material/FormControl";
 import FormHelperText from "@mui/material/FormHelperText";
 import Checkbox from "@mui/material/Checkbox";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import FormControlLabel from "@mui/material/FormControlLabel";
-import { useParams } from "react-router-dom";
 
 const UpdateFood = () => {
   const isNonMobile = useMediaQuery("(min-width:600px)");
 
-  const [getName, setName] = useState("");
-  const [getDescription, setDescription] = useState("");
-  const [getIngredient, setIngredient] = useState("");
   const [getCourseTypes, setCourseTypes] = useState([]);
   const [getFoodTypes, setFoodTypes] = useState([]);
   const [getCourseTypeId, setCourseTypeId] = React.useState("");
@@ -43,7 +39,6 @@ const UpdateFood = () => {
         const ingredient = response.data["data"].ingredient;
         const available = response.data["data"].available;
         const pictureUrl = response.data["data"].pictureUrl;
-        const isDeleted = response.data["data"].isDeleted;
         const courseTypeId = response.data["data"].courseType.id;
         const typeIds = [];
         response.data["data"].types.map((val) => {

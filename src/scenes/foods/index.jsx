@@ -1,7 +1,6 @@
 import { Box, Stack, Button } from "@mui/material";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import { tokens } from "../../theme";
-import { mockDataContacts } from "../../data/mockData";
 import Header from "../../components/Header";
 import { useTheme } from "@mui/material";
 import axios from "axios";
@@ -33,6 +32,15 @@ const Foods = () => {
       });
   };
 
+  const recoverFood = async (id) => {
+    await axios
+      .put(`https://localhost:7246/api/v1/Foods/` + id + `/recover`)
+      .then()
+      .finally((e) => {
+        fetchData();
+      });
+  };
+
   const columns = [
     {
       field: "index",
@@ -42,7 +50,7 @@ const Foods = () => {
     {
       field: "name",
       headerName: "Name",
-      flex: 0.7
+      flex: 0.7,
     },
     {
       field: "description",
@@ -65,7 +73,9 @@ const Foods = () => {
       headerName: "picture",
       renderCell: (params) => {
         const currentRow = params.row;
-        return <img {...srcset(currentRow["pictureUrl"], 250, 200, 2, 2)} alt='Food image'/>;
+        return (
+          <img width={100} src={currentRow["pictureUrl"]} alt="Food image" />
+        );
       },
       flex: 1,
     },
@@ -103,21 +113,22 @@ const Foods = () => {
       headerName: "Options",
       renderCell: (params) => {
         const currentRow = params.row;
-        let updateButton = <Button></Button>;
-        let deleteButton = <Button></Button>;
-
-        updateButton = (
-          <Button
-            variant="outlined"
-            color="warning"
-            size="small"
-            onClick={() => directToUpdateFood(currentRow["id"])}
-          >
-            Update
-          </Button>
-        );
+        let updateButton;
+        let deleteButton;
+        let recoverButton;
 
         if (!currentRow["isDeleted"]) {
+          updateButton = (
+            <Button
+              variant="outlined"
+              color="warning"
+              size="small"
+              onClick={() => directToUpdateFood(currentRow["id"])}
+            >
+              Update
+            </Button>
+          );
+
           deleteButton = (
             <Button
               variant="outlined"
@@ -129,12 +140,33 @@ const Foods = () => {
             </Button>
           );
         } else {
-          deleteButton = null;
+          recoverButton = (
+            <Button
+              variant="outlined"
+              color="info"
+              size="small"
+              onClick={() => recoverFood(currentRow["id"])}
+            >
+              Recover
+            </Button>
+          );
+
+          deleteButton = (
+            <Button
+              variant="outlined"
+              color="error"
+              size="small"
+              onClick={() => deleteFood(currentRow["id"])}
+            >
+              Delete
+            </Button>
+          );
         }
         return (
           <Stack direction="row" spacing={2}>
             {updateButton}
             {deleteButton}
+            {recoverButton}
           </Stack>
         );
       },
@@ -206,12 +238,12 @@ const Foods = () => {
 };
 
 function srcset(image, width, height, rows = 1, cols = 1) {
-    return {
-      src: `${image}?w=${width * cols}&h=${height * rows}&fit=crop&auto=format`,
-      srcSet: `${image}?w=${width * cols}&h=${
-        height * rows
-      }&fit=crop&auto=format&dpr=2 2x`,
-    };
-  }
+  return {
+    src: `${image}?w=${width * cols}&h=${height * rows}&fit=crop&auto=format`,
+    srcSet: `${image}?w=${width * cols}&h=${
+      height * rows
+    }&fit=crop&auto=format&dpr=2 2x`,
+  };
+}
 
 export default Foods;

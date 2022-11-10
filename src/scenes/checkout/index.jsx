@@ -19,10 +19,13 @@ const Checkout = () => {
   }, []);
 
   const fetchData = async () => {
-    let response = await axios.get(
+    let processingResponse = await axios.get(
       `https://localhost:7246/api/v1/Orders?Status=Processing`
     );
-    setAPIData(response.data["data"]);
+    let checkingResponse = await axios.get(
+      `https://localhost:7246/api/v1/Orders?Status=Checking`
+    );
+    setAPIData([...processingResponse.data["data"], ...checkingResponse.data["data"]]);
   };
 
   const confirm = async (id) => {
@@ -89,7 +92,6 @@ const Checkout = () => {
       headerName: "Details",
       renderCell: (params) => {
         const currentRow = params.row;
-
         return (
           <Stack direction="row" spacing={2}>
             <Button
@@ -110,9 +112,8 @@ const Checkout = () => {
       headerName: "Options",
       renderCell: (params) => {
         const currentRow = params.row;
-
-        return (
-          <Stack direction="row" spacing={2}>
+        if (currentRow["status"] === "Checking") {
+          return (
             <Button
               variant="outlined"
               color="warning"
@@ -121,8 +122,9 @@ const Checkout = () => {
             >
               Checkout
             </Button>
-          </Stack>
-        );
+          );
+        }
+        return[];
       },
       flex: 1,
     },
