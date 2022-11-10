@@ -1,12 +1,10 @@
-import { Box, Stack, Button } from "@mui/material";
-import { DataGrid, GridToolbar, GridCellEditStopReasons } from "@mui/x-data-grid";
+import { Box, Stack, Button, useTheme } from "@mui/material";
+import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import { tokens } from "../../theme";
 import Header from "../../components/Header";
-import { useTheme } from "@mui/material";
 import axios from "axios";
-import React, { useEffect, useState, useRef } from "react";
-import { useNavigate } from "react-router-dom";
-import { useParams } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import Snackbar from '@mui/material/Snackbar';
 import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
@@ -224,7 +222,7 @@ const MenuFoods = () => {
       headerName: "Options",
       renderCell: (params) => {
         const currentRow = params.row;
-        let deleteButton = <Button></Button>;
+        let deleteButton;
 
         deleteButton = (
           <Button

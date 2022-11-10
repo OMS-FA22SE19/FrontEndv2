@@ -23,7 +23,7 @@ import DialogTitle from "@mui/material/DialogTitle";
 import Alert from "@mui/material/Alert";
 import Snackbar from "@mui/material/Snackbar";
 
-const CourseTypes = () => {
+const FoodTypes = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const [rows, setRows] = React.useState([]);
@@ -73,7 +73,7 @@ const CourseTypes = () => {
         response = await handleUpdate(newRow);
       } 
       setSnackbar({
-        children: "Course Type successfully saved",
+        children: "Food Type successfully saved",
         severity: "success",
       });
       resolve(response);
@@ -94,7 +94,7 @@ const CourseTypes = () => {
       handleDelete(id);
       setDeleteArguments(null);
       setSnackbar({
-        children: "Course Type " + name + " successfully deleted",
+        children: "Food Type " + name + " successfully deleted",
         severity: "success",
       });
     } catch (error) {
@@ -104,7 +104,7 @@ const CourseTypes = () => {
 
   const handleDelete = async (id) => {
     await axios
-      .delete(`https://localhost:7246/api/v1/CourseTypes/` + id)
+      .delete(`https://localhost:7246/api/v1/Types/` + id)
       .then(response => {
         if(response.status === 204) {
           fetchData();
@@ -115,7 +115,7 @@ const CourseTypes = () => {
 
   const handleRecover = async (id) => {
     await axios
-      .put(`https://localhost:7246/api/v1/CourseTypes/` + id + `/recover`)
+      .put(`https://localhost:7246/api/v1/Types/` + id + `/recover`)
       .then(response => {
         if(response.status === 204) {
           fetchData();
@@ -126,7 +126,7 @@ const CourseTypes = () => {
 
   const handleUpdate = async (currentRow) => {
     const requestBody = {id: currentRow["id"], name: currentRow["name"], description: currentRow["description"]};
-    await axios.put(`https://localhost:7246/api/v1/CourseTypes/` + currentRow["id"], requestBody)
+    await axios.put(`https://localhost:7246/api/v1/Types/` + currentRow["id"], requestBody)
       .catch(() => {})
       .finally(() => fetchData());
   };
@@ -198,13 +198,13 @@ const CourseTypes = () => {
   };
 
   const fetchData = async () => {
-    let response = await axios.get(`https://localhost:7246/api/v1/CourseTypes`);
+    let response = await axios.get(`https://localhost:7246/api/v1/Types`);
     setRows(response.data["data"]);
   };
 
   const handleAdd = async (currentRow) => {
     const requestBody = {name: currentRow["name"], description: currentRow["description"]};
-    await axios.post(`https://localhost:7246/api/v1/CourseTypes/`, requestBody)
+    await axios.post(`https://localhost:7246/api/v1/Types/`, requestBody)
       .catch(() => {})
       .finally(() => fetchData());
   };
@@ -259,12 +259,11 @@ const CourseTypes = () => {
         let id = index.api.getRowIndex(index?.row?.id) + 1;
         return id;
       },
-      flex: 0.15
     },
     {
       field: "name",
       headerName: "Name",
-      flex: 0.75,
+      flex: 1,
       editable: true,
       preProcessEditCellProps: (params) => {
         const hasError = params.props.value.trim() === "";
@@ -297,16 +296,16 @@ const CourseTypes = () => {
         if(currentRow["isDeleted"]) {
           return [
             <GridActionsCellItem
+              icon={<RestoreIcon />}
+              label="Restore"
+              onClick={handleRecoverClick(id)}
+            />,
+            <GridActionsCellItem
             icon={<DeleteIcon />}
             label="Delete"
             onClick={handleDeleteClick(id, name)}
             color="inherit"
-          />,
-            <GridActionsCellItem
-              icon={<RestoreIcon />}
-              label="Restore"
-              onClick={handleRecoverClick(id)}
-            />
+          />
           ]
         }
 
@@ -347,13 +346,12 @@ const CourseTypes = () => {
           />,
         ];
       },
-      flex: 0.5
     },
   ];
 
   return (
     <Box m="20px">
-      <Header title="COURSE TYPES" subtitle="List of Course Types" />
+      <Header title="FOOD TYPES" subtitle="List of Food Types" />
       {renderConfirmEditDialog()}
       {renderConfirmDeleteDialog()}
       <Box
@@ -432,7 +430,6 @@ function EditToolbar(props) {
 
   const handleClick = () => {
     const id =  Math.max(...rows.map(o => o.id)) + 1;
-
     setIsAdding(true);
     setRows((oldRows) => [...oldRows, { id, name: "", description: "", isNew: true }]);
     setRowModesModel((oldModel) => ({
@@ -445,7 +442,7 @@ function EditToolbar(props) {
     return (
       <GridToolbarContainer>
         <Button color="primary" startIcon={<AddIcon />} onClick={handleClick}>
-          Add New Course Type
+          Add New Food Type
         </Button>
       </GridToolbarContainer>
     );
@@ -462,4 +459,4 @@ function computeMutation(newRow, oldRow) {
   return null;
 }
 
-export default CourseTypes;
+export default FoodTypes;
