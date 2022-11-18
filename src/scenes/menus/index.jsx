@@ -1,4 +1,4 @@
-import { Box, Button, useTheme } from "@mui/material";
+import { Box, Button, useTheme, IconButton } from "@mui/material";
 import {
   DataGrid,
   GridRowModes,
@@ -23,6 +23,8 @@ import DialogActions from "@mui/material/DialogActions";
 import DialogTitle from "@mui/material/DialogTitle";
 import Alert from "@mui/material/Alert";
 import Snackbar from "@mui/material/Snackbar";
+import SearchIcon from "@mui/icons-material/Search";
+import InputBase from "@mui/material/InputBase";
 
 const Menus = () => {
   const theme = useTheme();
@@ -35,6 +37,7 @@ const Menus = () => {
   const [isEditing, setIsEditing] = React.useState(false);
   const [isAdding, setIsAdding] = React.useState(false);
   const [snackbar, setSnackbar] = React.useState(null);
+  const [searchValue, setSearchValue] = React.useState("");
 
   const handleCloseSnackbar = () => setSnackbar(null);
 
@@ -155,7 +158,8 @@ const Menus = () => {
   };
 
   const fetchData = async () => {
-    let response = await axios.get(`https://localhost:7246/api/v1/Menus`);
+    const search = searchValue.trim();
+    let response = await axios.get(`https://localhost:7246/api/v1/Menus` + `?searchValue=` + search);
     setRows(response.data["data"]);
   };
 
@@ -370,9 +374,38 @@ const Menus = () => {
     },
   ];
 
+  const handleSearchChange = (event) => {
+    setSearchValue(event.target.value);
+  };
+
+  const handleKeyDown = (event) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      event.stopPropagation();
+      fetchData();
+    }
+  };
+
+
   return (
     <Box m="20px">
       <Header title="Menus" subtitle="List of Menus" />
+      {/* SEARCH BAR */}
+      <Box
+        display="flex"
+        backgroundColor={colors.primary[400]}
+        borderRadius="3px"
+      >
+        <InputBase
+          onChange={handleSearchChange}
+          sx={{ ml: 2, flex: 1 }}
+          placeholder="Search"
+          onKeyPress={handleKeyDown}
+        />
+        <IconButton onClick={fetchData} sx={{ p: 1 }}>
+          <SearchIcon />
+        </IconButton>
+      </Box>
       {renderConfirmEditDialog()}
       {renderConfirmDeleteDialog()}
       <Box

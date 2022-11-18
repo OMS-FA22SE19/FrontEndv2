@@ -1,4 +1,11 @@
-import { Box, Stack, Button, useTheme, TextField } from "@mui/material";
+import {
+  Box,
+  Stack,
+  Button,
+  useTheme,
+  TextField,
+  IconButton,
+} from "@mui/material";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import { tokens } from "../../theme";
 import Header from "../../components/Header";
@@ -8,6 +15,10 @@ import Dialog from "@mui/material/Dialog";
 import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
 import DialogTitle from "@mui/material/DialogTitle";
+import SearchIcon from "@mui/icons-material/Search";
+import InputBase from "@mui/material/InputBase";
+import Tabs from "@mui/material/Tabs";
+import Tab from "@mui/material/Tab";
 
 const OrderDetails = () => {
   const theme = useTheme();
@@ -16,44 +27,99 @@ const OrderDetails = () => {
   const [promiseArguments, setPromiseArguments] = useState(null);
   const [quantity, setQuantity] = useState(0);
   const noButtonRef = useRef(null);
+  const [searchValue, setSearchValue] = React.useState("");
+  const [tabValue, setTabValue] = React.useState(0);
+  const [status, setStatus] = React.useState("Received");
 
   useEffect(() => {
     fetchData();
   }, []);
 
   const fetchData = async () => {
+    const search = searchValue.trim();
     let response = await axios.get(
-      `https://localhost:7246/api/v1/OrderDetails`
+      `https://localhost:7246/api/v1/OrderDetails` +
+        `?status=` +
+        status +
+        `&searchValue=` +
+        search
     );
-    // setAPIData(response.data["data"]);
+
     const data = response.data["data"];
     let result = [];
     data.forEach((detail) => {
-      const element = result.find(e => {
-        return e.foodId == detail.foodId && e.tableId == detail.tableId && e.date == new Date(detail.date).toLocaleTimeString() && e.status == detail.status;
-      })
-      if(element === undefined) {
-        const orderDetail = 
-          {
-            id: detail.id,
-            orderId: detail.orderId, 
-            userId: detail.userId, 
-            phoneNumber: detail.phoneNumber, 
-            tableId: detail.tableId, 
-            date: new Date(detail.date).toLocaleTimeString(), 
-            status: detail.status, 
-            foodId: detail.foodId, 
-            foodName: detail.foodName,
-            note: detail.note,
-            price: detail.price,
-            ids: [detail.id]
-          }
-        result.push(orderDetail)
-      }
-      else {
+      const element = result.find((e) => {
+        return (
+          e.foodId == detail.foodId &&
+          e.tableId == detail.tableId &&
+          e.date == new Date(detail.date).toLocaleTimeString() &&
+          e.status == detail.status
+        );
+      });
+      if (element === undefined) {
+        const orderDetail = {
+          id: detail.id,
+          orderId: detail.orderId,
+          userId: detail.userId,
+          phoneNumber: detail.phoneNumber,
+          tableId: detail.tableId,
+          date: new Date(detail.date).toLocaleTimeString(),
+          status: detail.status,
+          foodId: detail.foodId,
+          foodName: detail.foodName,
+          note: detail.note,
+          price: detail.price,
+          ids: [detail.id],
+        };
+        result.push(orderDetail);
+      } else {
         element.ids.push(detail.id);
       }
-    })
+    });
+    setAPIData(result);
+  };
+
+  const fetchDataWithStatus = async (value) => {
+    const search = searchValue.trim();
+    let response = await axios.get(
+      `https://localhost:7246/api/v1/OrderDetails` +
+        `?status=` +
+        value +
+        `&searchValue=` +
+        search
+    );
+
+    const data = response.data["data"];
+    let result = [];
+    data.forEach((detail) => {
+      const element = result.find((e) => {
+        return (
+          e.foodId == detail.foodId &&
+          e.tableId == detail.tableId &&
+          e.date == new Date(detail.date).toLocaleTimeString() &&
+          e.status == detail.status
+        );
+      });
+      if (element === undefined) {
+        const orderDetail = {
+          id: detail.id,
+          orderId: detail.orderId,
+          userId: detail.userId,
+          phoneNumber: detail.phoneNumber,
+          tableId: detail.tableId,
+          date: new Date(detail.date).toLocaleTimeString(),
+          status: detail.status,
+          foodId: detail.foodId,
+          foodName: detail.foodName,
+          note: detail.note,
+          price: detail.price,
+          ids: [detail.id],
+        };
+        result.push(orderDetail);
+      } else {
+        element.ids.push(detail.id);
+      }
+    });
     setAPIData(result);
   };
 
@@ -65,12 +131,12 @@ const OrderDetails = () => {
   };
 
   const handleUpdateYes = async () => {
-    const { row, status} = promiseArguments;
+    const { row, status } = promiseArguments;
     try {
       // Make the HTTP request to save in the backend
-      for(let i = 0; i < quantity; i++) {
+      for (let i = 0; i < quantity; i++) {
         const id = row.ids.pop();
-        if(id !== undefined) {
+        if (id !== undefined) {
           await updateStatus(id, status);
         }
       }
@@ -87,7 +153,7 @@ const OrderDetails = () => {
     setPromiseArguments(null);
   };
 
-  function handleQuantityChange (e) {
+  function handleQuantityChange(e) {
     setQuantity(e.target.value);
   }
 
@@ -97,6 +163,7 @@ const OrderDetails = () => {
     }
 
     const { row, status } = promiseArguments;
+
     return (
       <Dialog
         maxWidth="xs"
@@ -104,17 +171,23 @@ const OrderDetails = () => {
         open={!!promiseArguments}
       >
         <DialogTitle>Updating status</DialogTitle>
-        <DialogContent dividers>
-        {`Pressing 'Yes' to confirm.`}
-        </DialogContent>
-        <TextField type="number" onChange={handleQuantityChange} ></TextField>
+        <DialogContent dividers>{`Pressing 'Yes' to confirm.`}</DialogContent>
+        <TextField
+          type="number"
+          value={quantity}
+          onChange={handleQuantityChange}
+        ></TextField>
         <DialogActions>
           <Button ref={noButtonRef} onClick={handleUpdateNo}>
             No
           </Button>
-          <Button onClick={() => {
-            handleUpdateYes();
-          }}>Yes</Button>
+          <Button
+            onClick={() => {
+              handleUpdateYes();
+            }}
+          >
+            Yes
+          </Button>
         </DialogActions>
       </Dialog>
     );
@@ -137,7 +210,7 @@ const OrderDetails = () => {
     {
       field: "phoneNumber",
       headerName: "Phone Number",
-      flex: 1
+      flex: 1,
     },
     {
       field: "date",
@@ -165,11 +238,12 @@ const OrderDetails = () => {
     },
     {
       field: "quantity",
-      headerName: "quantity",
+      headerName: "Quantity",
       flex: 1,
       renderCell: (params) => {
         const currentRow = params.row;
-        return currentRow?.ids?.length ?? 0;
+        currentRow.quantity = currentRow?.ids?.length ?? 0;
+        return currentRow.quantity;
       },
     },
     {
@@ -185,7 +259,8 @@ const OrderDetails = () => {
               color="info"
               size="small"
               onClick={() => {
-                setPromiseArguments({row: currentRow, status: "Processing"});
+                setQuantity(currentRow.quantity);
+                setPromiseArguments({ row: currentRow, status: "Processing" });
               }}
             >
               Process
@@ -199,7 +274,7 @@ const OrderDetails = () => {
               color="warning"
               size="small"
               onClick={() => {
-                setPromiseArguments({row: currentRow, status: "Served"});
+                setPromiseArguments({ row: currentRow, status: "Served" });
               }}
             >
               Serve
@@ -216,13 +291,79 @@ const OrderDetails = () => {
     },
   ];
 
+  const handleSearchChange = (event) => {
+    setSearchValue(event.target.value);
+  };
+
+  const handleKeyDown = (event) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      event.stopPropagation();
+      fetchData();
+    }
+  };
+
+  const handleTabChange = (event, newValue) => {
+    let status = "Received";
+    switch (newValue) {
+      case 0:
+        setStatus("Received");
+        break;
+      case 1:
+        setStatus("Reserved");
+        status = "Reserved";
+        break;
+      case 2:
+        setStatus("Processing");
+        status = "Processing";
+        break;
+      case 3:
+        setStatus("Served");
+        status = "Served";
+        break;
+      default:
+        break;
+    }
+    setTabValue(newValue);
+    fetchDataWithStatus(status);
+  };
+
   return (
     <Box m="20px">
       <Header title="ORDER DETAILS" subtitle="List of Order Details" />
+      <Box sx={{ width: "100%", bgcolor: colors.blueAccent[700] }}>
+        <Tabs
+          value={tabValue}
+          indicatorColor="primary"
+          textColor="primary"
+          onChange={handleTabChange}
+        >
+          <Tab label="Received" />
+          <Tab label="Reserved" />
+          <Tab label="Processing" />
+          <Tab label="Served" />
+        </Tabs>
+      </Box>
+      {/* SEARCH BAR */}
+      <Box
+        display="flex"
+        backgroundColor={colors.primary[400]}
+        borderRadius="3px"
+      >
+        <InputBase
+          onChange={handleSearchChange}
+          sx={{ ml: 2, flex: 1 }}
+          placeholder="Search"
+          onKeyPress={handleKeyDown}
+        />
+        <IconButton onClick={fetchData} sx={{ p: 1 }}>
+          <SearchIcon />
+        </IconButton>
+      </Box>
       {renderConfirmEditDialog()}
       <Box
         m="40px 0 0 0"
-        height="75vh"
+        height="65vh"
         sx={{
           "& .MuiDataGrid-root": {
             border: "none",

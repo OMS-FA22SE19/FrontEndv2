@@ -1,10 +1,11 @@
-import { Box, Stack, Button } from "@mui/material";
+import { Box, Stack, Button, useTheme, IconButton} from "@mui/material";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import { tokens } from "../../theme";
 import Header from "../../components/Header";
-import { useTheme } from "@mui/material";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
+import SearchIcon from "@mui/icons-material/Search";
+import InputBase from "@mui/material/InputBase";
 
 const Checkout = () => {
   const theme = useTheme();
@@ -13,17 +14,19 @@ const Checkout = () => {
   const [detailData, setDetailData] = useState([]);
   const [detailTitle, setDetailTitle] = useState([]);
   const [open, setOpen] = useState(false);
+  const [searchValue, setSearchValue] = React.useState("");
 
   useEffect(() => {
     fetchData();
   }, []);
 
   const fetchData = async () => {
+    const search = searchValue.trim();
     let processingResponse = await axios.get(
-      `https://localhost:7246/api/v1/Orders?Status=Processing`
+      `https://localhost:7246/api/v1/Orders?Status=Processing` + `&searchValue=` + search
     );
     let checkingResponse = await axios.get(
-      `https://localhost:7246/api/v1/Orders?Status=Checking`
+      `https://localhost:7246/api/v1/Orders?Status=Checking` + `&searchValue=` + search
     );
     setAPIData([...processingResponse.data["data"], ...checkingResponse.data["data"]]);
   };
@@ -35,7 +38,7 @@ const Checkout = () => {
   };
 
   const viewDetails = async (currentRow) => {
-    var orderId = currentRow["id"];
+    const orderId = currentRow["id"];
     setDetailTitle("Details Of Order: " + orderId);
     setDetailData(currentRow["orderDetails"]);
     setOpen(true);
@@ -174,9 +177,36 @@ const Checkout = () => {
     },
   ];
 
+  const handleSearchChange = (event) => {
+    setSearchValue(event.target.value);
+  };
+
+  const handleKeyDown = (event) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      event.stopPropagation();
+      fetchData();
+    }
+  };
+
   return (
     <Box m="20px">
       <Header title="ORDERS" subtitle="List of Order" />
+      <Box
+        display="flex"
+        backgroundColor={colors.primary[400]}
+        borderRadius="3px"
+      >
+        <InputBase
+          onChange={handleSearchChange}
+          sx={{ ml: 2, flex: 1 }}
+          placeholder="Search"
+          onKeyPress={handleKeyDown}
+        />
+        <IconButton onClick={fetchData} sx={{ p: 1 }}>
+          <SearchIcon />
+        </IconButton>
+      </Box>
       <Box
         m="35px 0 0 0"
         height="40vh"
