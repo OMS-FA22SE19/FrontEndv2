@@ -13,7 +13,7 @@ import {
   GridActionsCellItem,
 } from "@mui/x-data-grid";
 import axios from "axios";
-import { Box, useTheme } from "@mui/material";
+import { Box, useTheme, IconButton } from "@mui/material";
 import Header from "../../components/Header";
 import { tokens } from "../../theme";
 import Dialog from "@mui/material/Dialog";
@@ -22,6 +22,8 @@ import DialogActions from "@mui/material/DialogActions";
 import DialogTitle from "@mui/material/DialogTitle";
 import Alert from "@mui/material/Alert";
 import Snackbar from "@mui/material/Snackbar";
+import SearchIcon from "@mui/icons-material/Search";
+import InputBase from "@mui/material/InputBase";
 
 const FoodTypes = () => {
   const theme = useTheme();
@@ -34,6 +36,7 @@ const FoodTypes = () => {
   const [isEditing, setIsEditing] = React.useState(false);
   const [isAdding, setIsAdding] = React.useState(false);
   const [snackbar, setSnackbar] = React.useState(null);
+  const [searchValue, setSearchValue] = React.useState("");
 
   const handleCloseSnackbar = () => setSnackbar(null);
 
@@ -198,7 +201,8 @@ const FoodTypes = () => {
   };
 
   const fetchData = async () => {
-    let response = await axios.get(`https://localhost:7246/api/v1/Types`);
+    const search = searchValue.trim();
+    let response = await axios.get(`https://localhost:7246/api/v1/Types` + `?searchValue=` + search);
     setRows(response.data["data"]);
   };
 
@@ -349,9 +353,38 @@ const FoodTypes = () => {
     },
   ];
 
+  const handleSearchChange = (event) => {
+    setSearchValue(event.target.value);
+  };
+
+  const handleKeyDown = (event) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      event.stopPropagation();
+      fetchData();
+    }
+  };
+
+
   return (
     <Box m="20px">
       <Header title="FOOD TYPES" subtitle="List of Food Types" />
+      {/* SEARCH BAR */}
+      <Box
+        display="flex"
+        backgroundColor={colors.primary[400]}
+        borderRadius="3px"
+      >
+        <InputBase
+          onChange={handleSearchChange}
+          sx={{ ml: 2, flex: 1 }}
+          placeholder="Search"
+          onKeyPress={handleKeyDown}
+        />
+        <IconButton onClick={fetchData} sx={{ p: 1 }}>
+          <SearchIcon />
+        </IconButton>
+      </Box>
       {renderConfirmEditDialog()}
       {renderConfirmDeleteDialog()}
       <Box

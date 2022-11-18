@@ -13,7 +13,7 @@ import {
   GridActionsCellItem,
 } from "@mui/x-data-grid";
 import axios from "axios";
-import { Box, useTheme } from "@mui/material";
+import { Box, useTheme, IconButton } from "@mui/material";
 import Header from "../../components/Header";
 import { tokens } from "../../theme";
 import Dialog from "@mui/material/Dialog";
@@ -22,6 +22,8 @@ import DialogActions from "@mui/material/DialogActions";
 import DialogTitle from "@mui/material/DialogTitle";
 import Alert from "@mui/material/Alert";
 import Snackbar from "@mui/material/Snackbar";
+import SearchIcon from "@mui/icons-material/Search";
+import InputBase from "@mui/material/InputBase";
 
 const CourseTypes = () => {
   const theme = useTheme();
@@ -34,6 +36,7 @@ const CourseTypes = () => {
   const [isEditing, setIsEditing] = React.useState(false);
   const [isAdding, setIsAdding] = React.useState(false);
   const [snackbar, setSnackbar] = React.useState(null);
+  const [searchValue, setSearchValue] = React.useState("");
 
   const handleCloseSnackbar = () => setSnackbar(null);
 
@@ -67,11 +70,11 @@ const CourseTypes = () => {
     try {
       // Make the HTTP request to save in the backend
       let response;
-      if(newRow.isNew !== undefined) {
+      if (newRow.isNew !== undefined) {
         response = await handleAdd(newRow);
-      }else {
+      } else {
         response = await handleUpdate(newRow);
-      } 
+      }
       setSnackbar({
         children: "Course Type successfully saved",
         severity: "success",
@@ -105,28 +108,36 @@ const CourseTypes = () => {
   const handleDelete = async (id) => {
     await axios
       .delete(`https://localhost:7246/api/v1/CourseTypes/` + id)
-      .then(response => {
-        if(response.status === 204) {
+      .then((response) => {
+        if (response.status === 204) {
           fetchData();
         }
       })
-      .catch(error => console.log(error));
+      .catch((error) => console.log(error));
   };
 
   const handleRecover = async (id) => {
     await axios
       .put(`https://localhost:7246/api/v1/CourseTypes/` + id + `/recover`)
-      .then(response => {
-        if(response.status === 204) {
+      .then((response) => {
+        if (response.status === 204) {
           fetchData();
         }
       })
-      .catch(error => console.log(error));
+      .catch((error) => console.log(error));
   };
 
   const handleUpdate = async (currentRow) => {
-    const requestBody = {id: currentRow["id"], name: currentRow["name"], description: currentRow["description"]};
-    await axios.put(`https://localhost:7246/api/v1/CourseTypes/` + currentRow["id"], requestBody)
+    const requestBody = {
+      id: currentRow["id"],
+      name: currentRow["name"],
+      description: currentRow["description"],
+    };
+    await axios
+      .put(
+        `https://localhost:7246/api/v1/CourseTypes/` + currentRow["id"],
+        requestBody
+      )
       .catch(() => {})
       .finally(() => fetchData());
   };
@@ -152,9 +163,7 @@ const CourseTypes = () => {
         open={!!promiseArguments}
       >
         <DialogTitle>Are you sure?</DialogTitle>
-        <DialogContent dividers>
-        {`Pressing 'Yes' to confirm.`}
-        </DialogContent>
+        <DialogContent dividers>{`Pressing 'Yes' to confirm.`}</DialogContent>
         <DialogActions>
           <Button ref={noButtonRef} onClick={handleUpdateNo}>
             No
@@ -198,13 +207,20 @@ const CourseTypes = () => {
   };
 
   const fetchData = async () => {
-    let response = await axios.get(`https://localhost:7246/api/v1/CourseTypes`);
+    const search = searchValue.trim();
+    let response = await axios.get(
+      `https://localhost:7246/api/v1/CourseTypes` + `?searchValue=` + search
+    );
     setRows(response.data["data"]);
   };
 
   const handleAdd = async (currentRow) => {
-    const requestBody = {name: currentRow["name"], description: currentRow["description"]};
-    await axios.post(`https://localhost:7246/api/v1/CourseTypes/`, requestBody)
+    const requestBody = {
+      name: currentRow["name"],
+      description: currentRow["description"],
+    };
+    await axios
+      .post(`https://localhost:7246/api/v1/CourseTypes/`, requestBody)
       .catch(() => {})
       .finally(() => fetchData());
   };
@@ -259,7 +275,7 @@ const CourseTypes = () => {
         let id = index.api.getRowIndex(index?.row?.id) + 1;
         return id;
       },
-      flex: 0.15
+      flex: 0.15,
     },
     {
       field: "name",
@@ -294,20 +310,20 @@ const CourseTypes = () => {
         const id = currentRow.id;
         const name = currentRow.name;
         const isInEditMode = rowModesModel[id]?.mode === GridRowModes.Edit;
-        if(currentRow["isDeleted"]) {
+        if (currentRow["isDeleted"]) {
           return [
             <GridActionsCellItem
-            icon={<DeleteIcon />}
-            label="Delete"
-            onClick={handleDeleteClick(id, name)}
-            color="inherit"
-          />,
+              icon={<DeleteIcon />}
+              label="Delete"
+              onClick={handleDeleteClick(id, name)}
+              color="inherit"
+            />,
             <GridActionsCellItem
               icon={<RestoreIcon />}
               label="Restore"
               onClick={handleRecoverClick(id)}
-            />
-          ]
+            />,
+          ];
         }
 
         if (isInEditMode) {
@@ -347,13 +363,41 @@ const CourseTypes = () => {
           />,
         ];
       },
-      flex: 0.5
+      flex: 0.5,
     },
   ];
+
+  const handleSearchChange = (event) => {
+    setSearchValue(event.target.value);
+  };
+
+  const handleKeyDown = (event) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      event.stopPropagation();
+      fetchData();
+    }
+  };
 
   return (
     <Box m="20px">
       <Header title="COURSE TYPES" subtitle="List of Course Types" />
+      {/* SEARCH BAR */}
+      <Box
+        display="flex"
+        backgroundColor={colors.primary[400]}
+        borderRadius="3px"
+      >
+        <InputBase
+          onChange={handleSearchChange}
+          sx={{ ml: 2, flex: 1 }}
+          placeholder="Search"
+          onKeyPress={handleKeyDown}
+        />
+        <IconButton onClick={fetchData} sx={{ p: 1 }}>
+          <SearchIcon />
+        </IconButton>
+      </Box>
       {renderConfirmEditDialog()}
       {renderConfirmDeleteDialog()}
       <Box
@@ -409,10 +453,12 @@ const CourseTypes = () => {
           }}
           experimentalFeatures={{ newEditingApi: true }}
           onProcessRowUpdateError={(error) => {
-            if(error.message === "Cannot read properties of undefined (reading 'id')") {
+            if (
+              error.message ===
+              "Cannot read properties of undefined (reading 'id')"
+            ) {
               window.location.reload();
-            }
-            else {
+            } else {
               console.log(error);
             }
           }}
@@ -431,10 +477,13 @@ function EditToolbar(props) {
   const { rows, setRows, setRowModesModel, isAdding, setIsAdding } = props;
 
   const handleClick = () => {
-    const id =  Math.max(...rows.map(o => o.id)) + 1;
+    const id = Math.max(...rows.map((o) => o.id)) + 1;
 
     setIsAdding(true);
-    setRows((oldRows) => [...oldRows, { id, name: "", description: "", isNew: true }]);
+    setRows((oldRows) => [
+      ...oldRows,
+      { id, name: "", description: "", isNew: true },
+    ]);
     setRowModesModel((oldModel) => ({
       ...oldModel,
       [id]: { mode: GridRowModes.Edit, fieldToFocus: "name" },

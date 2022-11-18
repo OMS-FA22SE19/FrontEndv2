@@ -90,7 +90,7 @@ const Sidebar = () => {
           </MenuItem>
 
           {!isCollapsed && (
-            <Box mb="25px">
+            <Box mb="30px">
               <Box display="flex" justifyContent="center" alignItems="center">
                 <img
                   alt="profile-user"
@@ -156,6 +156,13 @@ const Sidebar = () => {
             <Item
               title="Users"
               to="/users"
+              icon={<PersonOutlinedIcon />}
+              selected={selected}
+              setSelected={setSelected}
+            />
+            <Item
+              title="Reservations"
+              to="/reservations"
               icon={<PersonOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
