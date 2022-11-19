@@ -274,10 +274,26 @@ const OrderDetails = () => {
               color="warning"
               size="small"
               onClick={() => {
+                setQuantity(currentRow.quantity);
+                setPromiseArguments({ row: currentRow, status: "ReadyToServe" });
+              }}
+            >
+              Ready To Serve
+            </Button>
+          );
+        }
+        if (currentRow["status"] === "ReadyToServe") {
+          optionButton = (
+            <Button
+              variant="outlined"
+              color="warning"
+              size="small"
+              onClick={() => {
+                setQuantity(currentRow.quantity);
                 setPromiseArguments({ row: currentRow, status: "Served" });
               }}
             >
-              Serve
+              Ready To Serve
             </Button>
           );
         }
@@ -309,17 +325,21 @@ const OrderDetails = () => {
       case 0:
         setStatus("Received");
         break;
-      case 1:
+      case -3:
         setStatus("Reserved");
         status = "Reserved";
         break;
-      case 2:
+      case 1:
         setStatus("Processing");
         status = "Processing";
         break;
-      case 3:
+      case 2:
         setStatus("Served");
         status = "Served";
+        break;
+      case 3:
+        setStatus("ReadyToServe");
+        status = "ReadyToServe";
         break;
       default:
         break;
@@ -338,10 +358,11 @@ const OrderDetails = () => {
           textColor="primary"
           onChange={handleTabChange}
         >
-          <Tab label="Received" />
-          <Tab label="Reserved" />
-          <Tab label="Processing" />
-          <Tab label="Served" />
+          <Tab value={0} label="Received" />
+          <Tab value={-3} label="Reserved" />
+          <Tab value={1} label="Processing" />
+          <Tab value={3} label="Ready To Serve" />
+          <Tab value={2} label="Served" />
         </Tabs>
       </Box>
       {/* SEARCH BAR */}
