@@ -8,7 +8,7 @@ import {
 } from "@mui/material";
 import { tokens } from "../../theme";
 import { mockTransactions, mockTrendingFood } from "../../data/mockData";
-import DownloadOutlinedIcon from "@mui/icons-material/DownloadOutlined";
+import ReceiptIcon from '@mui/icons-material/Receipt';
 import FastfoodIcon from "@mui/icons-material/Fastfood";
 import PointOfSaleIcon from "@mui/icons-material/PointOfSale";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
@@ -22,6 +22,7 @@ import ProgressCircle from "../../components/ProgressCircle";
 import axios from "axios";
 import * as React from "react";
 import { BarItem } from "@nivo/bar";
+import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 
 const Dashboard = () => {
   const theme = useTheme();
@@ -39,6 +40,30 @@ const Dashboard = () => {
   React.useEffect(() => {
     fetchData();
   }, []);
+
+  const columns = [
+    {
+      field: "id",
+      headerName: "No.",
+      renderCell: (index) => index.api.getRowIndex(index.row.id) + 1,
+    },
+    { field: "user", headerName: "Customer Name" },
+    {
+      field: "phoneNumber",
+      headerName: "Phone Number",
+      flex: 1,
+    },
+    {
+      field: "quantity",
+      headerName: "Times Order",
+      flex: 2,
+    },
+    {
+      field: "cost",
+      headerName: "Cost",
+      flex: 1,
+    },
+  ];
 
   return (
     <Box m="20px">
@@ -58,137 +83,8 @@ const Dashboard = () => {
       >
         {/* ROW 1 */}
         <Box
-          gridColumn="span 3"
-          backgroundColor={colors.primary[400]}
-          display="flex"
-          alignItems="center"
-          justifyContent="center"
-        >
-          <StatBox
-            title="431,225 VND"
-            subtitle="Sales Obtained"
-            progress="0.50"
-            increase="+21%"
-            icon={
-              <PointOfSaleIcon
-                sx={{ color: colors.greenAccent[600], fontSize: "26px" }}
-              />
-            }
-          />
-        </Box>
-        <Box
-          gridColumn="span 3"
-          backgroundColor={colors.primary[400]}
-          display="flex"
-          alignItems="center"
-          justifyContent="center"
-        >
-          {/* <StatBox
-            title={newCustomers.customers}
-            subtitle="New Customers"
-            progress="0.30"
-            increase={"+" + newCustomers.increase}
-            icon={
-              <PersonAddIcon
-                sx={{ color: colors.greenAccent[600], fontSize: "26px" }}
-              />
-            }
-          /> */}
-          <StatBox
-            title="251"
-            subtitle="New Customers"
-            progress="0.30"
-            increase="+15%"
-            icon={
-              <PersonAddIcon
-                sx={{ color: colors.greenAccent[600], fontSize: "26px" }}
-              />
-            }
-          />
-        </Box>
-        <Box
-          gridColumn="span 3"
-          backgroundColor={colors.primary[400]}
-          display="flex"
-          alignItems="center"
-          justifyContent="center"
-        >
-          <StatBox
-            title="40"
-            subtitle="Food"
-            progress="0.75"
-            increase="+14%"
-            icon={
-              <FastfoodIcon
-                sx={{ color: colors.greenAccent[600], fontSize: "26px" }}
-              />
-            }
-          />
-        </Box>
-        {/* <Box
-          gridColumn="span 3"
-          backgroundColor={colors.primary[400]}
-          display="flex"
-          alignItems="center"
-          justifyContent="center"
-        >
-          <StatBox
-            title="1,325,134"
-            subtitle="Traffic Received"
-            progress="0.80"
-            increase="+43%"
-            icon={
-              <TrafficIcon
-                sx={{ color: colors.greenAccent[600], fontSize: "26px" }}
-              />
-            }
-          />
-        </Box> */}
-
-        {/* ROW 2 */}
-        <Box
-          gridColumn="span 8"
-          gridRow="span 2"
-          backgroundColor={colors.primary[400]}
-        >
-          <Box
-            mt="25px"
-            p="0 30px"
-            display="flex "
-            justifyContent="space-between"
-            alignItems="center"
-          >
-            <Box>
-              <Typography
-                variant="h5"
-                fontWeight="600"
-                color={colors.grey[100]}
-              >
-                Revenue Generated
-              </Typography>
-              <Typography
-                variant="h3"
-                fontWeight="bold"
-                color={colors.greenAccent[500]}
-              >
-                340,514,000 VND
-              </Typography>
-            </Box>
-            <Box>
-              <IconButton>
-                <DownloadOutlinedIcon
-                  sx={{ fontSize: "26px", color: colors.greenAccent[500] }}
-                />
-              </IconButton>
-            </Box>
-          </Box>
-          <Box height="250px" m="-20px 0 0 0">
-            <LineChart isDashboard={true} />
-          </Box>
-        </Box>
-        <Box
           gridColumn="span 4"
-          gridRow="span 2"
+          gridRow="span 3"
           backgroundColor={colors.primary[400]}
           overflow="auto"
         >
@@ -236,85 +132,175 @@ const Dashboard = () => {
             </Box>
           ))}
         </Box>
+        {/* <Box
+          gridColumn="span 3"
+          backgroundColor={colors.primary[400]}
+          display="flex"
+          alignItems="center"
+          justifyContent="center"
+        >
+          <StatBox
+            title="431,225 VND"
+            subtitle="Sales Obtained"
+            progress="0.50"
+            increase="+21%"
+            icon={
+              <PointOfSaleIcon
+                sx={{ color: colors.greenAccent[600], fontSize: "26px" }}
+              />
+            }
+          />
+        </Box> */}
+        <Box
+          gridColumn="span 3"
+          backgroundColor={colors.primary[400]}
+          display="flex"
+          alignItems="center"
+          justifyContent="center"
+        >
+          {/* <StatBox
+            title={newCustomers.customers}
+            subtitle="New Customers"
+            progress="0.30"
+            increase={"+" + newCustomers.increase}
+            icon={
+              <PersonAddIcon
+                sx={{ color: colors.greenAccent[600], fontSize: "26px" }}
+              />
+            }
+          /> */}
+          <StatBox
+            title="251"
+            subtitle="Customers"
+            progress="0.30"
+            increase="+15%"
+            icon={
+              <PersonAddIcon
+                sx={{ color: colors.greenAccent[600], fontSize: "26px" }}
+              />
+            }
+          />
+        </Box>
+        <Box
+          gridColumn="span 2"
+          backgroundColor={colors.primary[400]}
+          display="flex"
+          alignItems="center"
+          justifyContent="center"
+        >
+          <StatBox
+            title="40"
+            subtitle="Food"
+            progress="0.75"
+            increase="+14%"
+            icon={
+              <FastfoodIcon
+                sx={{ color: colors.greenAccent[600], fontSize: "26px" }}
+              />
+            }
+          />
+        </Box>
+        <Box
+          gridColumn="span 3"
+          backgroundColor={colors.primary[400]}
+          display="flex"
+          alignItems="center"
+          justifyContent="center"
+        >
+          <StatBox
+            title="40/20"
+            subtitle="Orders/Reservations"
+            progress="0.75"
+            increase="+14%"
+            icon={
+              <ReceiptIcon
+                sx={{ color: colors.greenAccent[600], fontSize: "26px" }}
+              />
+            }
+          />
+        </Box>
+        {/* <Box
+          gridColumn="span 3"
+          backgroundColor={colors.primary[400]}
+          display="flex"
+          alignItems="center"
+          justifyContent="center"
+        >
+          <StatBox
+            title="1,325,134"
+            subtitle="Traffic Received"
+            progress="0.80"
+            increase="+43%"
+            icon={
+              <TrafficIcon
+                sx={{ color: colors.greenAccent[600], fontSize: "26px" }}
+              />
+            }
+          />
+        </Box> */}
 
+        {/* ROW 2 */}
+        {/* <Box
+          gridColumn="span 8"
+          gridRow="span 2"
+          backgroundColor={colors.primary[400]}
+        >
+          <Box
+            mt="25px"
+            p="0 30px"
+            display="flex "
+            justifyContent="space-between"
+            alignItems="center"
+          >
+          </Box>
+        </Box> */}
+        
         {/* ROW 3 */}
         <Box
-          gridColumn="span 12"
-          gridRow="span 2"
+          gridColumn="span 8"
+          height="55vh"
           backgroundColor={colors.primary[400]}
           overflow="auto"
         >
+          <Header title="TOP LOYAL CUSTOMERS" subtitle="List of Monthly Royal Customers" />
           <Box
-            xs={5} md={5}
+            m="5px 0 0 0"
             display="flex"
-            justifyContent="space-between"
             alignItems="center"
             borderBottom={`4px solid ${colors.primary[500]}`}
             colors={colors.grey[100]}
-            p="15px"
+            height="45vh"
+            sx={{
+              "& .MuiDataGrid-root": {
+                border: "none",
+              },
+              "& .MuiDataGrid-cell": {
+                borderBottom: "none",
+              },
+              "& .name-column--cell": {
+                color: colors.greenAccent[300],
+              },
+              "& .MuiDataGrid-columnHeaders": {
+                backgroundColor: colors.blueAccent[700],
+                borderBottom: "none",
+              },
+              "& .MuiDataGrid-virtualScroller": {
+                backgroundColor: colors.primary[400],
+              },
+              "& .MuiDataGrid-footerContainer": {
+                borderTop: "none",
+                backgroundColor: colors.blueAccent[700],
+              },
+              "& .MuiCheckbox-root": {
+                color: `${colors.greenAccent[200]} !important`,
+              },
+              "& .MuiDataGrid-toolbarContainer .MuiButton-text": {
+                color: `${colors.grey[100]} !important`,
+              },
+            }}
           >
-            <Typography color={colors.grey[100]} variant="h5" fontWeight="600">
-              Recent Transactions
-            </Typography>
+            <DataGrid rows={mockTransactions} columns={columns} />
           </Box>
-          {mockTransactions.map((transaction, i) => (
-            <Box
-              key={`${transaction.txId}-${i}`}
-              display="flex"
-              justifyContent="space-between"
-              alignItems="center"
-              borderBottom={`4px solid ${colors.primary[500]}`}
-              p="15px"
-            >
-              <Box
-                sx={{
-                  width: 200,
-                }}
-              >
-                <Typography
-                  color={colors.greenAccent[500]}
-                  variant="h5"
-                  fontWeight="600"
-                >
-                  {transaction.txId}
-                </Typography>
-                <Typography color={colors.grey[100]}>
-                  {transaction.user}
-                </Typography>
-              </Box>
-              <Box
-                sx={{
-                  width: 100,
-                }}
-                color={colors.grey[100]}
-              >
-                {transaction.date}
-              </Box>
-              <Box
-                sx={{
-                  width: 120,
-                }}
-                color={colors.grey[100]}
-              >
-                {transaction.tableType}
-              </Box>
-              <Box
-                sx={{
-                  width: 100,
-                }}
-                color={colors.grey[100]}
-              >
-                {transaction.numOfPeople}
-              </Box>
-              <Box
-                backgroundColor={colors.greenAccent[500]}
-                p="5px 10px"
-                borderRadius="4px"
-              >
-                {transaction.cost} VND
-              </Box>
-            </Box>
-          ))}
         </Box>
         {/* <Box
           gridColumn="span 4"
