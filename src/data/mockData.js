@@ -332,8 +332,38 @@ export const mockTrendingFood = [
   {
     no: "#5",
     name: "Kimchi Tokbokki",
-    quantity: "255",
+    quantity: "245",
     cost: "130.000 VND",
+  },
+  {
+    no: "#6",
+    name: "Salmon Sashimi",
+    quantity: "234",
+    cost: "130.000 VND",
+  },
+  {
+    no: "#7",
+    name: "Salmon Sashimi",
+    quantity: "221",
+    cost: "130.000 VND",
+  },
+  {
+    no: "#8",
+    name: "Fried Chicken",
+    quantity: "217",
+    cost: "67.000 VND",
+  },
+  {
+    no: "#9",
+    name: "Spaghetti",
+    quantity: "175",
+    cost: "53.000 VND",
+  },
+  {
+    no: "#10",
+    name: "Bumpkin Soup",
+    quantity: "122",
+    cost: "30.000 VND",
   },
 ];
 

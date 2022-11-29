@@ -55,7 +55,7 @@ const Dashboard = () => {
     },
     {
       field: "quantity",
-      headerName: "Times Order",
+      headerName: "Order Times",
       flex: 2,
     },
     {
@@ -84,7 +84,7 @@ const Dashboard = () => {
         {/* ROW 1 */}
         <Box
           gridColumn="span 4"
-          gridRow="span 3"
+          gridRow="span 4"
           backgroundColor={colors.primary[400]}
           overflow="auto"
         >
@@ -209,7 +209,7 @@ const Dashboard = () => {
         >
           <StatBox
             title="40/20"
-            subtitle="Orders/Reservations"
+            subtitle="Monthly Orders/Reservations"
             progress="0.75"
             increase="+14%"
             icon={
