@@ -27,7 +27,7 @@ const Checkout = () => {
     const search = searchValue.trim();
     const searchByValue = searchBy.trim();
     let processingResponse = await axios.get(
-      `https://https://oms-fa22se19.herokuapp.com/api/v1/Orders?Status=Processing` +
+      `https://oms-fa22se19.herokuapp.com/api/v1/Orders?Status=Processing` +
         `&searchBy=` +
         searchByValue +
         `&searchValue=` +
