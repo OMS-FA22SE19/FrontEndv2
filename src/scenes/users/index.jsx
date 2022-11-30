@@ -19,13 +19,13 @@ const Users = () => {
   }, []);
 
   const fetchData = async () => {
-    let response = await axios.get(`https://localhost:7246/api/v1/Users`);
+    let response = await axios.get(`https://oms-fa22se19.herokuapp.com/api/v1/Users`);
     setAPIData(response.data["data"]);
   };
 
   const deleteUser = async (id) => {
     await axios
-      .delete(`https://localhost:7246/api/v1/Users/` + id)
+      .delete(`https://oms-fa22se19.herokuapp.com/api/v1/Users/` + id)
       .finally(() => fetchData());
   };
 

@@ -107,7 +107,7 @@ const CourseTypes = () => {
 
   const handleDelete = async (id) => {
     await axios
-      .delete(`https://localhost:7246/api/v1/CourseTypes/` + id)
+      .delete(`https://oms-fa22se19.herokuapp.com/api/v1/CourseTypes/` + id)
       .then((response) => {
         if (response.status === 204) {
           fetchData();
@@ -118,7 +118,7 @@ const CourseTypes = () => {
 
   const handleRecover = async (id) => {
     await axios
-      .put(`https://localhost:7246/api/v1/CourseTypes/` + id + `/recover`)
+      .put(`https://oms-fa22se19.herokuapp.com/api/v1/CourseTypes/` + id + `/recover`)
       .then((response) => {
         if (response.status === 204) {
           fetchData();
@@ -135,7 +135,7 @@ const CourseTypes = () => {
     };
     await axios
       .put(
-        `https://localhost:7246/api/v1/CourseTypes/` + currentRow["id"],
+        `https://oms-fa22se19.herokuapp.com/api/v1/CourseTypes/` + currentRow["id"],
         requestBody
       )
       .catch(() => {})
@@ -209,7 +209,7 @@ const CourseTypes = () => {
   const fetchData = async () => {
     const search = searchValue.trim();
     let response = await axios.get(
-      `https://localhost:7246/api/v1/CourseTypes` + `?searchValue=` + search
+      `https://oms-fa22se19.herokuapp.com/api/v1/CourseTypes` + `?searchValue=` + search
     );
     setRows(response.data["data"]);
   };
@@ -220,7 +220,7 @@ const CourseTypes = () => {
       description: currentRow["description"],
     };
     await axios
-      .post(`https://localhost:7246/api/v1/CourseTypes/`, requestBody)
+      .post(`https://oms-fa22se19.herokuapp.com/api/v1/CourseTypes/`, requestBody)
       .catch(() => {})
       .finally(() => fetchData());
   };

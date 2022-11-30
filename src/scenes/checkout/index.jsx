@@ -23,17 +23,17 @@ const Checkout = () => {
   const fetchData = async () => {
     const search = searchValue.trim();
     let processingResponse = await axios.get(
-      `https://localhost:7246/api/v1/Orders?Status=Processing` + `&searchValue=` + search
+      `https://https://oms-fa22se19.herokuapp.com/api/v1/Orders?Status=Processing` + `&searchValue=` + search
     );
     let checkingResponse = await axios.get(
-      `https://localhost:7246/api/v1/Orders?Status=Checking` + `&searchValue=` + search
+      `https://oms-fa22se19.herokuapp.com/api/v1/Orders?Status=Checking` + `&searchValue=` + search
     );
     setAPIData([...processingResponse.data["data"], ...checkingResponse.data["data"]]);
   };
 
   const confirm = async (id) => {
     await axios
-      .post(`https://localhost:7246/api/v1/Orders/` + id + "/Confirm")
+      .post(`https://oms-fa22se19.herokuapp.com/api/v1/Orders/` + id + "/Confirm")
       .then(() => fetchData());
   };
 

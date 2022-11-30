@@ -13,7 +13,7 @@ const Foods = () => {
   const [APIData, setAPIData] = useState([]);
 
   const fetchData = async () => {
-    let response = await axios.get(`https://localhost:7246/api/v1/Foods`);
+    let response = await axios.get(`https://oms-fa22se19.herokuapp.com/api/v1/Foods`);
     setAPIData(response.data["data"]);
   };
 
@@ -25,7 +25,7 @@ const Foods = () => {
 
   const deleteFood = async (id) => {
     await axios
-      .delete(`https://localhost:7246/api/v1/Foods/` + id)
+      .delete(`https://oms-fa22se19.herokuapp.com/api/v1/Foods/` + id)
       .then()
       .finally((e) => {
         fetchData();
@@ -34,7 +34,7 @@ const Foods = () => {
 
   const recoverFood = async (id) => {
     await axios
-      .put(`https://localhost:7246/api/v1/Foods/` + id + `/recover`)
+      .put(`https://oms-fa22se19.herokuapp.com/api/v1/Foods/` + id + `/recover`)
       .then()
       .finally((e) => {
         fetchData();
@@ -70,7 +70,7 @@ const Foods = () => {
     },
     {
       field: "pictureUrl",
-      headerName: "picture",
+      headerName: "Picture",
       renderCell: (params) => {
         const currentRow = params.row;
         return (

@@ -28,7 +28,7 @@ const CreateUser = () => {
       password: values.password,
       role: values.role,
     };
-    await axios.post(`https://localhost:7246/api/v1/Users`, requestBody);
+    await axios.post(`https://oms-fa22se19.herokuapp.com/api/v1/Users`, requestBody);
     routeChange();
   };
 

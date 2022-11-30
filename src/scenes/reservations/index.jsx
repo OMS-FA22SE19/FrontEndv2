@@ -56,7 +56,7 @@ const Reservations = () => {
 
   const handleCancelReservation = async (id) => {
     await axios
-      .delete(`https://localhost:7246/api/v1/Reservations/` + id)
+      .delete(`https://oms-fa22se19.herokuapp.com/api/v1/Reservations/` + id)
       .then((response) => {
         if (response.status === 204) {
           fetchData();
@@ -109,7 +109,7 @@ const Reservations = () => {
   const fetchData = async () => {
     const search = searchValue.trim();
     let response = await axios.get(
-      `https://localhost:7246/api/v1/Reservations` + `?status=` + status + `&searchValue=` + search
+      `https://oms-fa22se19.herokuapp.com/api/v1/Reservations` + `?status=` + status + `&searchValue=` + search
     );
     setRows(response.data["data"]);
   };
@@ -117,7 +117,7 @@ const Reservations = () => {
   const fetchDataWithStatus = async (status) => {
     const search = searchValue.trim();
     let response = await axios.get(
-      `https://localhost:7246/api/v1/Reservations` + `?status=` + status + `&searchValue=` + search
+      `https://oms-fa22se19.herokuapp.com/api/v1/Reservations` + `?status=` + status + `&searchValue=` + search
     );
     setRows(response.data["data"]);
   };
@@ -205,7 +205,6 @@ const Reservations = () => {
     {
       field: "endTime",
       headerName: "End Time",
-      type: "Date",
       flex: 1,
       renderCell: (params) => {
         const currentRow = params.row;

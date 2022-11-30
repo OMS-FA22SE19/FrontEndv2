@@ -23,7 +23,7 @@ const UpdateUser = () => {
 
   const fetchData = async () => {
     await axios
-      .get(`https://localhost:7246/api/v1/users/` + id)
+      .get(`https://oms-fa22se19.herokuapp.com/api/v1/users/` + id)
       .then((response) => {
         const fullName = response.data["data"].fullName;
         const email = response.data["data"].email;
@@ -48,7 +48,7 @@ const UpdateUser = () => {
       role: values.role,
     };
     await axios
-      .put(`https://localhost:7246/api/v1/users/` + id, requestBody)
+      .put(`https://oms-fa22se19.herokuapp.com/api/v1/users/` + id, requestBody)
       .finally(() => routeChange());
   };
 
