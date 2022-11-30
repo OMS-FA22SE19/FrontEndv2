@@ -1,4 +1,4 @@
-import { Box, Stack, Button, useTheme, IconButton} from "@mui/material";
+import { Box, Stack, Button, useTheme, IconButton } from "@mui/material";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import { tokens } from "../../theme";
 import Header from "../../components/Header";
@@ -6,6 +6,8 @@ import axios from "axios";
 import React, { useEffect, useState } from "react";
 import SearchIcon from "@mui/icons-material/Search";
 import InputBase from "@mui/material/InputBase";
+import Select from "@mui/material/Select";
+import MenuItem from "@mui/material/MenuItem";
 
 const Checkout = () => {
   const theme = useTheme();
@@ -15,6 +17,7 @@ const Checkout = () => {
   const [detailTitle, setDetailTitle] = useState([]);
   const [open, setOpen] = useState(false);
   const [searchValue, setSearchValue] = React.useState("");
+  const [searchBy, setSearchBy] = React.useState("TableId");
 
   useEffect(() => {
     fetchData();
@@ -22,13 +25,25 @@ const Checkout = () => {
 
   const fetchData = async () => {
     const search = searchValue.trim();
+    const searchByValue = searchBy.trim();
     let processingResponse = await axios.get(
-      `https://localhost:7246/api/v1/Orders?Status=Processing` + `&searchValue=` + search
+      `https://localhost:7246/api/v1/Orders?Status=Processing` +
+        `&searchBy=` +
+        searchByValue +
+        `&searchValue=` +
+        search
     );
     let checkingResponse = await axios.get(
-      `https://localhost:7246/api/v1/Orders?Status=Checking` + `&searchValue=` + search
+      `https://localhost:7246/api/v1/Orders?Status=Checking` +
+        `&searchBy=` +
+        searchByValue +
+        `&searchValue=` +
+        search
     );
-    setAPIData([...processingResponse.data["data"], ...checkingResponse.data["data"]]);
+    setAPIData([
+      ...processingResponse.data["data"],
+      ...checkingResponse.data["data"],
+    ]);
   };
 
   const confirm = async (id) => {
@@ -48,24 +63,41 @@ const Checkout = () => {
     {
       field: "index",
       headerName: "No.",
+      headerAlign: "center",
+      align: "center",
+      flex: 0.25,
       renderCell: (index) => index.api.getRowIndex(index.row.id) + 1,
     },
-    { field: "tableId", headerName: "Table ID", flex: 0.5 },
+    {
+      field: "tableId",
+      headerName: "Table ID",
+      headerAlign: "right",
+      align: "right",
+      flex: 0.25,
+    },
     {
       field: "fullName",
       headerName: "User",
       flex: 1,
       cellClassName: "name-column--cell",
     },
-    { field: "phoneNumber", headerName: "Phone Number", flex: 0.5 },
+    {
+      field: "phoneNumber",
+      headerName: "Phone Number",
+      headerAlign: "right",
+      align: "right",
+      flex: 0.5,
+    },
     {
       field: "date",
       headerName: "Date",
       flex: 1,
+      headerAlign: "right",
+      align: "right",
       cellClassName: "date-column--cell",
       renderCell: (params) => {
-          const currentRow = params.row;
-          return <div>{new Date(currentRow["date"]).toLocaleTimeString()}</div>;
+        const currentRow = params.row;
+        return <div>{new Date(currentRow["date"]).toLocaleTimeString()}</div>;
       },
     },
     {
@@ -77,18 +109,30 @@ const Checkout = () => {
       headerName: "Amount",
       headerAlign: "right",
       align: "right",
+      renderCell: (params) => {
+        const currentRow = params.row;
+        return <div>{currentRow["amount"].toLocaleString()}</div>;
+      },
     },
     {
       field: "prePaid",
       headerName: "Deposit",
       headerAlign: "right",
       align: "right",
+      renderCell: (params) => {
+        const currentRow = params.row;
+        return <div>{currentRow["prePaid"].toLocaleString()}</div>;
+      },
     },
     {
       field: "total",
       headerName: "Total",
       headerAlign: "right",
       align: "right",
+      renderCell: (params) => {
+        const currentRow = params.row;
+        return <div>{currentRow["total"].toLocaleString()}</div>;
+      },
     },
     {
       field: "details",
@@ -127,7 +171,7 @@ const Checkout = () => {
             </Button>
           );
         }
-        return[];
+        return [];
       },
       flex: 1,
     },
@@ -158,6 +202,10 @@ const Checkout = () => {
       flex: 1,
       headerAlign: "right",
       align: "right",
+      renderCell: (params) => {
+        const currentRow = params.row;
+        return <div>{currentRow["price"].toLocaleString()}</div>;
+      },
     },
     {
       field: "quantity",
@@ -174,6 +222,10 @@ const Checkout = () => {
       flex: 1,
       headerAlign: "right",
       align: "right",
+      renderCell: (params) => {
+        const currentRow = params.row;
+        return <div>{currentRow["amount"].toLocaleString()}</div>;
+      },
     },
   ];
 
@@ -197,6 +249,20 @@ const Checkout = () => {
         backgroundColor={colors.primary[400]}
         borderRadius="3px"
       >
+        <Select
+          sx={{ flex: 0.5 }}
+          labelId="searchBy"
+          id="searchBy"
+          value={searchBy}
+          onChange={(e) => {
+            setSearchBy(e.target.value);
+          }}
+          label="Search By"
+        >
+          <MenuItem value="TableId">TableId</MenuItem>
+          <MenuItem value="User">User</MenuItem>
+          <MenuItem value="PhoneNumber">Phone Number</MenuItem>
+        </Select>
         <InputBase
           onChange={handleSearchChange}
           sx={{ ml: 2, flex: 1 }}

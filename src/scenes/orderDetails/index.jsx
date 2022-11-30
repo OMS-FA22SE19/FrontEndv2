@@ -19,6 +19,8 @@ import SearchIcon from "@mui/icons-material/Search";
 import InputBase from "@mui/material/InputBase";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
+import Select from "@mui/material/Select";
+import MenuItem from "@mui/material/MenuItem";
 
 const OrderDetails = () => {
   const theme = useTheme();
@@ -30,6 +32,7 @@ const OrderDetails = () => {
   const [searchValue, setSearchValue] = React.useState("");
   const [tabValue, setTabValue] = React.useState(0);
   const [status, setStatus] = React.useState("Received");
+  const [searchBy, setSearchBy] = React.useState("TableId");
 
   useEffect(() => {
     fetchData();
@@ -37,25 +40,43 @@ const OrderDetails = () => {
 
   const fetchData = async () => {
     const search = searchValue.trim();
+    const searchByValue = searchBy.trim();
     let response = await axios.get(
       `https://localhost:7246/api/v1/OrderDetails` +
         `?status=` +
         status +
+        `&searchBy=` +
+        searchByValue +
         `&searchValue=` +
         search
     );
 
+    console.log(status);
+
     const data = response.data["data"];
     let result = [];
     data.forEach((detail) => {
-      const element = result.find((e) => {
-        return (
-          e.foodId == detail.foodId &&
-          e.tableId == detail.tableId &&
-          e.date == new Date(detail.date).toLocaleTimeString() &&
-          e.status == detail.status
-        );
-      });
+      let element = undefined;
+      if (status === "Received" || status === "") {
+        element = result.find((e) => {
+          return (
+            e.foodId == detail.foodId &&
+            e.tableId == detail.tableId &&
+            e.status == detail.status &&
+            e.note == detail.note
+          );
+        });
+      } else {
+        element = result.find((e) => {
+          return (
+            e.foodId == detail.foodId &&
+            e.tableId == detail.tableId &&
+            e.date == new Date(detail.date).toLocaleTimeString() &&
+            e.status == detail.status &&
+            e.note == detail.note
+          );
+        });
+      }
       if (element === undefined) {
         const orderDetail = {
           id: detail.id,
@@ -92,14 +113,27 @@ const OrderDetails = () => {
     const data = response.data["data"];
     let result = [];
     data.forEach((detail) => {
-      const element = result.find((e) => {
-        return (
-          e.foodId == detail.foodId &&
-          e.tableId == detail.tableId &&
-          e.date == new Date(detail.date).toLocaleTimeString() &&
-          e.status == detail.status
-        );
-      });
+      let element = undefined;
+      if (status === "Received") {
+        element = result.find((e) => {
+          return (
+            e.foodId == detail.foodId &&
+            e.tableId == detail.tableId &&
+            e.status == detail.status &&
+            e.note == detail.note
+          );
+        });
+      } else {
+        element = result.find((e) => {
+          return (
+            e.foodId == detail.foodId &&
+            e.tableId == detail.tableId &&
+            e.date == new Date(detail.date).toLocaleTimeString() &&
+            e.status == detail.status &&
+            e.note == detail.note
+          );
+        });
+      }
       if (element === undefined) {
         const orderDetail = {
           id: detail.id,
@@ -204,17 +238,30 @@ const OrderDetails = () => {
     {
       field: "id",
       headerName: "No.",
+      headerAlign: "center",
+      align: "center",
+      flex: 0.25,
       renderCell: (index) => index.api.getRowIndex(index.row.id) + 1,
     },
-    { field: "tableId", headerName: "Table ID" },
+    {
+      field: "tableId",
+      headerName: "Table ID",
+      flex: 0.25,
+      headerAlign: "center",
+      align: "right",
+    },
     {
       field: "phoneNumber",
       headerName: "Phone Number",
+      headerAlign: "right",
+      align: "right",
       flex: 1,
     },
     {
       field: "date",
       headerName: "Date",
+      headerAlign: "right",
+      align: "right",
       flex: 1,
     },
     {
@@ -275,25 +322,10 @@ const OrderDetails = () => {
               size="small"
               onClick={() => {
                 setQuantity(currentRow.quantity);
-                setPromiseArguments({ row: currentRow, status: "ReadyToServe" });
-              }}
-            >
-              Ready To Serve
-            </Button>
-          );
-        }
-        if (currentRow["status"] === "ReadyToServe") {
-          optionButton = (
-            <Button
-              variant="outlined"
-              color="warning"
-              size="small"
-              onClick={() => {
-                setQuantity(currentRow.quantity);
                 setPromiseArguments({ row: currentRow, status: "Served" });
               }}
             >
-              Ready To Serve
+              Serve
             </Button>
           );
         }
@@ -337,10 +369,6 @@ const OrderDetails = () => {
         setStatus("Served");
         status = "Served";
         break;
-      case 3:
-        setStatus("ReadyToServe");
-        status = "ReadyToServe";
-        break;
       default:
         break;
     }
@@ -361,7 +389,6 @@ const OrderDetails = () => {
           <Tab value={0} label="Received" />
           <Tab value={-3} label="Reserved" />
           <Tab value={1} label="Processing" />
-          <Tab value={3} label="Ready To Serve" />
           <Tab value={2} label="Served" />
         </Tabs>
       </Box>
@@ -371,6 +398,20 @@ const OrderDetails = () => {
         backgroundColor={colors.primary[400]}
         borderRadius="3px"
       >
+        <Select
+          sx={{ flex: 0.5 }}
+          labelId="searchBy"
+          id="searchBy"
+          value={searchBy}
+          onChange={(e) => {
+            setSearchBy(e.target.value);
+          }}
+          label="Search By"
+        >
+          <MenuItem value="TableId">TableId</MenuItem>
+          <MenuItem value="PhoneNumber">Phone Number</MenuItem>
+          <MenuItem value="FoodName">Food</MenuItem>
+        </Select>
         <InputBase
           onChange={handleSearchChange}
           sx={{ ml: 2, flex: 1 }}

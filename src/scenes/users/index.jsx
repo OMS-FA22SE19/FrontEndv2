@@ -45,9 +45,18 @@ const Users = () => {
     {
       field: "index",
       headerName: "No.",
+      headerAlign: "center",
+      align: "center",
+      flex: 0.25,
       renderCell: (index) => index.api.getRowIndex(index.row.id) + 1,
     },
-    { field: "id", headerName: "ID", flex: 1 },
+    {
+      field: "id",
+      headerName: "ID",
+      flex: 1,
+      headerAlign: "left",
+      align: "left",
+    },
     {
       field: "userName",
       headerName: "UserName",
@@ -68,6 +77,8 @@ const Users = () => {
     {
       field: "phoneNumber",
       headerName: "Phone Number",
+      headerAlign: "right",
+      align: "right",
       flex: 0.5,
     },
     {
