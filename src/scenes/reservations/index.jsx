@@ -1,10 +1,7 @@
 import * as React from "react";
 import Button from "@mui/material/Button";
 import PlaylistRemoveIcon from "@mui/icons-material/PlaylistRemove";
-import {
-  DataGrid,
-  GridActionsCellItem,
-} from "@mui/x-data-grid";
+import { DataGrid, GridActionsCellItem } from "@mui/x-data-grid";
 import axios from "axios";
 import { Box, useTheme, IconButton } from "@mui/material";
 import Header from "../../components/Header";
@@ -19,6 +16,8 @@ import SearchIcon from "@mui/icons-material/Search";
 import InputBase from "@mui/material/InputBase";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
+import Select from "@mui/material/Select";
+import MenuItem from "@mui/material/MenuItem";
 
 const Reservations = () => {
   const theme = useTheme();
@@ -31,6 +30,7 @@ const Reservations = () => {
   const [tabValue, setTabValue] = React.useState(0);
   const [searchValue, setSearchValue] = React.useState("");
   const [status, setStatus] = React.useState("Reserved");
+  const [searchBy, setSearchBy] = React.useState("FullName");
 
   const handleCloseSnackbar = () => setSnackbar(null);
 
@@ -72,8 +72,6 @@ const Reservations = () => {
     // noButtonRef.current?.focus();
   };
 
-  
-
   const renderConfirmDeleteDialog = () => {
     if (!deleteArguments) {
       return null;
@@ -108,16 +106,30 @@ const Reservations = () => {
 
   const fetchData = async () => {
     const search = searchValue.trim();
+    const searchByValue = searchBy.trim();
     let response = await axios.get(
-      `https://oms-fa22se19.herokuapp.com/api/v1/Reservations` + `?status=` + status + `&searchValue=` + search
+      `https://oms-fa22se19.herokuapp.com/api/v1/Reservations` +
+        `?status=` +
+        status +
+        `&searchBy=` +
+        searchByValue +
+        `&searchValue=` +
+        search
     );
     setRows(response.data["data"]);
   };
 
   const fetchDataWithStatus = async (status) => {
     const search = searchValue.trim();
+    const searchByValue = searchBy.trim();
     let response = await axios.get(
-      `https://oms-fa22se19.herokuapp.com/api/v1/Reservations` + `?status=` + status + `&searchValue=` + search
+      `https://oms-fa22se19.herokuapp.com/api/v1/Reservations` +
+        `?status=` +
+        status +
+        `&searchBy=` +
+        searchByValue +
+        `&searchValue=` +
+        search
     );
     setRows(response.data["data"]);
   };
@@ -134,12 +146,13 @@ const Reservations = () => {
     setDeleteArguments({ id, name });
   };
 
-  
-
   const columns = [
     {
       field: "index",
       headerName: "No.",
+      headerAlign: "center",
+      align: "center",
+      flex: 0.25,
       renderCell: (index) => {
         let id = index.api.getRowIndex(index?.row?.id) + 1;
         return id;
@@ -158,6 +171,8 @@ const Reservations = () => {
     {
       field: "phoneNumber",
       headerName: "Phone Number",
+      headerAlign: "right",
+      align: "right",
       flex: 0.5,
       renderCell: (params) => {
         const currentRow = params.row;
@@ -168,6 +183,8 @@ const Reservations = () => {
       field: "numOfPeople",
       headerName: "People",
       type: "number",
+      headerAlign: "right",
+      align: "right",
       flex: 0.3,
     },
     {
@@ -179,23 +196,36 @@ const Reservations = () => {
       field: "numOfSeats",
       headerName: "Seats",
       type: "number",
+      headerAlign: "right",
+      align: "right",
       flex: 0.3,
     },
     {
       field: "quantity",
       headerName: "Quantity",
       type: "number",
+      headerAlign: "right",
+      align: "right",
       flex: 0.3,
     },
     {
       field: "prePaid",
       headerName: "Deposit",
       type: "number",
+      headerAlign: "right",
+      align: "right",
       flex: 0.5,
+      renderCell: (params) => {
+        const currentRow = params.row;
+        return <div>{currentRow["prePaid"].toLocaleString()}</div>;
+      },
     },
     {
       field: "startTime",
       headerName: "Start Time",
+      type: "Date",
+      headerAlign: "right",
+      align: "right",
       flex: 1,
       renderCell: (params) => {
         const currentRow = params.row;
@@ -205,6 +235,8 @@ const Reservations = () => {
     {
       field: "endTime",
       headerName: "End Time",
+      headerAlign: "right",
+      align: "right",
       flex: 1,
       renderCell: (params) => {
         const currentRow = params.row;
@@ -246,7 +278,6 @@ const Reservations = () => {
     },
   ];
 
-  
   const handleSearchChange = (event) => {
     setSearchValue(event.target.value);
   };
@@ -306,6 +337,22 @@ const Reservations = () => {
         backgroundColor={colors.primary[400]}
         borderRadius="3px"
       >
+        <Select
+          sx={{ flex: 0.5 }}
+          labelId="searchBy"
+          id="searchBy"
+          value={searchBy}
+          onChange={(e) => {
+            setSearchBy(e.target.value);
+          }}
+          label="Search By"
+        >
+          <MenuItem value="FullName">Customer</MenuItem>
+          <MenuItem value="PhoneNumber">Phone Number</MenuItem>
+          <MenuItem value="NumOfPeople">People</MenuItem>
+          <MenuItem value="TableType">Table Type</MenuItem>
+          <MenuItem value="NumOfSeats">Seat</MenuItem>
+        </Select>
         <InputBase
           onChange={handleSearchChange}
           sx={{ ml: 2, flex: 1 }}

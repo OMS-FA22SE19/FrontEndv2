@@ -1,16 +1,20 @@
-import { Box, Stack, Button, useTheme } from "@mui/material";
+import { Box, Stack, Button, useTheme, IconButton } from "@mui/material";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import { tokens } from "../../theme";
 import Header from "../../components/Header";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import Snackbar from '@mui/material/Snackbar';
-import Dialog from '@mui/material/Dialog';
-import DialogTitle from '@mui/material/DialogTitle';
-import DialogContent from '@mui/material/DialogContent';
-import DialogActions from '@mui/material/DialogActions';
-import Alert from '@mui/material/Alert';
+import Snackbar from "@mui/material/Snackbar";
+import Dialog from "@mui/material/Dialog";
+import DialogTitle from "@mui/material/DialogTitle";
+import DialogContent from "@mui/material/DialogContent";
+import DialogActions from "@mui/material/DialogActions";
+import Alert from "@mui/material/Alert";
+import Select from "@mui/material/Select";
+import MenuItem from "@mui/material/MenuItem";
+import InputBase from "@mui/material/InputBase";
+import SearchIcon from "@mui/icons-material/Search";
 
 const MenuFoods = () => {
   const theme = useTheme();
@@ -18,6 +22,8 @@ const MenuFoods = () => {
   const [APIData, setAPIData] = useState([]);
   const { menuId } = useParams();
   const [menuName, setMenuName] = useState("");
+  const [searchValue, setSearchValue] = React.useState("");
+  const [searchBy, setSearchBy] = React.useState("Name");
 
   const noButtonRef = React.useRef(null);
   const [promiseArguments, setPromiseArguments] = React.useState(null);
@@ -43,7 +49,7 @@ const MenuFoods = () => {
           resolve(oldRow); // Nothing was changed
         }
       }),
-    [],
+    []
   );
 
   const handleNo = () => {
@@ -58,7 +64,10 @@ const MenuFoods = () => {
     try {
       // Make the HTTP request to save in the backend
       const response = await updatePrice(newRow);
-      setSnackbar({ children: 'Price successfully saved', severity: 'success' });
+      setSnackbar({
+        children: "Price successfully saved",
+        severity: "success",
+      });
       resolve(response);
       setPromiseArguments(null);
     } catch (error) {
@@ -72,7 +81,7 @@ const MenuFoods = () => {
     // the cell triggers "No". Instead, we manually focus the "No" button once
     // the dialog is fully open.
     // noButtonRef.current?.focus();
-  };  
+  };
 
   const renderConfirmDialog = () => {
     if (!promiseArguments) {
@@ -103,8 +112,16 @@ const MenuFoods = () => {
   };
 
   const fetchData = async () => {
+    const search = searchValue.trim();
+    const searchByValue = searchBy.trim();
     let response = await axios.get(
-      `https://oms-fa22se19.herokuapp.com/api/v1/Menus/` + menuId + `/Food`
+      `https://oms-fa22se19.herokuapp.com/api/v1/Menus/` +
+        menuId +
+        `/Food` +
+        `?searchBy=` +
+        searchByValue +
+        `&searchValue=` +
+        search
     );
     setAPIData(response.data["data"]);
   };
@@ -123,18 +140,29 @@ const MenuFoods = () => {
 
   let navigate = useNavigate();
 
-  const updatePrice = async (currentRow) => { 
-    const requestBody = {id: menuId, foodId: currentRow["id"], price: currentRow["price"]};
-    await axios.put(`https://oms-fa22se19.herokuapp.com/api/v1/Menus/` + menuId + `/Food/` + currentRow["id"], requestBody)
+  const updatePrice = async (currentRow) => {
+    const requestBody = {
+      id: menuId,
+      foodId: currentRow["id"],
+      price: currentRow["price"],
+    };
+    await axios
+      .put(
+        `https://oms-fa22se19.herokuapp.com/api/v1/Menus/` +
+          menuId +
+          `/Food/` +
+          currentRow["id"],
+        requestBody
+      )
       .catch(() => {})
       .finally(() => fetchData());
-  }
+  };
 
   const deleteFood = async (id) => {
     await axios
       .delete(`https://oms-fa22se19.herokuapp.com/api/v1/Menus/` + menuId + `/Food/` + id)
       .then()
-      .catch()  
+      .catch()
       .finally((e) => {
         fetchData();
       });
@@ -145,6 +173,17 @@ const MenuFoods = () => {
       field: "index",
       headerName: "No.",
       renderCell: (index) => index.api.getRowIndex(index.row.id) + 1,
+    },
+    {
+      field: "pictureUrl",
+      headerName: "Picture",
+      renderCell: (params) => {
+        const currentRow = params.row;
+        return (
+          <img width={100} src={currentRow["pictureUrl"]} alt="Food image" />
+        );
+      },
+      flex: 1,
     },
     {
       field: "name",
@@ -168,25 +207,15 @@ const MenuFoods = () => {
       flex: 0.5,
     },
     {
-      field: "pictureUrl",
-      headerName: "picture",
-      renderCell: (params) => {
-        const currentRow = params.row;
-        return (
-          <img
-            {...srcset(currentRow["pictureUrl"], 250, 200, 2, 2)}
-            alt="Food image"
-          />
-        );
-      },
-      flex: 1,
-    },
-    {
       field: "price",
       headerName: "Price",
       type: "number",
       flex: 0.5,
-      editable: true
+      renderCell: (params) => {
+        const currentRow = params.row;
+        return currentRow["price"].toLocaleString();
+      },
+      editable: true,
     },
     {
       field: "courseTypeName",
@@ -234,7 +263,7 @@ const MenuFoods = () => {
             Remove
           </Button>
         );
-        
+
         return (
           <Stack direction="row" spacing={2}>
             {deleteButton}
@@ -246,14 +275,26 @@ const MenuFoods = () => {
   ];
 
   const directToCreateFood = () => {
-    let path = `/menu/` + menuId + '/foods/add';
+    let path = `/menu/` + menuId + "/foods/add";
     navigate(path);
+  };
+
+  const handleSearchChange = (event) => {
+    setSearchValue(event.target.value);
+  };
+
+  const handleKeyDown = (event) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      event.stopPropagation();
+      fetchData();
+    }
   };
 
   return (
     <Box m="20px">
       {renderConfirmDialog()}
-      <Header title="FOODS" subtitle={"List of Foods in Menu: " + menuName}/>
+      <Header title="FOODS" subtitle={"List of Foods in Menu: " + menuName} />
       <Button
         variant="outlined"
         color="secondary"
@@ -262,6 +303,38 @@ const MenuFoods = () => {
       >
         Insert
       </Button>
+      {/* SEARCH BAR */}
+      <Box
+        display="flex"
+        backgroundColor={colors.primary[400]}
+        borderRadius="3px"
+      >
+        <Select
+          sx={{ flex: 0.5 }}
+          labelId="searchBy"
+          id="searchBy"
+          value={searchBy}
+          onChange={(e) => {
+            setSearchBy(e.target.value);
+          }}
+          label="Search By"
+        >
+          <MenuItem value="Name">Name</MenuItem>
+          <MenuItem value="Description">Description</MenuItem>
+          <MenuItem value="Ingredient">Ingredient</MenuItem>
+          <MenuItem value="CourseType">Course Type</MenuItem>
+          <MenuItem value="FoodType">Food Type</MenuItem>
+        </Select>
+        <InputBase
+          onChange={handleSearchChange}
+          sx={{ ml: 2, flex: 1 }}
+          placeholder="Search"
+          onKeyPress={handleKeyDown}
+        />
+        <IconButton onClick={fetchData} sx={{ p: 1 }}>
+          <SearchIcon />
+        </IconButton>
+      </Box>
       <Box
         m="40px 0 0 0"
         height="75vh"
@@ -321,5 +394,3 @@ function srcset(image, width, height, rows = 1, cols = 1) {
 }
 
 export default MenuFoods;
-
-

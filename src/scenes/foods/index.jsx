@@ -1,4 +1,4 @@
-import { Box, Stack, Button } from "@mui/material";
+import { Box, Stack, Button, IconButton } from "@mui/material";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import { tokens } from "../../theme";
 import Header from "../../components/Header";
@@ -6,14 +6,28 @@ import { useTheme } from "@mui/material";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import Select from "@mui/material/Select";
+import MenuItem from "@mui/material/MenuItem";
+import InputBase from "@mui/material/InputBase";
+import SearchIcon from "@mui/icons-material/Search";
 
 const Foods = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const [APIData, setAPIData] = useState([]);
+  const [searchValue, setSearchValue] = React.useState("");
+  const [searchBy, setSearchBy] = React.useState("Name");
 
   const fetchData = async () => {
-    let response = await axios.get(`https://oms-fa22se19.herokuapp.com/api/v1/Foods`);
+    const search = searchValue.trim();
+    const searchByValue = searchBy.trim();
+    let response = await axios.get(
+      `https://oms-fa22se19.herokuapp.com/api/v1/Foods` +
+        `?searchBy=` +
+        searchByValue +
+        `&searchValue=` +
+        search
+    );
     setAPIData(response.data["data"]);
   };
 
@@ -48,6 +62,17 @@ const Foods = () => {
       renderCell: (index) => index.api.getRowIndex(index.row.id) + 1,
     },
     {
+      field: "pictureUrl",
+      headerName: "Picture",
+      renderCell: (params) => {
+        const currentRow = params.row;
+        return (
+          <img width={100} src={currentRow["pictureUrl"]} alt="Food image" />
+        );
+      },
+      flex: 1,
+    },
+    {
       field: "name",
       headerName: "Name",
       flex: 0.7,
@@ -67,17 +92,6 @@ const Foods = () => {
       headerName: "Available",
       type: "boolean",
       flex: 0.5,
-    },
-    {
-      field: "pictureUrl",
-      headerName: "Picture",
-      renderCell: (params) => {
-        const currentRow = params.row;
-        return (
-          <img width={100} src={currentRow["pictureUrl"]} alt="Food image" />
-        );
-      },
-      flex: 1,
     },
     {
       field: "courseTypeName",
@@ -184,6 +198,18 @@ const Foods = () => {
     navigate(path);
   };
 
+  const handleSearchChange = (event) => {
+    setSearchValue(event.target.value);
+  };
+
+  const handleKeyDown = (event) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      event.stopPropagation();
+      fetchData();
+    }
+  };
+
   return (
     <Box m="20px">
       <Header title="FOODS" subtitle="List of Foods" />
@@ -195,6 +221,38 @@ const Foods = () => {
       >
         Insert
       </Button>
+      {/* SEARCH BAR */}
+      <Box
+        display="flex"
+        backgroundColor={colors.primary[400]}
+        borderRadius="3px"
+      >
+        <Select
+          sx={{ flex: 0.5 }}
+          labelId="searchBy"
+          id="searchBy"
+          value={searchBy}
+          onChange={(e) => {
+            setSearchBy(e.target.value);
+          }}
+          label="Search By"
+        >
+          <MenuItem value="Name">Name</MenuItem>
+          <MenuItem value="Description">Description</MenuItem>
+          <MenuItem value="Ingredient">Ingredient</MenuItem>
+          <MenuItem value="CourseType">Course Type</MenuItem>
+          <MenuItem value="FoodType">Food Type</MenuItem>
+        </Select>
+        <InputBase
+          onChange={handleSearchChange}
+          sx={{ ml: 2, flex: 1 }}
+          placeholder="Search"
+          onKeyPress={handleKeyDown}
+        />
+        <IconButton onClick={fetchData} sx={{ p: 1 }}>
+          <SearchIcon />
+        </IconButton>
+      </Box>
       <Box
         m="40px 0 0 0"
         height="75vh"
