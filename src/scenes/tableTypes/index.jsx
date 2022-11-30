@@ -66,11 +66,11 @@ const TableTypes = () => {
     try {
       // Make the HTTP request to save in the backend
       let response;
-      if(newRow.isNew !== undefined) {
+      if (newRow.isNew !== undefined) {
         response = await handleAdd(newRow);
-      }else {
+      } else {
         response = await handleUpdate(newRow);
-      } 
+      }
       setSnackbar({
         children: "Table Type successfully saved",
         severity: "success",
@@ -104,34 +104,43 @@ const TableTypes = () => {
   const handleDelete = async (id) => {
     await axios
       .delete(`https://localhost:7246/api/v1/TableTypes/` + id)
-      .then(response => {
-        if(response.status === 204) {
+      .then((response) => {
+        if (response.status === 204) {
           fetchData();
         }
       })
-      .catch(error => console.log(error));
+      .catch((error) => console.log(error));
   };
 
   const handleRecover = async (id) => {
     await axios
       .put(`https://localhost:7246/api/v1/TableTypes/` + id + `/recover`)
-      .then(response => {
-        if(response.status === 204) {
+      .then((response) => {
+        if (response.status === 204) {
           fetchData();
         }
       })
-      .catch(error => console.log(error));
+      .catch((error) => console.log(error));
   };
 
   const handleUpdate = async (currentRow) => {
-    const requestBody = {id: currentRow["id"], name: currentRow["name"], chargePerSeat: currentRow["chargePerSeat"], canBeCombined: currentRow["canBeCombined"]};
-    await axios.put(`https://localhost:7246/api/v1/TableTypes/` + currentRow["id"], requestBody)
-    .then(response => {
-      if(response.status === 204) {
-        fetchData();
-      }
-    })
-    .catch((error) => console.log(error))
+    const requestBody = {
+      id: currentRow["id"],
+      name: currentRow["name"],
+      chargePerSeat: currentRow["chargePerSeat"],
+      canBeCombined: currentRow["canBeCombined"],
+    };
+    await axios
+      .put(
+        `https://localhost:7246/api/v1/TableTypes/` + currentRow["id"],
+        requestBody
+      )
+      .then((response) => {
+        if (response.status === 204) {
+          fetchData();
+        }
+      })
+      .catch((error) => console.log(error));
   };
   const handleEntered = () => {
     // The `autoFocus` is not used because, if used, the same Enter that saves
@@ -155,9 +164,7 @@ const TableTypes = () => {
         open={!!promiseArguments}
       >
         <DialogTitle>Are you sure?</DialogTitle>
-        <DialogContent dividers>
-        {`Pressing 'Yes' to confirm.`}
-        </DialogContent>
+        <DialogContent dividers>{`Pressing 'Yes' to confirm.`}</DialogContent>
         <DialogActions>
           <Button ref={noButtonRef} onClick={handleUpdateNo}>
             No
@@ -206,8 +213,13 @@ const TableTypes = () => {
   };
 
   const handleAdd = async (currentRow) => {
-    const requestBody = {name: currentRow["name"], chargePerSeat: currentRow["chargePerSeat"], chargePerSeat: currentRow["chargePerSeat"]};
-    await axios.post(`https://localhost:7246/api/v1/TableTypes/`, requestBody)
+    const requestBody = {
+      name: currentRow["name"],
+      chargePerSeat: currentRow["chargePerSeat"],
+      chargePerSeat: currentRow["chargePerSeat"],
+    };
+    await axios
+      .post(`https://localhost:7246/api/v1/TableTypes/`, requestBody)
       .catch(() => {})
       .finally(() => fetchData());
   };
@@ -260,83 +272,57 @@ const TableTypes = () => {
       headerName: "No.",
       renderCell: (index) => index.api.getRowIndex(index.row.id) + 1,
     },
-    { field: "name", headerName: "Name", flex: 1, editable: true},
-    { field: "quantity", headerName: "Quantity", flex: 0.5 },
+    { field: "name", headerName: "Name", flex: 1, editable: true },
+    {
+      field: "quantity",
+      headerName: "Quantity",
+      headerAlign: "right",
+      align: "right",
+      flex: 0.5,
+    },
     {
       field: "chargePerSeat",
       headerName: "Charge per seat",
       type: "number",
+      headerAlign: "right",
+      align: "right",
+      flex: 0.5,
+      editable: true,
+      renderCell: (params) => {
+        const currentRow = params.row;
+        return currentRow["chargePerSeat"].toLocaleString();
+      },
+    },
+    {
+      field: "canBeCombined",
+      headerName: "Can Be Combined",
+      type: "boolean",
       flex: 0.5,
       editable: true,
     },
     {
-        field: "canBeCombined",
-        headerName: "Can Be Combined",
-        type: "boolean",
-        flex: 0.5,
-        editable: true,
-      },
-      {
-        field: "isDeleted",
-        headerName: "Is Deleted",
-        type: "boolean",
-        flex: 0.5,
-      },
-      {
-        field: "actions",
-        type: "actions",
-        headerName: "Actions",
-        width: 100,
-        cellClassName: "actions",
-        getActions: (params) => {
-          const currentRow = params.row;
-          const id = currentRow.id;
-          const name = currentRow.name;
-          const isInEditMode = rowModesModel[id]?.mode === GridRowModes.Edit;
-          if(currentRow["isDeleted"]) {
-            return [
-              <GridActionsCellItem
-                icon={<RestoreIcon />}
-                label="Restore"
-                onClick={handleRecoverClick(id)}
-              />,
-              <GridActionsCellItem
-              icon={<DeleteIcon />}
-              label="Delete"
-              onClick={handleDeleteClick(id, name)}
-              color="inherit"
-            />,
-            ]
-          }
-  
-          if (isInEditMode) {
-            return [
-              <GridActionsCellItem
-                icon={<SaveIcon />}
-                label="Save"
-                onClick={handleSaveClick(currentRow)}
-              />,
-              <GridActionsCellItem
-                icon={<CancelIcon />}
-                label="Cancel"
-                className="textPrimary"
-                onClick={handleCancelClick(id)}
-                color="inherit"
-              />,
-            ];
-          }
-  
-          if (isEditing && !isInEditMode) {
-            return [];
-          }
-  
+      field: "isDeleted",
+      headerName: "Is Deleted",
+      type: "boolean",
+      flex: 0.5,
+    },
+    {
+      field: "actions",
+      type: "actions",
+      headerName: "Actions",
+      width: 100,
+      cellClassName: "actions",
+      getActions: (params) => {
+        const currentRow = params.row;
+        const id = currentRow.id;
+        const name = currentRow.name;
+        const isInEditMode = rowModesModel[id]?.mode === GridRowModes.Edit;
+        if (currentRow["isDeleted"]) {
           return [
             <GridActionsCellItem
-              icon={<EditIcon />}
-              label="Edit"
-              className="textPrimary"
-              onClick={handleEditClick(id)}
-              color="inherit"
+              icon={<RestoreIcon />}
+              label="Restore"
+              onClick={handleRecoverClick(id)}
             />,
             <GridActionsCellItem
               icon={<DeleteIcon />}
@@ -345,10 +331,48 @@ const TableTypes = () => {
               color="inherit"
             />,
           ];
-        },
-        flex: 1
+        }
+
+        if (isInEditMode) {
+          return [
+            <GridActionsCellItem
+              icon={<SaveIcon />}
+              label="Save"
+              onClick={handleSaveClick(currentRow)}
+            />,
+            <GridActionsCellItem
+              icon={<CancelIcon />}
+              label="Cancel"
+              className="textPrimary"
+              onClick={handleCancelClick(id)}
+              color="inherit"
+            />,
+          ];
+        }
+
+        if (isEditing && !isInEditMode) {
+          return [];
+        }
+
+        return [
+          <GridActionsCellItem
+            icon={<EditIcon />}
+            label="Edit"
+            className="textPrimary"
+            onClick={handleEditClick(id)}
+            color="inherit"
+          />,
+          <GridActionsCellItem
+            icon={<DeleteIcon />}
+            label="Delete"
+            onClick={handleDeleteClick(id, name)}
+            color="inherit"
+          />,
+        ];
       },
-    ];
+      flex: 1,
+    },
+  ];
 
   return (
     <Box m="20px">
@@ -404,10 +428,12 @@ const TableTypes = () => {
           }}
           experimentalFeatures={{ newEditingApi: true }}
           onProcessRowUpdateError={(error) => {
-            if(error.message === "Cannot read properties of undefined (reading 'id')") {
+            if (
+              error.message ===
+              "Cannot read properties of undefined (reading 'id')"
+            ) {
               window.location.reload();
-            }
-            else {
+            } else {
               console.log(error);
             }
           }}
@@ -426,10 +452,20 @@ function EditToolbar(props) {
   const { rows, setRows, setRowModesModel, isAdding, setIsAdding } = props;
 
   const handleClick = () => {
-    const id =  Math.max(...rows.map(o => o.id)) + 1;
+    const id = Math.max(...rows.map((o) => o.id)) + 1;
 
     setIsAdding(true);
-    setRows((oldRows) => [...oldRows, { id, name: "", quantity: 0, chargePerSeat: 0, canBeCombined: false, isNew: true }]);
+    setRows((oldRows) => [
+      ...oldRows,
+      {
+        id,
+        name: "",
+        quantity: 0,
+        chargePerSeat: 0,
+        canBeCombined: false,
+        isNew: true,
+      },
+    ]);
     setRowModesModel((oldModel) => ({
       ...oldModel,
       [id]: { mode: GridRowModes.Edit, fieldToFocus: "name" },

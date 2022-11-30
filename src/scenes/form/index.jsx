@@ -3,17 +3,33 @@ import { Formik } from "formik";
 import * as yup from "yup";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import Header from "../../components/Header";
+import * as React from "react";
+import axios from "axios";
 
 const Form = () => {
   const isNonMobile = useMediaQuery("(min-width:600px)");
+  const [demoReservation, setDemoReservation] = React.useState([]);
 
-  const handleFormSubmit = (values) => {
-    console.log(values);
+  const handleFormSubmit = async (values) => {
+    var query = {
+      startTime: values.startTime,
+      endTime: values.endTime,
+      numOfCheckInReservation: values.numOfCheckInReservation,
+      numOfAvailableReservation: values.numOfAvailableReservation,
+      numOfCancelledReservation: values.numOfCancelledReservation,
+    };
+
+    await axios
+    .post(`https://localhost:7246/api/v1/Demo/Reservation`, query)
+    .then((response) => setDemoReservation(response.data["data"]));
   };
 
   return (
     <Box m="20px">
-      <Header title="Demo Reservation" subtitle="Create Multiple Reservations" />
+      <Header
+        title="Demo Reservation"
+        subtitle="Create Multiple Reservations"
+      />
 
       <Formik
         onSubmit={handleFormSubmit}
@@ -54,7 +70,7 @@ const Form = () => {
                 inputProps={{
                   step: 300, // 5 min
                 }}
-                sx={{ gridColumn: "span 2" }}
+                sx={{ gridColumn: "span 1" }}
               />
               <TextField
                 fullWidth
@@ -73,6 +89,17 @@ const Form = () => {
                 inputProps={{
                   step: 300, // 5 min
                 }}
+                sx={{ gridColumn: "span 1" }}
+              />
+              <TextField
+                fullWidth
+                variant="filled"
+                type="string"
+                label="Console Log"
+                onBlur={handleBlur}
+                onChange={handleChange}
+                value={demoReservation}
+                name="Reservation Console Log"
                 sx={{ gridColumn: "span 2" }}
               />
               <TextField
@@ -84,9 +111,15 @@ const Form = () => {
                 onChange={handleChange}
                 value={values.numOfCheckInReservation}
                 name="numOfCheckInReservation"
-                error={!!touched.numOfCheckInReservation && !!errors.numOfCheckInReservation}
-                helperText={touched.numOfCheckInReservation && errors.numOfCheckInReservation}
-                sx={{ gridColumn: "span 4" }}
+                error={
+                  !!touched.numOfCheckInReservation &&
+                  !!errors.numOfCheckInReservation
+                }
+                helperText={
+                  touched.numOfCheckInReservation &&
+                  errors.numOfCheckInReservation
+                }
+                sx={{ gridColumn: "span 1" }}
               />
               <TextField
                 fullWidth
@@ -97,9 +130,15 @@ const Form = () => {
                 onChange={handleChange}
                 value={values.numOfAvailableReservation}
                 name="numOfAvailableReservation"
-                error={!!touched.numOfAvailableReservation && !!errors.numOfAvailableReservation}
-                helperText={touched.numOfAvailableReservation && errors.numOfAvailableReservation}
-                sx={{ gridColumn: "span 4" }}
+                error={
+                  !!touched.numOfAvailableReservation &&
+                  !!errors.numOfAvailableReservation
+                }
+                helperText={
+                  touched.numOfAvailableReservation &&
+                  errors.numOfAvailableReservation
+                }
+                sx={{ gridColumn: "span 1" }}
               />
               <TextField
                 fullWidth
@@ -110,9 +149,15 @@ const Form = () => {
                 onChange={handleChange}
                 value={values.numOfCancelledReservation}
                 name="numOfCancelledReservation"
-                error={!!touched.numOfCancelledReservation && !!errors.numOfCancelledReservation}
-                helperText={touched.numOfCancelledReservation && errors.numOfCancelledReservation}
-                sx={{ gridColumn: "span 4" }}
+                error={
+                  !!touched.numOfCancelledReservation &&
+                  !!errors.numOfCancelledReservation
+                }
+                helperText={
+                  touched.numOfCancelledReservation &&
+                  errors.numOfCancelledReservation
+                }
+                sx={{ gridColumn: "span 1" }}
               />
             </Box>
             <Box display="flex" justifyContent="end" mt="20px">
@@ -127,22 +172,17 @@ const Form = () => {
   );
 };
 
-const phoneRegExp =
-  /^((\+[1-9]{1,4}[ -]?)|(\([0-9]{2,3}\)[ -]?)|([0-9]{2,4})[ -]?)*?[0-9]{3,4}[ -]?[0-9]{3,4}$/;
-
 const checkoutSchema = yup.object().shape({
-  startTime: yup.date().required("required"),
-  endTime: yup.date(),
   numOfCheckInReservation: yup.number().moreThan(-1),
   numOfAvailableReservation: yup.number().moreThan(-1),
-  numOfCancelledReservation: yup.number().moreThan(-1)
+  numOfCancelledReservation: yup.number().moreThan(-1),
 });
 const initialValues = {
   startTime: "11:00",
   endTime: "",
   numOfCheckInReservation: 0,
   numOfAvailableReservation: 0,
-  numOfCancelledReservation: 0
+  numOfCancelledReservation: 0,
 };
 
 export default Form;
