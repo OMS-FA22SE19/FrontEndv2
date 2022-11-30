@@ -103,7 +103,7 @@ const TableTypes = () => {
 
   const handleDelete = async (id) => {
     await axios
-      .delete(`https://localhost:7246/api/v1/TableTypes/` + id)
+      .delete(`https://oms-fa22se19.herokuapp.com/api/v1/TableTypes/` + id)
       .then((response) => {
         if (response.status === 204) {
           fetchData();
@@ -114,7 +114,7 @@ const TableTypes = () => {
 
   const handleRecover = async (id) => {
     await axios
-      .put(`https://localhost:7246/api/v1/TableTypes/` + id + `/recover`)
+      .put(`https://oms-fa22se19.herokuapp.com/api/v1/TableTypes/` + id + `/recover`)
       .then((response) => {
         if (response.status === 204) {
           fetchData();
@@ -132,7 +132,7 @@ const TableTypes = () => {
     };
     await axios
       .put(
-        `https://localhost:7246/api/v1/TableTypes/` + currentRow["id"],
+        `https://oms-fa22se19.herokuapp.com/api/v1/TableTypes/` + currentRow["id"],
         requestBody
       )
       .then((response) => {
@@ -208,7 +208,7 @@ const TableTypes = () => {
   };
 
   const fetchData = async () => {
-    let response = await axios.get(`https://localhost:7246/api/v1/TableTypes`);
+    let response = await axios.get(`https://oms-fa22se19.herokuapp.com/api/v1/TableTypes`);
     setRows(response.data["data"]);
   };
 
@@ -219,7 +219,7 @@ const TableTypes = () => {
       chargePerSeat: currentRow["chargePerSeat"],
     };
     await axios
-      .post(`https://localhost:7246/api/v1/TableTypes/`, requestBody)
+      .post(`https://oms-fa22se19.herokuapp.com/api/v1/TableTypes/`, requestBody)
       .catch(() => {})
       .finally(() => fetchData());
   };

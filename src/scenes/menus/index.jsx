@@ -123,7 +123,7 @@ const Menus = () => {
 
   const handleDelete = async (id) => {
     await axios
-      .delete(`https://localhost:7246/api/v1/Menus/` + id)
+      .delete(`https://oms-fa22se19.herokuapp.com/api/v1/Menus/` + id)
       .then(response => {
         if(response.status === 204) {
           fetchData();
@@ -134,7 +134,7 @@ const Menus = () => {
 
   const handleRecover = async (id) => {
     await axios
-      .put(`https://localhost:7246/api/v1/Menus/` + id + `/recover`)
+      .put(`https://oms-fa22se19.herokuapp.com/api/v1/Menus/` + id + `/recover`)
       .then(response => {
         if(response.status === 204) {
           fetchData();
@@ -145,7 +145,7 @@ const Menus = () => {
 
   const handleUpdate = async (currentRow) => {
     const requestBody = {id: currentRow["id"], name: currentRow["name"], description: currentRow["description"]};
-    await axios.put(`https://localhost:7246/api/v1/Menus/` + currentRow["id"], requestBody)
+    await axios.put(`https://oms-fa22se19.herokuapp.com/api/v1/Menus/` + currentRow["id"], requestBody)
       .catch(() => {})
       .finally(() => fetchData());
   };
@@ -159,7 +159,7 @@ const Menus = () => {
 
   const fetchData = async () => {
     const search = searchValue.trim();
-    let response = await axios.get(`https://localhost:7246/api/v1/Menus` + `?searchValue=` + search);
+    let response = await axios.get(`https://oms-fa22se19.herokuapp.com/api/v1/Menus` + `?searchValue=` + search);
     setRows(response.data["data"]);
   };
 
@@ -230,7 +230,7 @@ const Menus = () => {
 
   const createMenu = async (currentRow) => {
     const requestBody = {name: currentRow["name"], description: currentRow["description"]};
-    await axios.post(`https://localhost:7246/api/v1/Menus/`, requestBody)
+    await axios.post(`https://oms-fa22se19.herokuapp.com/api/v1/Menus/`, requestBody)
       .catch(() => {})
       .finally(() => fetchData());
   };

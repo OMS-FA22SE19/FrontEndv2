@@ -27,14 +27,14 @@ const Checkout = () => {
     const search = searchValue.trim();
     const searchByValue = searchBy.trim();
     let processingResponse = await axios.get(
-      `https://localhost:7246/api/v1/Orders?Status=Processing` +
+      `https://https://oms-fa22se19.herokuapp.com/api/v1/Orders?Status=Processing` +
         `&searchBy=` +
         searchByValue +
         `&searchValue=` +
         search
     );
     let checkingResponse = await axios.get(
-      `https://localhost:7246/api/v1/Orders?Status=Checking` +
+      `https://oms-fa22se19.herokuapp.com/api/v1/Orders?Status=Checking` +
         `&searchBy=` +
         searchByValue +
         `&searchValue=` +
@@ -48,7 +48,7 @@ const Checkout = () => {
 
   const confirm = async (id) => {
     await axios
-      .post(`https://localhost:7246/api/v1/Orders/` + id + "/Confirm")
+      .post(`https://oms-fa22se19.herokuapp.com/api/v1/Orders/` + id + "/Confirm")
       .then(() => fetchData());
   };
 

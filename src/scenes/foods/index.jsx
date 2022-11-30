@@ -22,7 +22,7 @@ const Foods = () => {
     const search = searchValue.trim();
     const searchByValue = searchBy.trim();
     let response = await axios.get(
-      `https://localhost:7246/api/v1/Foods` +
+      `https://oms-fa22se19.herokuapp.com/api/v1/Foods` +
         `?searchBy=` +
         searchByValue +
         `&searchValue=` +
@@ -39,7 +39,7 @@ const Foods = () => {
 
   const deleteFood = async (id) => {
     await axios
-      .delete(`https://localhost:7246/api/v1/Foods/` + id)
+      .delete(`https://oms-fa22se19.herokuapp.com/api/v1/Foods/` + id)
       .then()
       .finally((e) => {
         fetchData();
@@ -48,7 +48,7 @@ const Foods = () => {
 
   const recoverFood = async (id) => {
     await axios
-      .put(`https://localhost:7246/api/v1/Foods/` + id + `/recover`)
+      .put(`https://oms-fa22se19.herokuapp.com/api/v1/Foods/` + id + `/recover`)
       .then()
       .finally((e) => {
         fetchData();

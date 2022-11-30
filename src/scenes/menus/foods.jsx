@@ -115,7 +115,7 @@ const MenuFoods = () => {
     const search = searchValue.trim();
     const searchByValue = searchBy.trim();
     let response = await axios.get(
-      `https://localhost:7246/api/v1/Menus/` +
+      `https://oms-fa22se19.herokuapp.com/api/v1/Menus/` +
         menuId +
         `/Food` +
         `?searchBy=` +
@@ -128,7 +128,7 @@ const MenuFoods = () => {
 
   const getMenuInfo = async () => {
     let response = await axios.get(
-      `https://localhost:7246/api/v1/Menus/` + menuId
+      `https://oms-fa22se19.herokuapp.com/api/v1/Menus/` + menuId
     );
     setMenuName(response.data["data"]["name"]);
   };
@@ -148,7 +148,7 @@ const MenuFoods = () => {
     };
     await axios
       .put(
-        `https://localhost:7246/api/v1/Menus/` +
+        `https://oms-fa22se19.herokuapp.com/api/v1/Menus/` +
           menuId +
           `/Food/` +
           currentRow["id"],
@@ -160,7 +160,7 @@ const MenuFoods = () => {
 
   const deleteFood = async (id) => {
     await axios
-      .delete(`https://localhost:7246/api/v1/Menus/` + menuId + `/Food/` + id)
+      .delete(`https://oms-fa22se19.herokuapp.com/api/v1/Menus/` + menuId + `/Food/` + id)
       .then()
       .catch()
       .finally((e) => {

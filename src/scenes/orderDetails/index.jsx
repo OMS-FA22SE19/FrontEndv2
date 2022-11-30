@@ -42,7 +42,7 @@ const OrderDetails = () => {
     const search = searchValue.trim();
     const searchByValue = searchBy.trim();
     let response = await axios.get(
-      `https://localhost:7246/api/v1/OrderDetails` +
+      `https://oms-fa22se19.herokuapp.com/api/v1/OrderDetails` +
         `?status=` +
         status +
         `&searchBy=` +
@@ -103,7 +103,7 @@ const OrderDetails = () => {
   const fetchDataWithStatus = async (value) => {
     const search = searchValue.trim();
     let response = await axios.get(
-      `https://localhost:7246/api/v1/OrderDetails` +
+      `https://oms-fa22se19.herokuapp.com/api/v1/OrderDetails` +
         `?status=` +
         value +
         `&searchValue=` +
@@ -230,7 +230,7 @@ const OrderDetails = () => {
   const updateStatus = async (id, status) => {
     let requestBody = { id: id, status: status };
     await axios
-      .put(`https://localhost:7246/api/v1/OrderDetails/` + id, requestBody)
+      .put(`https://oms-fa22se19.herokuapp.com/api/v1/OrderDetails/` + id, requestBody)
       .then(() => fetchData());
   };
 

@@ -56,7 +56,7 @@ const Reservations = () => {
 
   const handleCancelReservation = async (id) => {
     await axios
-      .delete(`https://localhost:7246/api/v1/Reservations/` + id)
+      .delete(`https://oms-fa22se19.herokuapp.com/api/v1/Reservations/` + id)
       .then((response) => {
         if (response.status === 204) {
           fetchData();
@@ -108,7 +108,7 @@ const Reservations = () => {
     const search = searchValue.trim();
     const searchByValue = searchBy.trim();
     let response = await axios.get(
-      `https://localhost:7246/api/v1/Reservations` +
+      `https://oms-fa22se19.herokuapp.com/api/v1/Reservations` +
         `?status=` +
         status +
         `&searchBy=` +
@@ -123,7 +123,7 @@ const Reservations = () => {
     const search = searchValue.trim();
     const searchByValue = searchBy.trim();
     let response = await axios.get(
-      `https://localhost:7246/api/v1/Reservations` +
+      `https://oms-fa22se19.herokuapp.com/api/v1/Reservations` +
         `?status=` +
         status +
         `&searchBy=` +
@@ -235,7 +235,6 @@ const Reservations = () => {
     {
       field: "endTime",
       headerName: "End Time",
-      type: "Date",
       headerAlign: "right",
       align: "right",
       flex: 1,
