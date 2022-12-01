@@ -27,6 +27,7 @@ import SearchIcon from "@mui/icons-material/Search";
 import InputBase from "@mui/material/InputBase";
 
 const Menus = () => {
+  const host = `https://localhost:7246`
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const [rows, setRows] = useState([]);
@@ -123,7 +124,7 @@ const Menus = () => {
 
   const handleDelete = async (id) => {
     await axios
-      .delete(`https://oms-fa22se19.herokuapp.com/api/v1/Menus/` + id)
+      .delete(host + `/api/v1/Menus/` + id)
       .then(response => {
         if(response.status === 204) {
           fetchData();
@@ -134,7 +135,7 @@ const Menus = () => {
 
   const handleRecover = async (id) => {
     await axios
-      .put(`https://oms-fa22se19.herokuapp.com/api/v1/Menus/` + id + `/recover`)
+      .put(host + `/api/v1/Menus/` + id + `/recover`)
       .then(response => {
         if(response.status === 204) {
           fetchData();
@@ -145,7 +146,7 @@ const Menus = () => {
 
   const handleUpdate = async (currentRow) => {
     const requestBody = {id: currentRow["id"], name: currentRow["name"], description: currentRow["description"]};
-    await axios.put(`https://oms-fa22se19.herokuapp.com/api/v1/Menus/` + currentRow["id"], requestBody)
+    await axios.put(host + `/api/v1/Menus/` + currentRow["id"], requestBody)
       .catch(() => {})
       .finally(() => fetchData());
   };
@@ -159,7 +160,7 @@ const Menus = () => {
 
   const fetchData = async () => {
     const search = searchValue.trim();
-    let response = await axios.get(`https://oms-fa22se19.herokuapp.com/api/v1/Menus` + `?searchValue=` + search);
+    let response = await axios.get(host + `/api/v1/Menus` + `?searchValue=` + search);
     setRows(response.data["data"]);
   };
 
@@ -230,7 +231,7 @@ const Menus = () => {
 
   const createMenu = async (currentRow) => {
     const requestBody = {name: currentRow["name"], description: currentRow["description"]};
-    await axios.post(`https://oms-fa22se19.herokuapp.com/api/v1/Menus/`, requestBody)
+    await axios.post(host + `/api/v1/Menus/`, requestBody)
       .catch(() => {})
       .finally(() => fetchData());
   };
@@ -399,7 +400,7 @@ const Menus = () => {
         <InputBase
           onChange={handleSearchChange}
           sx={{ ml: 2, flex: 1 }}
-          placeholder="Search"
+          placeholder="Search name, description"
           onKeyPress={handleKeyDown}
         />
         <IconButton onClick={fetchData} sx={{ p: 1 }}>

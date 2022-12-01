@@ -16,6 +16,7 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 import { useParams } from "react-router-dom";
 
 const AddFood = () => {
+  const host = `https://localhost:7246`
   const isNonMobile = useMediaQuery("(min-width:600px)");
   const { menuId } = useParams();
   
@@ -74,13 +75,13 @@ const AddFood = () => {
 
   const fetchCourseTypes = async () => {
     await axios
-      .get(`https://oms-fa22se19.herokuapp.com/api/v1/CourseTypes`)
+      .get(host + `/api/v1/CourseTypes`)
       .then((response) => setCourseTypes(response.data["data"]));
   };
 
   const fetchFoodTypes = async () => {
     await axios
-      .get(`https://oms-fa22se19.herokuapp.com/api/v1/Types`)
+      .get(host + `/api/v1/Types`)
       .then((response) => setFoodTypes(response.data["data"]));
   };
 

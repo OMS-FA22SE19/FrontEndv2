@@ -1,4 +1,4 @@
-import { Box, Stack, Button } from "@mui/material";
+import { Box, Stack, Button, IconButton } from "@mui/material";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import { tokens } from "../../theme";
 import Header from "../../components/Header";
@@ -6,11 +6,18 @@ import { useTheme } from "@mui/material";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import SearchIcon from "@mui/icons-material/Search";
+import InputBase from "@mui/material/InputBase";
+import Select from "@mui/material/Select";
+import MenuItem from "@mui/material/MenuItem";
 
 const Users = () => {
+  const host = `https://localhost:7246`;
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const [APIData, setAPIData] = useState([]);
+  const [searchValue, setSearchValue] = React.useState("");
+  const [searchBy, setSearchBy] = React.useState("Id");
 
   let navigate = useNavigate();
 
@@ -19,14 +26,21 @@ const Users = () => {
   }, []);
 
   const fetchData = async () => {
-    let response = await axios.get(`https://oms-fa22se19.herokuapp.com/api/v1/Users`);
+    const search = searchValue.trim();
+    const searchByValue = searchBy.trim();
+    let response = await axios.get(
+      host +
+        `/api/v1/Users` +
+        `?searchBy=` +
+        searchByValue +
+        `&searchValue=` +
+        search
+    );
     setAPIData(response.data["data"]);
   };
 
   const deleteUser = async (id) => {
-    await axios
-      .delete(`https://oms-fa22se19.herokuapp.com/api/v1/Users/` + id)
-      .finally(() => fetchData());
+    await axios.delete(host + `/api/v1/Users/` + id).finally(() => fetchData());
   };
 
   const directToCreateUser = () => {
@@ -131,9 +145,53 @@ const Users = () => {
     },
   ];
 
+  const handleSearchChange = (event) => {
+    setSearchValue(event.target.value);
+  };
+
+  const handleKeyDown = (event) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      event.stopPropagation();
+      fetchData();
+    }
+  };
+
   return (
     <Box m="20px">
       <Header title="USERS" subtitle="List of Users" />
+      {/* SEARCH BAR */}
+      <Box
+        display="flex"
+        backgroundColor={colors.primary[400]}
+        borderRadius="3px"
+      >
+        <Select
+          sx={{ flex: 0.5 }}
+          labelId="searchBy"
+          id="searchBy"
+          value={searchBy}
+          onChange={(e) => {
+            setSearchBy(e.target.value);
+          }}
+          label="Search By"
+        >
+          <MenuItem value="Id">Id</MenuItem>
+          <MenuItem value="UserName">UserName</MenuItem>
+          <MenuItem value="FullName">FullName</MenuItem>
+          <MenuItem value="Email">Email</MenuItem>
+          <MenuItem value="PhoneNumber">Phone Number</MenuItem>
+        </Select>
+        <InputBase
+          onChange={handleSearchChange}
+          sx={{ ml: 2, flex: 1 }}
+          placeholder="Search"
+          onKeyPress={handleKeyDown}
+        />
+        <IconButton onClick={fetchData} sx={{ p: 1 }}>
+          <SearchIcon />
+        </IconButton>
+      </Box>
       <Button
         variant="outlined"
         color="secondary"

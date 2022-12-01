@@ -20,6 +20,7 @@ import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
 
 const Reservations = () => {
+  const host = `https://localhost:7246`
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const [rows, setRows] = React.useState([]);
@@ -56,7 +57,7 @@ const Reservations = () => {
 
   const handleCancelReservation = async (id) => {
     await axios
-      .delete(`https://oms-fa22se19.herokuapp.com/api/v1/Reservations/` + id)
+      .delete(host + `/api/v1/Reservations/` + id)
       .then((response) => {
         if (response.status === 204) {
           fetchData();
@@ -108,7 +109,7 @@ const Reservations = () => {
     const search = searchValue.trim();
     const searchByValue = searchBy.trim();
     let response = await axios.get(
-      `https://oms-fa22se19.herokuapp.com/api/v1/Reservations` +
+      host + `/api/v1/Reservations` +
         `?status=` +
         status +
         `&searchBy=` +
@@ -123,7 +124,7 @@ const Reservations = () => {
     const search = searchValue.trim();
     const searchByValue = searchBy.trim();
     let response = await axios.get(
-      `https://oms-fa22se19.herokuapp.com/api/v1/Reservations` +
+      host + `/api/v1/Reservations` +
         `?status=` +
         status +
         `&searchBy=` +

@@ -18,7 +18,7 @@ import Chip from "@mui/material/Chip";
 
 const CreateFood = () => {
   const isNonMobile = useMediaQuery("(min-width:600px)");
-
+  const host = `https://localhost:7246`
   const [getCourseTypes, setCourseTypes] = useState([]);
   const [getFoodTypes, setFoodTypes] = useState([]);
   const [getCourseTypeId, setCourseTypeId] = React.useState("");
@@ -73,13 +73,13 @@ const CreateFood = () => {
 
   const fetchCourseTypes = async () => {
     await axios
-      .get(`https://oms-fa22se19.herokuapp.com/api/v1/CourseTypes`)
+      .get(host + `/api/v1/CourseTypes`)
       .then((response) => setCourseTypes(response.data["data"]));
   };
 
   const fetchFoodTypes = async () => {
     await axios
-      .get(`https://oms-fa22se19.herokuapp.com/api/v1/Types`)
+      .get(host + `/api/v1/Types`)
       .then((response) => setFoodTypes(response.data["data"]));
   };
 

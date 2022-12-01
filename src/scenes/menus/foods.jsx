@@ -17,6 +17,7 @@ import InputBase from "@mui/material/InputBase";
 import SearchIcon from "@mui/icons-material/Search";
 
 const MenuFoods = () => {
+  const host = `https://localhost:7246`
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const [APIData, setAPIData] = useState([]);
@@ -115,7 +116,7 @@ const MenuFoods = () => {
     const search = searchValue.trim();
     const searchByValue = searchBy.trim();
     let response = await axios.get(
-      `https://oms-fa22se19.herokuapp.com/api/v1/Menus/` +
+      host + `/api/v1/Menus/` +
         menuId +
         `/Food` +
         `?searchBy=` +
@@ -128,7 +129,7 @@ const MenuFoods = () => {
 
   const getMenuInfo = async () => {
     let response = await axios.get(
-      `https://oms-fa22se19.herokuapp.com/api/v1/Menus/` + menuId
+      host + `/api/v1/Menus/` + menuId
     );
     setMenuName(response.data["data"]["name"]);
   };
@@ -148,7 +149,7 @@ const MenuFoods = () => {
     };
     await axios
       .put(
-        `https://oms-fa22se19.herokuapp.com/api/v1/Menus/` +
+        host + `/api/v1/Menus/` +
           menuId +
           `/Food/` +
           currentRow["id"],
@@ -160,7 +161,7 @@ const MenuFoods = () => {
 
   const deleteFood = async (id) => {
     await axios
-      .delete(`https://oms-fa22se19.herokuapp.com/api/v1/Menus/` + menuId + `/Food/` + id)
+      .delete(host + `/api/v1/Menus/` + menuId + `/Food/` + id)
       .then()
       .catch()
       .finally((e) => {

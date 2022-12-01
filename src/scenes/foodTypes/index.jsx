@@ -26,6 +26,7 @@ import SearchIcon from "@mui/icons-material/Search";
 import InputBase from "@mui/material/InputBase";
 
 const FoodTypes = () => {
+  const host = `https://localhost:7246`
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const [rows, setRows] = React.useState([]);
@@ -107,7 +108,7 @@ const FoodTypes = () => {
 
   const handleDelete = async (id) => {
     await axios
-      .delete(`https://oms-fa22se19.herokuapp.com/api/v1/Types/` + id)
+      .delete(host + `/api/v1/Types/` + id)
       .then(response => {
         if(response.status === 204) {
           fetchData();
@@ -118,7 +119,7 @@ const FoodTypes = () => {
 
   const handleRecover = async (id) => {
     await axios
-      .put(`https://oms-fa22se19.herokuapp.com/api/v1/Types/` + id + `/recover`)
+      .put(host + `/api/v1/Types/` + id + `/recover`)
       .then(response => {
         if(response.status === 204) {
           fetchData();
@@ -129,7 +130,7 @@ const FoodTypes = () => {
 
   const handleUpdate = async (currentRow) => {
     const requestBody = {id: currentRow["id"], name: currentRow["name"], description: currentRow["description"]};
-    await axios.put(`https://oms-fa22se19.herokuapp.com/api/v1/Types/` + currentRow["id"], requestBody)
+    await axios.put(host + `/api/v1/Types/` + currentRow["id"], requestBody)
       .catch(() => {})
       .finally(() => fetchData());
   };
@@ -202,13 +203,13 @@ const FoodTypes = () => {
 
   const fetchData = async () => {
     const search = searchValue.trim();
-    let response = await axios.get(`https://oms-fa22se19.herokuapp.com/api/v1/Types` + `?searchValue=` + search);
+    let response = await axios.get(host + `/api/v1/Types` + `?searchValue=` + search);
     setRows(response.data["data"]);
   };
 
   const handleAdd = async (currentRow) => {
     const requestBody = {name: currentRow["name"], description: currentRow["description"]};
-    await axios.post(`https://oms-fa22se19.herokuapp.com/api/v1/Types/`, requestBody)
+    await axios.post(host + `/api/v1/Types/`, requestBody)
       .catch(() => {})
       .finally(() => fetchData());
   };
@@ -378,7 +379,7 @@ const FoodTypes = () => {
         <InputBase
           onChange={handleSearchChange}
           sx={{ ml: 2, flex: 1 }}
-          placeholder="Search"
+          placeholder="Search name, description"
           onKeyPress={handleKeyDown}
         />
         <IconButton onClick={fetchData} sx={{ p: 1 }}>

@@ -10,6 +10,7 @@ import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
 
 const Checkout = () => {
+  const host = `https://localhost:7246`
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const [APIData, setAPIData] = useState([]);
@@ -27,14 +28,14 @@ const Checkout = () => {
     const search = searchValue.trim();
     const searchByValue = searchBy.trim();
     let processingResponse = await axios.get(
-      `https://https://oms-fa22se19.herokuapp.com/api/v1/Orders?Status=Processing` +
+      host + `/api/v1/Orders?Status=Processing` +
         `&searchBy=` +
         searchByValue +
         `&searchValue=` +
         search
     );
     let checkingResponse = await axios.get(
-      `https://oms-fa22se19.herokuapp.com/api/v1/Orders?Status=Checking` +
+      host + `/api/v1/Orders?Status=Checking` +
         `&searchBy=` +
         searchByValue +
         `&searchValue=` +
@@ -48,7 +49,7 @@ const Checkout = () => {
 
   const confirm = async (id) => {
     await axios
-      .post(`https://oms-fa22se19.herokuapp.com/api/v1/Orders/` + id + "/Confirm")
+      .post(host + `/api/v1/Orders/` + id + "/Confirm")
       .then(() => fetchData());
   };
 

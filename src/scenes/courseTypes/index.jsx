@@ -26,6 +26,7 @@ import SearchIcon from "@mui/icons-material/Search";
 import InputBase from "@mui/material/InputBase";
 
 const CourseTypes = () => {
+  const host = `https://localhost:7246`
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const [rows, setRows] = React.useState([]);
@@ -107,7 +108,7 @@ const CourseTypes = () => {
 
   const handleDelete = async (id) => {
     await axios
-      .delete(`https://oms-fa22se19.herokuapp.com/api/v1/CourseTypes/` + id)
+      .delete(host + `/api/v1/CourseTypes/` + id)
       .then((response) => {
         if (response.status === 204) {
           fetchData();
@@ -118,7 +119,7 @@ const CourseTypes = () => {
 
   const handleRecover = async (id) => {
     await axios
-      .put(`https://oms-fa22se19.herokuapp.com/api/v1/CourseTypes/` + id + `/recover`)
+      .put(host + `/api/v1/CourseTypes/` + id + `/recover`)
       .then((response) => {
         if (response.status === 204) {
           fetchData();
@@ -135,7 +136,7 @@ const CourseTypes = () => {
     };
     await axios
       .put(
-        `https://oms-fa22se19.herokuapp.com/api/v1/CourseTypes/` + currentRow["id"],
+        host + `/api/v1/CourseTypes/` + currentRow["id"],
         requestBody
       )
       .catch(() => {})
@@ -209,7 +210,7 @@ const CourseTypes = () => {
   const fetchData = async () => {
     const search = searchValue.trim();
     let response = await axios.get(
-      `https://oms-fa22se19.herokuapp.com/api/v1/CourseTypes` + `?searchValue=` + search
+      host + `/api/v1/CourseTypes` + `?searchValue=` + search
     );
     setRows(response.data["data"]);
   };
@@ -220,7 +221,7 @@ const CourseTypes = () => {
       description: currentRow["description"],
     };
     await axios
-      .post(`https://oms-fa22se19.herokuapp.com/api/v1/CourseTypes/`, requestBody)
+      .post(host + `/api/v1/CourseTypes/`, requestBody)
       .catch(() => {})
       .finally(() => fetchData());
   };
@@ -391,7 +392,7 @@ const CourseTypes = () => {
         <InputBase
           onChange={handleSearchChange}
           sx={{ ml: 2, flex: 1 }}
-          placeholder="Search"
+          placeholder="Search name, description"
           onKeyPress={handleKeyDown}
         />
         <IconButton onClick={fetchData} sx={{ p: 1 }}>

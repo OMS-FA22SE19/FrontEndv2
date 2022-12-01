@@ -27,6 +27,7 @@ import MenuItem from "@mui/material/MenuItem";
 import PropTypes from "prop-types";
 
 const Tables = () => {
+  const host = `https://localhost:7246`
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const [rows, setRows] = useState([]);
@@ -62,7 +63,7 @@ const Tables = () => {
 
   const fetchTableTypes = async () => {
     await axios
-      .get(`https://oms-fa22se19.herokuapp.com/api/v1/TableTypes`)
+      .get(host + `/api/v1/TableTypes`)
       .then((response) => setTableTypes(response.data["data"]));
   };
 
@@ -115,7 +116,7 @@ const Tables = () => {
 
   const handleDelete = async (id) => {
     await axios
-      .delete(`https://oms-fa22se19.herokuapp.com/api/v1/Tables/` + id)
+      .delete(host + `/api/v1/Tables/` + id)
       .then((response) => {
         if (response.status === 204) {
           fetchData();
@@ -126,7 +127,7 @@ const Tables = () => {
 
   const handleRecover = async (id) => {
     await axios
-      .put(`https://oms-fa22se19.herokuapp.com/api/v1/Tables/` + id + `/recover`)
+      .put(host + `/api/v1/Tables/` + id + `/recover`)
       .then((response) => {
         if (response.status === 204) {
           fetchData();
@@ -144,7 +145,7 @@ const Tables = () => {
     };
     await axios
       .put(
-        `https://oms-fa22se19.herokuapp.com/api/v1/Tables/` + currentRow["id"],
+        host + `/api/v1/Tables/` + currentRow["id"],
         requestBody
       )
       .then((response) => {
@@ -220,7 +221,7 @@ const Tables = () => {
   };
 
   const fetchData = async () => {
-    let response = await axios.get(`https://oms-fa22se19.herokuapp.com/api/v1/Tables`);
+    let response = await axios.get(host + `/api/v1/Tables`);
     setRows(response.data["data"]);
   };
 
@@ -230,7 +231,7 @@ const Tables = () => {
       chargePerSeat: currentRow["chargePerSeat"],
     };
     await axios
-      .post(`https://oms-fa22se19.herokuapp.com/api/v1/Tables/`, requestBody)
+      .post(host + `/api/v1/Tables/`, requestBody)
       .catch(() => {})
       .finally(() => fetchData());
   };

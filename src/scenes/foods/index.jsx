@@ -12,6 +12,7 @@ import InputBase from "@mui/material/InputBase";
 import SearchIcon from "@mui/icons-material/Search";
 
 const Foods = () => {
+  const host = `https://localhost:7246`
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const [APIData, setAPIData] = useState([]);
@@ -22,7 +23,7 @@ const Foods = () => {
     const search = searchValue.trim();
     const searchByValue = searchBy.trim();
     let response = await axios.get(
-      `https://oms-fa22se19.herokuapp.com/api/v1/Foods` +
+      host + `/api/v1/Foods` +
         `?searchBy=` +
         searchByValue +
         `&searchValue=` +
@@ -39,7 +40,7 @@ const Foods = () => {
 
   const deleteFood = async (id) => {
     await axios
-      .delete(`https://oms-fa22se19.herokuapp.com/api/v1/Foods/` + id)
+      .delete(host + `/api/v1/Foods/` + id)
       .then()
       .finally((e) => {
         fetchData();
@@ -48,7 +49,7 @@ const Foods = () => {
 
   const recoverFood = async (id) => {
     await axios
-      .put(`https://oms-fa22se19.herokuapp.com/api/v1/Foods/` + id + `/recover`)
+      .put(host + `/api/v1/Foods/` + id + `/recover`)
       .then()
       .finally((e) => {
         fetchData();

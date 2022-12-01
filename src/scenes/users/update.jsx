@@ -13,6 +13,7 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 import { useParams } from "react-router-dom";
 
 const UpdateUser = () => {
+  const host = `https://localhost:7246`
   const isNonMobile = useMediaQuery("(min-width:600px)");
   const { id } = useParams();
 
@@ -23,7 +24,7 @@ const UpdateUser = () => {
 
   const fetchData = async () => {
     await axios
-      .get(`https://oms-fa22se19.herokuapp.com/api/v1/users/` + id)
+      .get(host + `/api/v1/users/` + id)
       .then((response) => {
         const fullName = response.data["data"].fullName;
         const email = response.data["data"].email;
@@ -48,7 +49,7 @@ const UpdateUser = () => {
       role: values.role,
     };
     await axios
-      .put(`https://oms-fa22se19.herokuapp.com/api/v1/users/` + id, requestBody)
+      .put(host + `/api/v1/users/` + id, requestBody)
       .finally(() => routeChange());
   };
 

@@ -23,6 +23,7 @@ import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
 
 const OrderDetails = () => {
+  const host = `https://localhost:7246`
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const [APIData, setAPIData] = useState([]);
@@ -42,7 +43,7 @@ const OrderDetails = () => {
     const search = searchValue.trim();
     const searchByValue = searchBy.trim();
     let response = await axios.get(
-      `https://oms-fa22se19.herokuapp.com/api/v1/OrderDetails` +
+      host + `/api/v1/OrderDetails` +
         `?status=` +
         status +
         `&searchBy=` +
@@ -103,7 +104,7 @@ const OrderDetails = () => {
   const fetchDataWithStatus = async (value) => {
     const search = searchValue.trim();
     let response = await axios.get(
-      `https://oms-fa22se19.herokuapp.com/api/v1/OrderDetails` +
+      host + `/api/v1/OrderDetails` +
         `?status=` +
         value +
         `&searchValue=` +
@@ -230,7 +231,7 @@ const OrderDetails = () => {
   const updateStatus = async (id, status) => {
     let requestBody = { id: id, status: status };
     await axios
-      .put(`https://oms-fa22se19.herokuapp.com/api/v1/OrderDetails/` + id, requestBody)
+      .put(host + `/api/v1/OrderDetails/` + id, requestBody)
       .then(() => fetchData());
   };
 

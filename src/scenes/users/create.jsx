@@ -13,7 +13,7 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 
 const CreateUser = () => {
   const isNonMobile = useMediaQuery("(min-width:600px)");
-
+  const host = `https://localhost:7246`
   let navigate = useNavigate();
   const routeChange = () => {
     let path = `/users`;
@@ -28,7 +28,7 @@ const CreateUser = () => {
       password: values.password,
       role: values.role,
     };
-    await axios.post(`https://oms-fa22se19.herokuapp.com/api/v1/Users`, requestBody);
+    await axios.post(host + `/api/v1/Users`, requestBody);
     routeChange();
   };
 
