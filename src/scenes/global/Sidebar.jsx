@@ -80,7 +80,7 @@ const Sidebar = () => {
                 ml="15px"
               >
                 <Typography variant="h3" color={colors.grey[100]}>
-                  ADMINS
+                  STAFFS
                 </Typography>
                 <IconButton onClick={() => setIsCollapsed(!isCollapsed)}>
                   <MenuOutlinedIcon />
@@ -110,7 +110,7 @@ const Sidebar = () => {
                   Phan Ngoc Hoang Long
                 </Typography>
                 <Typography variant="h5" color={colors.greenAccent[500]}>
-                  OMS Administrator
+                  OMS Staff
                 </Typography>
               </Box>
             </Box>

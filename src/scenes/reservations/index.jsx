@@ -224,7 +224,6 @@ const Reservations = () => {
     {
       field: "startTime",
       headerName: "Start Time",
-      type: "Date",
       headerAlign: "right",
       align: "right",
       flex: 1,
