@@ -25,9 +25,10 @@ import FoodTypes from "./scenes/foodTypes";
 import Checkout from "./scenes/checkout";
 import Geography from "./scenes/geography";
 import Reservations from "./scenes/reservations";
+import SystemConfiguration from "./scenes/systemConfigurations";
 import { CssBaseline, ThemeProvider } from "@mui/material";
 import { ColorModeContext, useMode } from "./theme";
-import './firebase';
+import './firebase/firebase';
 
 function App() {
   const [theme, colorMode] = useMode();
@@ -60,6 +61,7 @@ function App() {
               <Route path="/foodTypes" element={<FoodTypes />} />
               <Route path="/reservations" element={<Reservations />} />
               <Route path="/checkout" element={<Checkout />} />
+              <Route path="/configuration" element={<SystemConfiguration />} />
               <Route path="/contacts" element={<Contacts />} />
               <Route path="/invoices" element={<Invoices />} />
               <Route path="/form" element={<Form />} />

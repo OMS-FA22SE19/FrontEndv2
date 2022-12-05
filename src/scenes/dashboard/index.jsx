@@ -1,40 +1,30 @@
 import {
   Box,
-  Button,
-  IconButton,
   Typography,
   useTheme,
-  Grid,
 } from "@mui/material";
 import { tokens } from "../../theme";
 import { mockTransactions, mockTrendingFood } from "../../data/mockData";
 import ReceiptIcon from '@mui/icons-material/Receipt';
 import FastfoodIcon from "@mui/icons-material/Fastfood";
-import PointOfSaleIcon from "@mui/icons-material/PointOfSale";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
-import TrafficIcon from "@mui/icons-material/Traffic";
 import Header from "../../components/Header";
-import LineChart from "../../components/LineChart";
-import GeographyChart from "../../components/GeographyChart";
-import BarChart from "../../components/BarChart";
 import StatBox from "../../components/StatBox";
-import ProgressCircle from "../../components/ProgressCircle";
 import axios from "axios";
 import * as React from "react";
-import { BarItem } from "@nivo/bar";
-import { DataGrid, GridToolbar } from "@mui/x-data-grid";
+import { DataGrid } from "@mui/x-data-grid";
 
 const Dashboard = () => {
+  const host = `https://localhost:7246`
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const [newCustomers, setNewCustomers] = React.useState("");
 
   const fetchData = async () => {
     let response = await axios.get(
-      `https://localhost:7246/api/Dashboard/Customers`
+      host + `/api/v1/Dashboard/Customers`
     );
     setNewCustomers(response.data["data"]);
-    console.log(newCustomers);
   };
 
   React.useEffect(() => {

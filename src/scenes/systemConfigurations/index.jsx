@@ -3,9 +3,7 @@ import { tokens } from "../../theme";
 import Header from "../../components/Header";
 import axios from "axios";
 import React, { useState } from "react";
-import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/DeleteOutlined";
 import SaveIcon from "@mui/icons-material/Save";
 import CancelIcon from "@mui/icons-material/Close";
 import RestoreIcon from "@mui/icons-material/Restore";
@@ -14,6 +12,7 @@ import {
   DataGrid,
   GridToolbarContainer,
   GridActionsCellItem,
+  useGridApiContext,
 } from "@mui/x-data-grid";
 import Dialog from "@mui/material/Dialog";
 import DialogContent from "@mui/material/DialogContent";
@@ -23,21 +22,23 @@ import Alert from "@mui/material/Alert";
 import Snackbar from "@mui/material/Snackbar";
 import SearchIcon from "@mui/icons-material/Search";
 import InputBase from "@mui/material/InputBase";
+import TextField from "@mui/material/TextField";
 
-const TableTypes = () => {
-  const host = `https://localhost:7246`
+const SystemConfiguration = () => {
+  const host = `https://localhost:7246`;
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const [rows, setRows] = useState([]);
   const [rowModesModel, setRowModesModel] = React.useState({});
   const noButtonRef = React.useRef(null);
   const [promiseArguments, setPromiseArguments] = React.useState(null);
-  const [deleteArguments, setDeleteArguments] = React.useState(null);
   const [isEditing, setIsEditing] = React.useState(false);
-  const [isAdding, setIsAdding] = React.useState(false);
   const [snackbar, setSnackbar] = React.useState(null);
   const [searchValue, setSearchValue] = React.useState("");
-
+  const [value, setValue] = React.useState(null);
+  const [error, setError] = React.useState("");
+  const [startTime, setStartTime] = React.useState("00:00");
+  const [endTime, setEndTime] = React.useState("00:00");
 
   const handleCloseSnackbar = () => setSnackbar(null);
 
@@ -71,13 +72,9 @@ const TableTypes = () => {
     try {
       // Make the HTTP request to save in the backend
       let response;
-      if (newRow.isNew !== undefined) {
-        response = await handleAdd(newRow);
-      } else {
-        response = await handleUpdate(newRow);
-      }
+      response = await handleUpdate(newRow.name, newRow.value);
       setSnackbar({
-        children: "Table Type successfully saved",
+        children: "Setting successfully saved",
         severity: "success",
       });
       resolve(response);
@@ -90,56 +87,13 @@ const TableTypes = () => {
     }
   };
 
-  const handleDeleteYes = async () => {
-    const { id, name } = deleteArguments;
-
-    try {
-      // Make the HTTP request to save in the backend
-      handleDelete(id);
-      setDeleteArguments(null);
-      setSnackbar({
-        children: "Table Type " + name + " successfully deleted",
-        severity: "success",
-      });
-    } catch (error) {
-      setDeleteArguments(null);
-    }
-  };
-
-  const handleDelete = async (id) => {
-    await axios
-      .delete(host + `/api/v1/TableTypes/` + id)
-      .then((response) => {
-        if (response.status === 204) {
-          fetchData();
-        }
-      })
-      .catch((error) => console.log(error));
-  };
-
-  const handleRecover = async (id) => {
-    await axios
-      .put(host + `/api/v1/TableTypes/` + id + `/recover`)
-      .then((response) => {
-        if (response.status === 204) {
-          fetchData();
-        }
-      })
-      .catch((error) => console.log(error));
-  };
-
-  const handleUpdate = async (currentRow) => {
+  const handleUpdate = async (name, value) => {
     const requestBody = {
-      id: currentRow["id"],
-      name: currentRow["name"],
-      chargePerSeat: currentRow["chargePerSeat"],
-      canBeCombined: currentRow["canBeCombined"],
+      name: name,
+      value: value,
     };
     await axios
-      .put(
-        host + `/api/v1/TableTypes/` + currentRow["id"],
-        requestBody
-      )
+      .put(host + `/api/v1/AdminSettings/`, requestBody)
       .then((response) => {
         if (response.status === 204) {
           fetchData();
@@ -180,53 +134,12 @@ const TableTypes = () => {
     );
   };
 
-  const renderConfirmDeleteDialog = () => {
-    if (!deleteArguments) {
-      return null;
-    }
-
-    const { name } = deleteArguments;
-
-    return (
-      <Dialog
-        maxWidth="xs"
-        TransitionProps={{ onEntered: handleEntered }}
-        open={!!deleteArguments}
-      >
-        <DialogTitle>Are you sure?</DialogTitle>
-        <DialogContent dividers>
-          {`Pressing 'Yes' will remove ${name}.`}
-        </DialogContent>
-        <DialogActions>
-          <Button
-            ref={noButtonRef}
-            onClick={() => {
-              setDeleteArguments(null);
-            }}
-          >
-            No
-          </Button>
-          <Button onClick={handleDeleteYes}>Yes</Button>
-        </DialogActions>
-      </Dialog>
-    );
-  };
-
   const fetchData = async () => {
     const search = searchValue.trim();
-    let response = await axios.get(host + `/api/v1/TableTypes` + `?searchValue=` + search);
+    let response = await axios.get(
+      host + `/api/v1/AdminSettings` + `?searchValue=` + search
+    );
     setRows(response.data["data"]);
-  };
-
-  const handleAdd = async (currentRow) => {
-    const requestBody = {
-      name: currentRow["name"],
-      chargePerSeat: currentRow["chargePerSeat"],
-    };
-    await axios
-      .post(host + `/api/v1/TableTypes/`, requestBody)
-      .catch(() => {})
-      .finally(() => fetchData());
   };
 
   const handleRowEditStart = (params, event) => {
@@ -237,24 +150,22 @@ const TableTypes = () => {
     event.defaultMuiPrevented = true;
   };
 
-  const handleEditClick = (id) => () => {
+  const handleEditClick = (id, value) => () => {
+    setValue(value);
     setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.Edit } });
     setIsEditing(true);
   };
 
   const handleSaveClick = (currentRow) => () => {
-    const id = currentRow.id;
+    const errorMessage = isValid(currentRow.name, currentRow.value);
+    if (errorMessage.length > 0) {
+      setError(errorMessage);
+      return;
+    }
+    const id = currentRow.name;
+    handleUpdate(id, value);
     setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.View } });
-    setIsAdding(false);
     setIsEditing(false);
-  };
-
-  const handleDeleteClick = (id, name) => () => {
-    setDeleteArguments({ id, name });
-  };
-
-  const handleRecoverClick = (id) => () => {
-    handleRecover(id);
   };
 
   const handleCancelClick = (id) => () => {
@@ -262,54 +173,131 @@ const TableTypes = () => {
       ...rowModesModel,
       [id]: { mode: GridRowModes.View, ignoreModifications: true },
     });
-
-    const editedRow = rows.find((row) => row?.id === id);
-    if (editedRow.isNew) {
-      setRows(rows.filter((row) => row?.id !== id));
-    }
-    setIsAdding(false);
     setIsEditing(false);
   };
+
+  function isValid(name, value, constant) {
+    let errorMessage = "";
+    switch (name) {
+      case "StartTime":
+        const endTime = rows.find((element) => {
+          return element.name === "EndTime";
+        }).value;
+        value >= endTime
+          ? (errorMessage =
+              "StartTime must start prior EndTime: " + endTime)
+          : (errorMessage = "");
+        break;
+      case "EndTime":
+        const startTime = rows.find((element) => {
+          return element.name === "StartTime";
+        }).value;
+        value < startTime
+          ? (errorMessage =
+              "EndTime must start after StartTime: " + startTime)
+          : (errorMessage = "");
+        break;
+      case "MinReservationDuration":
+        value < 15
+          ? (errorMessage =
+              "MinReservationDuration must not be less than 15 minutes")
+          : (errorMessage = "");
+        break;
+      case "MaxReservationDuration":
+        value > 180
+          ? (errorMessage =
+              "MaxReservationDuration must not be more than 180 minutes")
+          : (errorMessage = "");
+        break;
+      case "MaxEdit":
+        value < 0
+          ? (errorMessage = "MaxEdit must be more than 0")
+          : (errorMessage = "");
+        break;
+      case "ReservationTable ":
+        value < 0
+          ? (errorMessage = "ReservationTable must be more than 0")
+          : (errorMessage = "");
+        break;
+      default:
+        break;
+    }
+    return errorMessage;
+  }
 
   const columns = [
     {
       field: "index",
       headerName: "No.",
-      renderCell: (index) => index.api.getRowIndex(index.row.id) + 1,
-    },
-    { field: "name", headerName: "Name", flex: 1, editable: true },
-    {
-      field: "quantity",
-      headerName: "Quantity",
-      headerAlign: "right",
-      align: "right",
-      flex: 0.5,
+      renderCell: (index) => index.api.getRowIndex(index.row.name) + 1,
     },
     {
-      field: "chargePerSeat",
-      headerName: "Charge per seat",
-      type: "number",
-      headerAlign: "right",
-      align: "right",
-      flex: 0.5,
-      editable: true,
+      field: "name",
+      headerName: "Name",
+      flex: 1,
       renderCell: (params) => {
-        const currentRow = params.row;
-        return currentRow["chargePerSeat"].toLocaleString();
+        const name = params.row.name;
+        switch (name) {
+          case "MinReservationDuration":
+          case "MaxReservationDuration":
+            return name + " (minutes)";
+          case "MaxEdit":
+            return name + " (times)";
+          case "ReservationTable":
+            return name + " (%)";
+          default:
+            return name;
+        }
       },
     },
     {
-      field: "canBeCombined",
-      headerName: "Can Be Combined",
-      type: "boolean",
+      field: "value",
+      headerName: "Value",
+      headerAlign: "right",
+      align: "right",
       flex: 0.5,
       editable: true,
-    },
-    {
-      field: "isDeleted",
-      headerName: "Is Deleted",
-      type: "boolean",
-      flex: 0.5,
+      renderEditCell: (params) => {
+        const currentRow = params.row;
+        const name = currentRow.name;
+        const handleChange = (event) => {
+
+          setError(isValid(name, event.target.value));
+          setValue(event.target.value);
+        };
+        switch (name) {
+          case "StartTime":
+          case "EndTime":
+            return (
+              <Box
+                display="flex"
+                backgroundColor={colors.primary[400]}
+                borderRadius="3px"
+              >
+                <TextField
+                  error={error.length === 0 ? false : true}
+                  type="time"
+                  value={value}
+                  onChange={handleChange}
+                />
+              </Box>
+            );
+          case "MinReservationDuration":
+          case "MaxReservationDuration":
+          case "MaxEdit":
+          case "ReservationTable ":
+            return (
+              <TextField
+                error={error.length === 0 ? false : true}
+                type="number"
+                value={value}
+                onChange={handleChange}
+              />
+            );
+          default:
+            return null;
+        }
+      },
     },
     {
       field: "actions",
@@ -319,29 +307,14 @@ const TableTypes = () => {
       cellClassName: "actions",
       getActions: (params) => {
         const currentRow = params.row;
-        const id = currentRow.id;
         const name = currentRow.name;
-        const isInEditMode = rowModesModel[id]?.mode === GridRowModes.Edit;
-        if (currentRow["isDeleted"]) {
-          return [
-            <GridActionsCellItem
-              icon={<RestoreIcon />}
-              label="Restore"
-              onClick={handleRecoverClick(id)}
-            />,
-            <GridActionsCellItem
-              icon={<DeleteIcon />}
-              label="Delete"
-              onClick={handleDeleteClick(id, name)}
-              color="inherit"
-            />,
-          ];
-        }
+        const isInEditMode = rowModesModel[name]?.mode === GridRowModes.Edit;
 
         if (isInEditMode) {
           return [
             <GridActionsCellItem
               icon={<SaveIcon />}
+              disabled={error.length !== 0}
               label="Save"
               onClick={handleSaveClick(currentRow)}
             />,
@@ -349,7 +322,7 @@ const TableTypes = () => {
               icon={<CancelIcon />}
               label="Cancel"
               className="textPrimary"
-              onClick={handleCancelClick(id)}
+              onClick={handleCancelClick(name)}
               color="inherit"
             />,
           ];
@@ -364,13 +337,7 @@ const TableTypes = () => {
             icon={<EditIcon />}
             label="Edit"
             className="textPrimary"
-            onClick={handleEditClick(id)}
-            color="inherit"
-          />,
-          <GridActionsCellItem
-            icon={<DeleteIcon />}
-            label="Delete"
-            onClick={handleDeleteClick(id, name)}
+            onClick={handleEditClick(name, currentRow.value)}
             color="inherit"
           />,
         ];
@@ -393,9 +360,9 @@ const TableTypes = () => {
 
   return (
     <Box m="20px">
-      <Header title="TABLE TYPES" subtitle="List of Table Types" />
+      <Header title="CONFIGURATION SETTINGS" subtitle="List of Settings" />
+      {error.length === 0 ? null : <Alert severity="error">{error}</Alert>}
       {renderConfirmEditDialog()}
-      {renderConfirmDeleteDialog()}
       {/* SEARCH BAR */}
       <Box
         display="flex"
@@ -445,6 +412,7 @@ const TableTypes = () => {
         }}
       >
         <DataGrid
+          getRowId={(row) => row.name}
           rows={rows}
           columns={columns}
           editMode="row"
@@ -453,12 +421,6 @@ const TableTypes = () => {
           onRowEditStart={handleRowEditStart}
           onRowEditStop={handleRowEditStop}
           processRowUpdate={processRowUpdate}
-          components={{
-            Toolbar: EditToolbar,
-          }}
-          componentsProps={{
-            toolbar: { rows, setRows, setRowModesModel, isAdding, setIsAdding },
-          }}
           experimentalFeatures={{ newEditingApi: true }}
           onProcessRowUpdateError={(error) => {
             if (
@@ -481,52 +443,11 @@ const TableTypes = () => {
   );
 };
 
-function EditToolbar(props) {
-  const { rows, setRows, setRowModesModel, isAdding, setIsAdding } = props;
-
-  const handleClick = () => {
-    const id = Math.max(...rows.map((o) => o.id)) + 1;
-
-    setIsAdding(true);
-    setRows((oldRows) => [
-      ...oldRows,
-      {
-        id,
-        name: "",
-        quantity: 0,
-        chargePerSeat: 0,
-        canBeCombined: false,
-        isNew: true,
-      },
-    ]);
-    setRowModesModel((oldModel) => ({
-      ...oldModel,
-      [id]: { mode: GridRowModes.Edit, fieldToFocus: "name" },
-    }));
-  };
-
-  if (!isAdding) {
-    return (
-      <GridToolbarContainer>
-        <Button color="primary" startIcon={<AddIcon />} onClick={handleClick}>
-          Add New Table Type
-        </Button>
-      </GridToolbarContainer>
-    );
-  }
-}
-
 function computeMutation(newRow, oldRow) {
-  if (newRow.name !== oldRow.name) {
-    return `Name from '${oldRow.name}' to '${newRow.name}'`;
-  }
-  if (newRow.chargePerSeat !== oldRow.chargePerSeat) {
-    return `Charge Per Seat from '${oldRow.chargePerSeat}' to '${newRow.chargePerSeat}'`;
-  }
-  if (newRow.canBeCombined !== oldRow.canBeCombined) {
-    return `Can Be Combined from '${oldRow.canBeCombined}' to '${newRow.canBeCombined}'`;
+  if (newRow.value !== oldRow.value) {
+    return `Value from '${oldRow.value}' to '${newRow.value}'`;
   }
   return null;
 }
 
-export default TableTypes;
+export default SystemConfiguration;
