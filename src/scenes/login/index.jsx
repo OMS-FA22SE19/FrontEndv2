@@ -7,15 +7,19 @@ import React, {useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import Grid from "@mui/material/Grid";
 import { UserContext } from "../../context/UserContext";
+import { useEffect } from "react";
 
 const Login = () => {
   const {user} = useContext(UserContext);
 
   let navigate = useNavigate();
   const routeChange = () => {
-    let path = `/`;
-    navigate(path);
+    if(user !== null) {
+      window.location.href = "/";
+    }
   };
+
+  useEffect(() => routeChange, []);
 
   const handleFormSubmit = async (values) => {
     const requestBody = {
@@ -33,13 +37,13 @@ const Login = () => {
         values.email = "";
         values.password = "";
       })
-      .then(routeChange)
+      .then(() => {
+        window.location.href = "/";
+      })
       .catch((error) => console.log(error));
   };
 
-  if(user !== null) {
-    navigate("/");
-  }
+  
   return (
     <Box m="20px">
       <Header title="Sign In" subtitle="Login to OMS" />

@@ -59,6 +59,7 @@ function Routing(user) {
             <Route path="/users/create" element={<CreateUser />} />
             <Route path="/users/update/:id" element={<UpdateUser />} />
             <Route path="/configuration" element={<SystemConfiguration />} />
+            <Route path="/login" element={<Login />} />
             <Route path="/logout" element={<Logout />} />
             <Route path="*" element={<NotFound />} />
         </Routes>
@@ -78,6 +79,7 @@ function Routing(user) {
           <Route path="/tables" element={<Tables />} />
           <Route path="/courseTypes" element={<CourseTypes />} />
           <Route path="/foodTypes" element={<FoodTypes />} />
+          <Route path="/login" element={<Login />} />
           <Route path="/logout" element={<Logout />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
@@ -89,6 +91,7 @@ function Routing(user) {
           <Route path="/orderDetails" element={<OrderDetails />} />
           <Route path="/reservations" element={<Reservations />} />
           <Route path="/checkout" element={<Checkout />} />
+          <Route path="/login" element={<Login />} />
           <Route path="/logout" element={<Logout />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
@@ -98,6 +101,7 @@ function Routing(user) {
         <Routes>
           <Route path="/" element={<OrderDetails />} />
           <Route path="/orderDetails" element={<OrderDetails />} />
+          <Route path="/login" element={<Login />} />
           <Route path="/logout" element={<Logout />} />
           <Route path="*" element={<NotFound />} />
         </Routes>

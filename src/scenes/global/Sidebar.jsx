@@ -119,6 +119,7 @@ const Sidebar = () => {
   function SideBarItem({ selected, setSelected }) {
     switch (user.role) {
       case "Administrator":
+        setSelected("Users");
         return (
           <>
             <Item
@@ -138,6 +139,7 @@ const Sidebar = () => {
           </>
         );
       case "Restaurant Owner":
+        setSelected("Dashboard");
         return (
           <>
             <Item
@@ -192,6 +194,7 @@ const Sidebar = () => {
           </>
         );
       case "Chef":
+        setSelected("Order Details");
         return (
           <>
             <Item
@@ -204,6 +207,7 @@ const Sidebar = () => {
           </>
         );
       case "Staff":
+        setSelected("Reservations");
         return (
           <>
             <Item
