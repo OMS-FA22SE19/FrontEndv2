@@ -1,20 +1,13 @@
 import { Box, Button, useTheme, IconButton } from "@mui/material";
 import { tokens } from "../../theme";
 import Header from "../../components/Header";
-import axios from "axios";
 import React, { useState } from "react";
-import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/DeleteOutlined";
 import SaveIcon from "@mui/icons-material/Save";
 import CancelIcon from "@mui/icons-material/Close";
 import RestoreIcon from "@mui/icons-material/Restore";
-import {
-  GridRowModes,
-  DataGrid,
-  GridToolbarContainer,
-  GridActionsCellItem,
-} from "@mui/x-data-grid";
+import { GridRowModes, DataGrid, GridActionsCellItem } from "@mui/x-data-grid";
 import Dialog from "@mui/material/Dialog";
 import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
@@ -23,9 +16,12 @@ import Alert from "@mui/material/Alert";
 import Snackbar from "@mui/material/Snackbar";
 import SearchIcon from "@mui/icons-material/Search";
 import InputBase from "@mui/material/InputBase";
+import { EditToolbar } from "./EditToolbar";
+import useViewModel from "./viewModel";
+import TextField from "@mui/material/TextField";
+import Checkbox from '@mui/material/Checkbox';
 
 const TableTypes = () => {
-  const host = `https://localhost:7246`
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const [rows, setRows] = useState([]);
@@ -36,8 +32,20 @@ const TableTypes = () => {
   const [isEditing, setIsEditing] = React.useState(false);
   const [isAdding, setIsAdding] = React.useState(false);
   const [snackbar, setSnackbar] = React.useState(null);
-  const [searchValue, setSearchValue] = React.useState("");
+  const [error, setError] = useState([]);
+  const [name, setName] = React.useState("");
+  const [chargePerSeat, setChargePerSeat] = React.useState(0);
+  const [canBeCombined, setCanBeCombined] = React.useState(false);
+  const [valid, setValid] = React.useState(true);
 
+  const viewModelProps = { setRows, setSnackbar };
+  const {
+    getTableTypes,
+    addTableType,
+    updateTableType,
+    deleteTableType,
+    recoverTableType,
+  } = useViewModel(viewModelProps);
 
   const handleCloseSnackbar = () => setSnackbar(null);
 
@@ -56,13 +64,14 @@ const TableTypes = () => {
   );
 
   React.useEffect(() => {
-    fetchData();
+    getTableTypes();
   }, []);
 
   const handleUpdateNo = () => {
     const { oldRow, resolve } = promiseArguments;
     resolve(oldRow); // Resolve with the old row to not update the internal state
     setPromiseArguments(null);
+    getTableTypes();
   };
 
   const handleUpdateYes = async () => {
@@ -71,10 +80,17 @@ const TableTypes = () => {
     try {
       // Make the HTTP request to save in the backend
       let response;
+      const newTableType = {
+        id: newRow.id,
+        name: name,
+        chargePerSeat: chargePerSeat,
+        canBeCombined: canBeCombined,
+      };
+      console.log(newTableType);
       if (newRow.isNew !== undefined) {
-        response = await handleAdd(newRow);
+        response = await addTableType(newTableType);
       } else {
-        response = await handleUpdate(newRow);
+        response = await updateTableType(newTableType);
       }
       setSnackbar({
         children: "Table Type successfully saved",
@@ -83,7 +99,7 @@ const TableTypes = () => {
       resolve(response);
       setPromiseArguments(null);
     } catch (error) {
-      setSnackbar({ children: "Name can't be empty", severity: "error" });
+      setSnackbar({ children: error.message, severity: "error" });
       reject(oldRow);
       setPromiseArguments(null);
       console.log(error);
@@ -95,7 +111,7 @@ const TableTypes = () => {
 
     try {
       // Make the HTTP request to save in the backend
-      handleDelete(id);
+      deleteTableType(id);
       setDeleteArguments(null);
       setSnackbar({
         children: "Table Type " + name + " successfully deleted",
@@ -106,47 +122,6 @@ const TableTypes = () => {
     }
   };
 
-  const handleDelete = async (id) => {
-    await axios
-      .delete(host + `/api/v1/TableTypes/` + id)
-      .then((response) => {
-        if (response.status === 204) {
-          fetchData();
-        }
-      })
-      .catch((error) => console.log(error));
-  };
-
-  const handleRecover = async (id) => {
-    await axios
-      .put(host + `/api/v1/TableTypes/` + id + `/recover`)
-      .then((response) => {
-        if (response.status === 204) {
-          fetchData();
-        }
-      })
-      .catch((error) => console.log(error));
-  };
-
-  const handleUpdate = async (currentRow) => {
-    const requestBody = {
-      id: currentRow["id"],
-      name: currentRow["name"],
-      chargePerSeat: currentRow["chargePerSeat"],
-      canBeCombined: currentRow["canBeCombined"],
-    };
-    await axios
-      .put(
-        host + `/api/v1/TableTypes/` + currentRow["id"],
-        requestBody
-      )
-      .then((response) => {
-        if (response.status === 204) {
-          fetchData();
-        }
-      })
-      .catch((error) => console.log(error));
-  };
   const handleEntered = () => {
     // The `autoFocus` is not used because, if used, the same Enter that saves
     // the cell triggers "No". Instead, we manually focus the "No" button once
@@ -180,7 +155,7 @@ const TableTypes = () => {
     );
   };
 
-  const renderConfirmDeleteDialog = () => {
+  function renderConfirmDeleteDialog() {
     if (!deleteArguments) {
       return null;
     }
@@ -210,24 +185,7 @@ const TableTypes = () => {
         </DialogActions>
       </Dialog>
     );
-  };
-
-  const fetchData = async () => {
-    const search = searchValue.trim();
-    let response = await axios.get(host + `/api/v1/TableTypes` + `?searchValue=` + search);
-    setRows(response.data["data"]);
-  };
-
-  const handleAdd = async (currentRow) => {
-    const requestBody = {
-      name: currentRow["name"],
-      chargePerSeat: currentRow["chargePerSeat"],
-    };
-    await axios
-      .post(host + `/api/v1/TableTypes/`, requestBody)
-      .catch(() => {})
-      .finally(() => fetchData());
-  };
+  }
 
   const handleRowEditStart = (params, event) => {
     event.defaultMuiPrevented = true;
@@ -237,7 +195,11 @@ const TableTypes = () => {
     event.defaultMuiPrevented = true;
   };
 
-  const handleEditClick = (id) => () => {
+  const handleEditClick = (currentRow) => () => {
+    const id = currentRow.id;
+    setName(currentRow.name);
+    setChargePerSeat(currentRow.chargePerSeat);
+    setCanBeCombined(currentRow.canBeCombined);
     setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.Edit } });
     setIsEditing(true);
   };
@@ -247,14 +209,68 @@ const TableTypes = () => {
     setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.View } });
     setIsAdding(false);
     setIsEditing(false);
+    console.log("a");
   };
+
+  function isValid(name, value) {
+    let isValid = true;
+    switch (name) {
+      case "name":
+        if (value.trim() === "") {
+          isValid = false;
+          let existed = error.filter((e) => e.key === 1);
+          if (existed.length === 0) {
+            setError((oldError) => [
+              ...oldError,
+              { key: 1, value: "Name is required" },
+            ]);
+          }
+        } else {
+          const removedError = error.filter((error) => error.key !== 1);
+          setError(removedError);
+        }
+        if (value.trim().length < 2 || value.trim().length.length > 256) {
+          isValid = false;
+          let existed = error.filter((e) => e.key === 2);
+          if (existed.length === 0) {
+            setError((oldError) => [
+              ...oldError,
+              { key: 2, value: "Length Name must be between 2 and 256" },
+            ]);
+          }
+        } else {
+          const removedError = error.filter((error) => error.key !== 2);
+          setError(removedError);
+        }
+        break;
+      case "chargePerSeat":
+        if (value < 0) {
+          isValid = false;
+          let existed = error.filter((e) => e.key === 3);
+          if (existed.length === 0) {
+            setError((oldError) => [
+              ...oldError,
+              { key: 3, value: "ChargePerSeat must be greater than 0" },
+            ]);
+          }
+        } else {
+          const removedError = error.filter((error) => error.key !== 3);
+          setError(removedError);
+        }
+        break;
+      default:
+        break;
+    }
+    setValid(isValid);
+    return isValid;
+  }
 
   const handleDeleteClick = (id, name) => () => {
     setDeleteArguments({ id, name });
   };
 
   const handleRecoverClick = (id) => () => {
-    handleRecover(id);
+    recoverTableType(id);
   };
 
   const handleCancelClick = (id) => () => {
@@ -269,6 +285,7 @@ const TableTypes = () => {
     }
     setIsAdding(false);
     setIsEditing(false);
+    setError([]);
   };
 
   const columns = [
@@ -277,7 +294,27 @@ const TableTypes = () => {
       headerName: "No.",
       renderCell: (index) => index.api.getRowIndex(index.row.id) + 1,
     },
-    { field: "name", headerName: "Name", flex: 1, editable: true },
+    {
+      field: "name",
+      headerName: "Name",
+      flex: 1,
+      editable: true,
+      renderEditCell: (params) => {
+        const handleChange = (event) => {
+          isValid("name", event.target.value);
+          setName(event.target.value);
+        };
+
+        return (
+          <TextField
+            error={error.length === 0 ? false : true}
+            type="string"
+            value={name}
+            onChange={handleChange}
+          />
+        );
+      },
+    },
     {
       field: "quantity",
       headerName: "Quantity",
@@ -295,7 +332,22 @@ const TableTypes = () => {
       editable: true,
       renderCell: (params) => {
         const currentRow = params.row;
-        return currentRow["chargePerSeat"].toLocaleString();
+        return currentRow["chargePerSeat"]?.toLocaleString() ?? 0;
+      },
+      renderEditCell: (params) => {
+        const handleChange = (event) => {
+          isValid("chargePerSeat", event.target.value);
+          setChargePerSeat(event.target.value);
+        };
+
+        return (
+          <TextField
+            error={error.length === 0 ? false : true}
+            type="number"
+            value={chargePerSeat}
+            onChange={handleChange}
+          />
+        );
       },
     },
     {
@@ -304,6 +356,16 @@ const TableTypes = () => {
       type: "boolean",
       flex: 0.5,
       editable: true,
+      renderEditCell: (params) => {
+        const handleChange = (event) => {
+          isValid("canBeCombined", event.target.value);
+          setCanBeCombined(event.target.value === "on" ? true : false);
+        };
+
+        return (
+          <Checkbox onChange={handleChange} />
+        );
+      },
     },
     {
       field: "isDeleted",
@@ -329,12 +391,6 @@ const TableTypes = () => {
               label="Restore"
               onClick={handleRecoverClick(id)}
             />,
-            <GridActionsCellItem
-              icon={<DeleteIcon />}
-              label="Delete"
-              onClick={handleDeleteClick(id, name)}
-              color="inherit"
-            />,
           ];
         }
 
@@ -343,6 +399,7 @@ const TableTypes = () => {
             <GridActionsCellItem
               icon={<SaveIcon />}
               label="Save"
+              disabled={error.length !== 0 || !valid}
               onClick={handleSaveClick(currentRow)}
             />,
             <GridActionsCellItem
@@ -364,7 +421,7 @@ const TableTypes = () => {
             icon={<EditIcon />}
             label="Edit"
             className="textPrimary"
-            onClick={handleEditClick(id)}
+            onClick={handleEditClick(currentRow)}
             color="inherit"
           />,
           <GridActionsCellItem
@@ -379,21 +436,41 @@ const TableTypes = () => {
     },
   ];
 
+  function computeMutation(newRow, oldRow) {
+    if (name !== oldRow.name) {
+      return `Name from '${oldRow.name}' to '${name}'`;
+    }
+    if (chargePerSeat !== oldRow.chargePerSeat) {
+      return `Charge Per Seat from '${oldRow.chargePerSeat}' to '${chargePerSeat}'`;
+    }
+    if (canBeCombined !== oldRow.canBeCombined) {
+      return `Can Be Combined from '${oldRow.canBeCombined}' to '${canBeCombined}'`;
+    }
+    return null;
+  }
+
   const handleSearchChange = (event) => {
-    setSearchValue(event.target.value);
+    getTableTypes(event.target.value);
   };
 
   const handleKeyDown = (event) => {
     if (event.key === "Enter") {
       event.preventDefault();
       event.stopPropagation();
-      fetchData();
+      getTableTypes();
     }
   };
 
   return (
     <Box m="20px">
       <Header title="TABLE TYPES" subtitle="List of Table Types" />
+      {error.length === 0
+        ? null
+        : error.map((message) => (
+            <Alert key={message.key} severity="error">
+              {message.value}
+            </Alert>
+          ))}
       {renderConfirmEditDialog()}
       {renderConfirmDeleteDialog()}
       {/* SEARCH BAR */}
@@ -408,7 +485,7 @@ const TableTypes = () => {
           placeholder="Search name, chargePerSeat"
           onKeyPress={handleKeyDown}
         />
-        <IconButton onClick={fetchData} sx={{ p: 1 }}>
+        <IconButton onClick={getTableTypes} sx={{ p: 1 }}>
           <SearchIcon />
         </IconButton>
       </Box>
@@ -457,7 +534,21 @@ const TableTypes = () => {
             Toolbar: EditToolbar,
           }}
           componentsProps={{
-            toolbar: { rows, setRows, setRowModesModel, isAdding, setIsAdding },
+            toolbar: {
+              rows,
+              setRows,
+              setRowModesModel,
+              isAdding,
+              setIsAdding,
+              name,
+              setName,
+              chargePerSeat,
+              setChargePerSeat,
+              canBeCombined,
+              setCanBeCombined,
+              valid,
+              setValid,
+            },
           }}
           experimentalFeatures={{ newEditingApi: true }}
           onProcessRowUpdateError={(error) => {
@@ -465,7 +556,7 @@ const TableTypes = () => {
               error.message ===
               "Cannot read properties of undefined (reading 'id')"
             ) {
-              window.location.reload();
+              // window.location.reload();
             } else {
               console.log(error);
             }
@@ -480,53 +571,5 @@ const TableTypes = () => {
     </Box>
   );
 };
-
-function EditToolbar(props) {
-  const { rows, setRows, setRowModesModel, isAdding, setIsAdding } = props;
-
-  const handleClick = () => {
-    const id = Math.max(...rows.map((o) => o.id)) + 1;
-
-    setIsAdding(true);
-    setRows((oldRows) => [
-      ...oldRows,
-      {
-        id,
-        name: "",
-        quantity: 0,
-        chargePerSeat: 0,
-        canBeCombined: false,
-        isNew: true,
-      },
-    ]);
-    setRowModesModel((oldModel) => ({
-      ...oldModel,
-      [id]: { mode: GridRowModes.Edit, fieldToFocus: "name" },
-    }));
-  };
-
-  if (!isAdding) {
-    return (
-      <GridToolbarContainer>
-        <Button color="primary" startIcon={<AddIcon />} onClick={handleClick}>
-          Add New Table Type
-        </Button>
-      </GridToolbarContainer>
-    );
-  }
-}
-
-function computeMutation(newRow, oldRow) {
-  if (newRow.name !== oldRow.name) {
-    return `Name from '${oldRow.name}' to '${newRow.name}'`;
-  }
-  if (newRow.chargePerSeat !== oldRow.chargePerSeat) {
-    return `Charge Per Seat from '${oldRow.chargePerSeat}' to '${newRow.chargePerSeat}'`;
-  }
-  if (newRow.canBeCombined !== oldRow.canBeCombined) {
-    return `Can Be Combined from '${oldRow.canBeCombined}' to '${newRow.canBeCombined}'`;
-  }
-  return null;
-}
 
 export default TableTypes;

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { ProSidebar, Menu, MenuItem } from "react-pro-sidebar";
 import { Box, IconButton, Typography, useTheme } from "@mui/material";
 import { Link } from "react-router-dom";
@@ -7,9 +7,9 @@ import { tokens } from "../../theme";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import ReceiptOutlinedIcon from "@mui/icons-material/ReceiptOutlined";
 import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
-import HelpOutlineOutlinedIcon from "@mui/icons-material/HelpOutlineOutlined";
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
-import SettingsIcon from '@mui/icons-material/Settings';
+import SettingsIcon from "@mui/icons-material/Settings";
+import { UserContext } from "../../context/UserContext";
 
 const Item = ({ title, to, icon, selected, setSelected }) => {
   const theme = useTheme();
@@ -30,6 +30,7 @@ const Item = ({ title, to, icon, selected, setSelected }) => {
 };
 
 const Sidebar = () => {
+  const { user } = useContext(UserContext);
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -73,8 +74,8 @@ const Sidebar = () => {
                 alignItems="center"
                 ml="15px"
               >
-                <Typography variant="h3" color={colors.grey[100]}>
-                  ADMINS
+                <Typography variant="h4" color={colors.grey[100]}>
+                  {user?.role?.toString().toUpperCase() + "S"}
                 </Typography>
                 <IconButton onClick={() => setIsCollapsed(!isCollapsed)}>
                   <MenuOutlinedIcon />
@@ -100,21 +101,30 @@ const Sidebar = () => {
                   color={colors.grey[100]}
                   fontWeight="bold"
                   sx={{ m: "10px 0 0 0" }}
-                >
-                  Phan Ngoc Hoang Long
-                </Typography>
+                ></Typography>
                 <Typography variant="h5" color={colors.greenAccent[500]}>
-                  OMS Administrator
+                  OMS {user.role}
                 </Typography>
               </Box>
             </Box>
           )}
 
           <Box paddingLeft={isCollapsed ? undefined : "10%"}>
+            <SideBarItem selected={selected} setSelected={setSelected} />
+          </Box>
+        </Menu>
+      </ProSidebar>
+    </Box>
+  );
+  function SideBarItem({ selected, setSelected }) {
+    switch (user.role) {
+      case "Administrator":
+        return (
+          <>
             <Item
-              title="Dashboard"
-              to="/"
-              icon={<HomeOutlinedIcon />}
+              title="Users"
+              to="/users"
+              icon={<PersonOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
             />
@@ -125,52 +135,28 @@ const Sidebar = () => {
               selected={selected}
               setSelected={setSelected}
             />
-
-            <Typography
-              variant="h6"
-              color={colors.grey[300]}
-              sx={{ m: "15px 0 5px 20px" }}
-            >
-              Data
-            </Typography>
+          </>
+        );
+      case "Restaurant Owner":
+        return (
+          <>
             <Item
-              title="Order Details"
-              to="/orderDetails"
-              icon={<ReceiptOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-            />
-            <Item
-              title="Checkout"
-              to="/checkout"
-              icon={<ReceiptOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-            />
-             <Typography
-              variant="h6"
-              color={colors.grey[300]}
-              sx={{ m: "15px 0 5px 20px" }}
-            >
-              Management
-            </Typography>
-            <Item
-              title="Users"
-              to="/users"
-              icon={<PersonOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-            />
-            <Item
-              title="Reservations"
-              to="/reservations"
-              icon={<PersonOutlinedIcon />}
+              title="Dashboard"
+              to="/"
+              icon={<HomeOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
             />
             <Item
               title="Menus"
               to="/menus"
+              icon={<ReceiptOutlinedIcon />}
+              selected={selected}
+              setSelected={setSelected}
+            />
+            <Item
+              title="Foods"
+              to="/foods"
               icon={<ReceiptOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
@@ -190,13 +176,6 @@ const Sidebar = () => {
               setSelected={setSelected}
             />
             <Item
-              title="Foods"
-              to="/foods"
-              icon={<ReceiptOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-            />
-            <Item
               title="Table Types"
               to="/tableTypes"
               icon={<ReceiptOutlinedIcon />}
@@ -210,33 +189,50 @@ const Sidebar = () => {
               selected={selected}
               setSelected={setSelected}
             />
-
-            <Typography
-              variant="h6"
-              color={colors.grey[300]}
-              sx={{ m: "15px 0 5px 20px" }}
-            >
-              Pages
-            </Typography>
+          </>
+        );
+      case "Chef":
+        return (
+          <>
             <Item
-              title="Profile Form"
-              to="/form"
+              title="Order Details"
+              to="/orderDetails"
+              icon={<ReceiptOutlinedIcon />}
+              selected={selected}
+              setSelected={setSelected}
+            />
+          </>
+        );
+      case "Staff":
+        return (
+          <>
+            <Item
+              title="Reservations"
+              to="/reservations"
               icon={<PersonOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
             />
             <Item
-              title="FAQ Page"
-              to="/faq"
-              icon={<HelpOutlineOutlinedIcon />}
+              title="Order Details"
+              to="/orderDetails"
+              icon={<ReceiptOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
             />
-          </Box>
-        </Menu>
-      </ProSidebar>
-    </Box>
-  );
+            <Item
+              title="Checkout"
+              to="/checkout"
+              icon={<ReceiptOutlinedIcon />}
+              selected={selected}
+              setSelected={setSelected}
+            />
+          </>
+        );
+      default:
+        return null;
+    }
+  }
 };
 
 export default Sidebar;

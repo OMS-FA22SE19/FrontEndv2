@@ -37,7 +37,7 @@ const Reservations = () => {
 
   React.useEffect(() => {
     fetchData();
-  }, []);
+  });
 
   const handleDeleteYes = async () => {
     const { id, name } = deleteArguments;
@@ -158,7 +158,6 @@ const Reservations = () => {
         let id = index.api.getRowIndex(index?.row?.id) + 1;
         return id;
       },
-      flex: 0.1,
     },
     {
       field: "user",

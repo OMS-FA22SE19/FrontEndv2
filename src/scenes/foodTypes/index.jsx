@@ -1,17 +1,11 @@
 import * as React from "react";
 import Button from "@mui/material/Button";
-import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/DeleteOutlined";
 import SaveIcon from "@mui/icons-material/Save";
 import CancelIcon from "@mui/icons-material/Close";
 import RestoreIcon from "@mui/icons-material/Restore";
-import {
-  GridRowModes,
-  DataGrid,
-  GridToolbarContainer,
-  GridActionsCellItem,
-} from "@mui/x-data-grid";
+import { GridRowModes, DataGrid, GridActionsCellItem } from "@mui/x-data-grid";
 import axios from "axios";
 import { Box, useTheme, IconButton } from "@mui/material";
 import Header from "../../components/Header";
@@ -24,9 +18,11 @@ import Alert from "@mui/material/Alert";
 import Snackbar from "@mui/material/Snackbar";
 import SearchIcon from "@mui/icons-material/Search";
 import InputBase from "@mui/material/InputBase";
+import { EditToolbar } from "./EditToolbar";
+import useViewModel from "./viewModel";
+import TextField from "@mui/material/TextField";
 
 const FoodTypes = () => {
-  const host = `https://localhost:7246`
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const [rows, setRows] = React.useState([]);
@@ -38,6 +34,19 @@ const FoodTypes = () => {
   const [isAdding, setIsAdding] = React.useState(false);
   const [snackbar, setSnackbar] = React.useState(null);
   const [searchValue, setSearchValue] = React.useState("");
+  const [error, setError] = React.useState([]);
+  const [name, setName] = React.useState("");
+  const [description, setDescription] = React.useState("");
+  const [valid, setValid] = React.useState(true);
+
+  const viewModelProps = { setRows, setSnackbar };
+  const {
+    getFoodTypes,
+    addFoodType,
+    updateFoodType,
+    deleteFoodType,
+    recoverFoodType,
+  } = useViewModel(viewModelProps);
 
   const handleCloseSnackbar = () => setSnackbar(null);
 
@@ -56,7 +65,7 @@ const FoodTypes = () => {
   );
 
   React.useEffect(() => {
-    fetchData();
+    getFoodTypes();
   }, []);
 
   const handleUpdateNo = () => {
@@ -71,11 +80,17 @@ const FoodTypes = () => {
     try {
       // Make the HTTP request to save in the backend
       let response;
-      if(newRow.isNew !== undefined) {
-        response = await handleAdd(newRow);
-      }else {
-        response = await handleUpdate(newRow);
-      } 
+      const newFoodType = {
+        id: newRow.id,
+        name: name,
+        description: description,
+      };
+      if (newRow.isNew !== undefined) {
+
+        response = await addFoodType(newFoodType);
+      } else {
+        response = await updateFoodType(newFoodType);
+      }
       setSnackbar({
         children: "Food Type successfully saved",
         severity: "success",
@@ -95,7 +110,7 @@ const FoodTypes = () => {
 
     try {
       // Make the HTTP request to save in the backend
-      handleDelete(id);
+      deleteFoodType(id);
       setDeleteArguments(null);
       setSnackbar({
         children: "Food Type " + name + " successfully deleted",
@@ -106,34 +121,6 @@ const FoodTypes = () => {
     }
   };
 
-  const handleDelete = async (id) => {
-    await axios
-      .delete(host + `/api/v1/Types/` + id)
-      .then(response => {
-        if(response.status === 204) {
-          fetchData();
-        }
-      })
-      .catch(error => console.log(error));
-  };
-
-  const handleRecover = async (id) => {
-    await axios
-      .put(host + `/api/v1/Types/` + id + `/recover`)
-      .then(response => {
-        if(response.status === 204) {
-          fetchData();
-        }
-      })
-      .catch(error => console.log(error));
-  };
-
-  const handleUpdate = async (currentRow) => {
-    const requestBody = {id: currentRow["id"], name: currentRow["name"], description: currentRow["description"]};
-    await axios.put(host + `/api/v1/Types/` + currentRow["id"], requestBody)
-      .catch(() => {})
-      .finally(() => fetchData());
-  };
   const handleEntered = () => {
     // The `autoFocus` is not used because, if used, the same Enter that saves
     // the cell triggers "No". Instead, we manually focus the "No" button once
@@ -156,9 +143,7 @@ const FoodTypes = () => {
         open={!!promiseArguments}
       >
         <DialogTitle>Are you sure?</DialogTitle>
-        <DialogContent dividers>
-        {`Pressing 'Yes' to confirm.`}
-        </DialogContent>
+        <DialogContent dividers>{`Pressing 'Yes' to confirm.`}</DialogContent>
         <DialogActions>
           <Button ref={noButtonRef} onClick={handleUpdateNo}>
             No
@@ -169,7 +154,7 @@ const FoodTypes = () => {
     );
   };
 
-  const renderConfirmDeleteDialog = () => {
+  function renderConfirmDeleteDialog() {
     if (!deleteArguments) {
       return null;
     }
@@ -199,20 +184,7 @@ const FoodTypes = () => {
         </DialogActions>
       </Dialog>
     );
-  };
-
-  const fetchData = async () => {
-    const search = searchValue.trim();
-    let response = await axios.get(host + `/api/v1/Types` + `?searchValue=` + search);
-    setRows(response.data["data"]);
-  };
-
-  const handleAdd = async (currentRow) => {
-    const requestBody = {name: currentRow["name"], description: currentRow["description"]};
-    await axios.post(host + `/api/v1/Types/`, requestBody)
-      .catch(() => {})
-      .finally(() => fetchData());
-  };
+  }
 
   const handleRowEditStart = (params, event) => {
     event.defaultMuiPrevented = true;
@@ -222,7 +194,10 @@ const FoodTypes = () => {
     event.defaultMuiPrevented = true;
   };
 
-  const handleEditClick = (id) => () => {
+  const handleEditClick = (currentRow) => () => {
+    const id = currentRow.id;
+    setName(currentRow.name);
+    setDescription(currentRow.description);
     setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.Edit } });
     setIsEditing(true);
   };
@@ -239,7 +214,7 @@ const FoodTypes = () => {
   };
 
   const handleRecoverClick = (id) => () => {
-    handleRecover(id);
+    recoverFoodType(id);
   };
 
   const handleCancelClick = (id) => () => {
@@ -254,7 +229,84 @@ const FoodTypes = () => {
     }
     setIsAdding(false);
     setIsEditing(false);
+    setError([]);
   };
+
+  function isValid(name, value) {
+    let isValid = true;
+    switch (name) {
+      case "name":
+        if (value.trim() === "") {
+          isValid = false;
+          let existed = error.filter((e) => e.key === 1);
+          if (existed.length === 0) {
+            setError((oldError) => [
+              ...oldError,
+              { key: 1, value: "Name is required" },
+            ]);
+          }
+        } else {
+          const removedError = error.filter((error) => error.key !== 1);
+          setError(removedError);
+        }
+        if (value.trim().length < 2 || value.trim().length.length > 256) {
+          isValid = false;
+          let existed = error.filter((e) => e.key === 2);
+          if (existed.length === 0) {
+            setError((oldError) => [
+              ...oldError,
+              { key: 2, value: "Length Name must be between 2 and 256" },
+            ]);
+          }
+        } else {
+          const removedError = error.filter((error) => error.key !== 2);
+          setError(removedError);
+        }
+        break;
+      case "description":
+        if (value.trim() === "") {
+          isValid = false;
+          let existed = error.filter((e) => e.key === 3);
+          if (existed.length === 0) {
+            setError((oldError) => [
+              ...oldError,
+              { key: 3, value: "Description is required" },
+            ]);
+          }
+        } else {
+          const removedError = error.filter((error) => error.key !== 3);
+          setError(removedError);
+        }
+        if (value.trim().length < 2 || value.trim().length.length > 512) {
+          isValid = false;
+          let existed = error.filter((e) => e.key === 4);
+          if (existed.length === 0) {
+            setError((oldError) => [
+              ...oldError,
+              { key: 4, value: "Length Description must be between 2 and 512" },
+            ]);
+          }
+        } else {
+          const removedError = error.filter((error) => error.key !== 4);
+          setError(removedError);
+        }
+        break;
+      default:
+        break;
+    }
+    setValid(isValid);
+    return isValid;
+  }
+
+  function computeMutation(newRow, oldRow) {
+    if (name !== oldRow.name) {
+      return `Name from '${oldRow.name}' to '${name}'`;
+    }
+    if (description !== oldRow.description) {
+      return `Description from '${oldRow.description}' to '${description}'`;
+    }
+    return null;
+  }
 
   const columns = [
     {
@@ -264,15 +316,27 @@ const FoodTypes = () => {
         let id = index.api.getRowIndex(index?.row?.id) + 1;
         return id;
       },
+      flex: 0.15,
     },
     {
       field: "name",
       headerName: "Name",
-      flex: 1,
+      flex: 0.75,
       editable: true,
-      preProcessEditCellProps: (params) => {
-        const hasError = params.props.value.trim() === "";
-        return { ...params.props, error: hasError };
+      renderEditCell: (params) => {
+        const handleChange = (event) => {
+          isValid("name", event.target.value);
+          setName(event.target.value);
+        };
+
+        return (
+          <TextField
+            error={error.length === 0 ? false : true}
+            type="string"
+            value={name}
+            onChange={handleChange}
+          />
+        );
       },
     },
     {
@@ -280,6 +344,21 @@ const FoodTypes = () => {
       headerName: "Description",
       flex: 1,
       editable: true,
+      renderEditCell: (params) => {
+        const handleChange = (event) => {
+          isValid("description", event.target.value);
+          setDescription(event.target.value);
+        };
+
+        return (
+          <TextField
+            error={error.length === 0 ? false : true}
+            type="string"
+            value={description}
+            onChange={handleChange}
+          />
+        );
+      },
     },
     {
       field: "isDeleted",
@@ -298,20 +377,14 @@ const FoodTypes = () => {
         const id = currentRow.id;
         const name = currentRow.name;
         const isInEditMode = rowModesModel[id]?.mode === GridRowModes.Edit;
-        if(currentRow["isDeleted"]) {
+        if (currentRow["isDeleted"]) {
           return [
             <GridActionsCellItem
               icon={<RestoreIcon />}
               label="Restore"
               onClick={handleRecoverClick(id)}
             />,
-            <GridActionsCellItem
-            icon={<DeleteIcon />}
-            label="Delete"
-            onClick={handleDeleteClick(id, name)}
-            color="inherit"
-          />
-          ]
+          ];
         }
 
         if (isInEditMode) {
@@ -320,6 +393,7 @@ const FoodTypes = () => {
               icon={<SaveIcon />}
               label="Save"
               onClick={handleSaveClick(currentRow)}
+              disabled={error.length !== 0 || !valid}
             />,
             <GridActionsCellItem
               icon={<CancelIcon />}
@@ -340,7 +414,7 @@ const FoodTypes = () => {
             icon={<EditIcon />}
             label="Edit"
             className="textPrimary"
-            onClick={handleEditClick(id)}
+            onClick={handleEditClick(currentRow)}
             color="inherit"
           />,
           <GridActionsCellItem
@@ -351,25 +425,32 @@ const FoodTypes = () => {
           />,
         ];
       },
+      flex: 0.5,
     },
   ];
 
   const handleSearchChange = (event) => {
-    setSearchValue(event.target.value);
+    getFoodTypes(event.target.value);
   };
 
   const handleKeyDown = (event) => {
     if (event.key === "Enter") {
       event.preventDefault();
       event.stopPropagation();
-      fetchData();
+      getFoodTypes();
     }
   };
-
 
   return (
     <Box m="20px">
       <Header title="FOOD TYPES" subtitle="List of Food Types" />
+      {error.length === 0
+        ? null
+        : error.map((message) => (
+            <Alert key={message.key} severity="error">
+              {message.value}
+            </Alert>
+          ))}
       {/* SEARCH BAR */}
       <Box
         display="flex"
@@ -382,7 +463,7 @@ const FoodTypes = () => {
           placeholder="Search name, description"
           onKeyPress={handleKeyDown}
         />
-        <IconButton onClick={fetchData} sx={{ p: 1 }}>
+        <IconButton onClick={getFoodTypes} sx={{ p: 1 }}>
           <SearchIcon />
         </IconButton>
       </Box>
@@ -437,14 +518,28 @@ const FoodTypes = () => {
             Toolbar: EditToolbar,
           }}
           componentsProps={{
-            toolbar: { rows, setRows, setRowModesModel, isAdding, setIsAdding },
+            toolbar: {
+              rows,
+              setRows,
+              setRowModesModel,
+              isAdding,
+              setIsAdding,
+              name,
+              setName,
+              description,
+              setDescription,
+              valid,
+              setValid,
+            },
           }}
           experimentalFeatures={{ newEditingApi: true }}
           onProcessRowUpdateError={(error) => {
-            if(error.message === "Cannot read properties of undefined (reading 'id')") {
+            if (
+              error.message ===
+              "Cannot read properties of undefined (reading 'id')"
+            ) {
               window.location.reload();
-            }
-            else {
+            } else {
               console.log(error);
             }
           }}
@@ -458,39 +553,5 @@ const FoodTypes = () => {
     </Box>
   );
 };
-
-function EditToolbar(props) {
-  const { rows, setRows, setRowModesModel, isAdding, setIsAdding } = props;
-
-  const handleClick = () => {
-    const id =  Math.max(...rows.map(o => o.id)) + 1;
-    setIsAdding(true);
-    setRows((oldRows) => [...oldRows, { id, name: "", description: "", isNew: true }]);
-    setRowModesModel((oldModel) => ({
-      ...oldModel,
-      [id]: { mode: GridRowModes.Edit, fieldToFocus: "name" },
-    }));
-  };
-
-  if (!isAdding) {
-    return (
-      <GridToolbarContainer>
-        <Button color="primary" startIcon={<AddIcon />} onClick={handleClick}>
-          Add New Food Type
-        </Button>
-      </GridToolbarContainer>
-    );
-  }
-}
-
-function computeMutation(newRow, oldRow) {
-  if (newRow.name !== oldRow.name) {
-    return `Name from '${oldRow.name}' to '${newRow.name}'`;
-  }
-  if (newRow.description !== oldRow.description) {
-    return `Description from '${oldRow.description}' to '${newRow.description}'`;
-  }
-  return null;
-}
 
 export default FoodTypes;

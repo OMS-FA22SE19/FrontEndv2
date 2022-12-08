@@ -1,14 +1,22 @@
-import * as React from "react";
-import Button from "@mui/material/Button";
+import { Box, Button, useTheme, IconButton } from "@mui/material";
+import {
+  DataGrid,
+  GridRowModes,
+  GridToolbarContainer,
+  GridActionsCellItem
+} from "@mui/x-data-grid";
+import { tokens } from "../../../theme";
+import Header from "../../../components/Header";
+import axios from "axios";
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import MenuBookIcon from '@mui/icons-material/MenuBook';
+import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/DeleteOutlined";
 import SaveIcon from "@mui/icons-material/Save";
 import CancelIcon from "@mui/icons-material/Close";
 import RestoreIcon from "@mui/icons-material/Restore";
-import { GridRowModes, DataGrid, GridActionsCellItem } from "@mui/x-data-grid";
-import { Box, useTheme, IconButton } from "@mui/material";
-import Header from "../../components/Header";
-import { tokens } from "../../theme";
 import Dialog from "@mui/material/Dialog";
 import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
@@ -17,14 +25,12 @@ import Alert from "@mui/material/Alert";
 import Snackbar from "@mui/material/Snackbar";
 import SearchIcon from "@mui/icons-material/Search";
 import InputBase from "@mui/material/InputBase";
-import { EditToolbar } from "./EditToolbar";
-import useViewModel from "./viewModel";
-import TextField from "@mui/material/TextField";
 
-const CourseTypes = () => {
+const Menus = () => {
+  const host = `https://localhost:7246`
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
-  const [rows, setRows] = React.useState([]);
+  const [rows, setRows] = useState([]);
   const [rowModesModel, setRowModesModel] = React.useState({});
   const noButtonRef = React.useRef(null);
   const [promiseArguments, setPromiseArguments] = React.useState(null);
@@ -32,19 +38,7 @@ const CourseTypes = () => {
   const [isEditing, setIsEditing] = React.useState(false);
   const [isAdding, setIsAdding] = React.useState(false);
   const [snackbar, setSnackbar] = React.useState(null);
-  const [error, setError] = React.useState([]);
-  const [name, setName] = React.useState("");
-  const [description, setDescription] = React.useState("");
-  const [valid, setValid] = React.useState(true);
-
-  const viewModelProps = { setRows, setSnackbar };
-  const {
-    getCourseTypes,
-    addCourseType,
-    updateCourseType,
-    deleteCourseType,
-    recoverCourseType,
-  } = useViewModel(viewModelProps);
+  const [searchValue, setSearchValue] = React.useState("");
 
   const handleCloseSnackbar = () => setSnackbar(null);
 
@@ -62,8 +56,23 @@ const CourseTypes = () => {
     []
   );
 
-  React.useEffect(() => {
-    getCourseTypes();
+  function computeMutation(newRow, oldRow) {
+    if (newRow.name !== oldRow.name) {
+      return `Name from '${oldRow.name}' to '${newRow.name}'`;
+    }
+    if (newRow.description !== oldRow.description) {
+      return `Description from '${oldRow.description}' to '${newRow.description}'`;
+    }
+    if (newRow.Available !== oldRow.Available) {
+      return `Available from '${oldRow.description}' to '${newRow.description}'`;
+    }
+    return null;
+  }
+
+  let navigate = useNavigate();
+
+  useEffect(() => {
+    fetchData();
   }, []);
 
   const handleUpdateNo = () => {
@@ -78,24 +87,19 @@ const CourseTypes = () => {
     try {
       // Make the HTTP request to save in the backend
       let response;
-      const newCourseType = {
-        id: newRow.id,
-        name: name,
-        description: description,
-      };
-      if (newRow.isNew !== undefined) {
-        response = await addCourseType(newCourseType);
-      } else {
-        response = await updateCourseType(newCourseType);
-      }
+      if(newRow.isNew !== undefined) {
+        response = await createMenu(newRow);
+      }else {
+        response = await handleUpdate(newRow);
+      } 
       setSnackbar({
-        children: "Course Type successfully saved",
+        children: "Menu successfully saved",
         severity: "success",
       });
       resolve(response);
       setPromiseArguments(null);
     } catch (error) {
-      setSnackbar({ children: error.message, severity: "error" });
+      setSnackbar({ children: "Name can't be empty", severity: "error" });
       reject(oldRow);
       setPromiseArguments(null);
       console.log(error);
@@ -107,10 +111,10 @@ const CourseTypes = () => {
 
     try {
       // Make the HTTP request to save in the backend
-      deleteCourseType(id);
+      handleDelete(id);
       setDeleteArguments(null);
       setSnackbar({
-        children: "Course Type " + name + " successfully deleted",
+        children: "Menu " + name + " successfully deleted",
         severity: "success",
       });
     } catch (error) {
@@ -118,11 +122,51 @@ const CourseTypes = () => {
     }
   };
 
+  const handleDelete = async (id) => {
+    await axios
+      .delete(host + `/api/v1/Menus/` + id)
+      .then(response => {
+        if(response.status === 204) {
+          fetchData();
+        }
+      })
+      .catch(error => console.log(error));
+  };
+
+  const handleRecover = async (id) => {
+    await axios
+      .put(host + `/api/v1/Menus/` + id + `/recover`)
+      .then(response => {
+        if(response.status === 204) {
+          fetchData();
+        }
+      })
+      .catch(error => console.log(error));
+  };
+
+  const handleUpdate = async (currentRow) => {
+    const requestBody = {id: currentRow["id"], name: currentRow["name"], description: currentRow["description"]};
+    await axios.put(host + `/api/v1/Menus/` + currentRow["id"], requestBody)
+      .catch(() => {})
+      .finally(() => fetchData());
+  };
+
   const handleEntered = () => {
     // The `autoFocus` is not used because, if used, the same Enter that saves
     // the cell triggers "No". Instead, we manually focus the "No" button once
     // the dialog is fully open.
     // noButtonRef.current?.focus();
+  };
+
+  const fetchData = async () => {
+    const search = searchValue.trim();
+    let response = await axios.get(host + `/api/v1/Menus` + `?searchValue=` + search);
+    setRows(response.data["data"]);
+  };
+
+  const directToMenuFoods = (id) => () => {
+    let path = `/Menus/` + id + '/foods';
+    navigate(path);
   };
 
   const renderConfirmEditDialog = () => {
@@ -140,7 +184,9 @@ const CourseTypes = () => {
         open={!!promiseArguments}
       >
         <DialogTitle>Are you sure?</DialogTitle>
-        <DialogContent dividers>{`Pressing 'Yes' to confirm.`}</DialogContent>
+        <DialogContent dividers>
+        {`Pressing 'Yes' to confirm.`}
+        </DialogContent>
         <DialogActions>
           <Button ref={noButtonRef} onClick={handleUpdateNo}>
             No
@@ -151,7 +197,7 @@ const CourseTypes = () => {
     );
   };
 
-  function renderConfirmDeleteDialog() {
+  const renderConfirmDeleteDialog = () => {
     if (!deleteArguments) {
       return null;
     }
@@ -181,7 +227,14 @@ const CourseTypes = () => {
         </DialogActions>
       </Dialog>
     );
-  }
+  };
+
+  const createMenu = async (currentRow) => {
+    const requestBody = {name: currentRow["name"], description: currentRow["description"]};
+    await axios.post(host + `/api/v1/Menus/`, requestBody)
+      .catch(() => {})
+      .finally(() => fetchData());
+  };
 
   const handleRowEditStart = (params, event) => {
     event.defaultMuiPrevented = true;
@@ -191,10 +244,7 @@ const CourseTypes = () => {
     event.defaultMuiPrevented = true;
   };
 
-  const handleEditClick = (currentRow) => () => {
-    const id = currentRow.id;
-    setName(currentRow.name);
-    setDescription(currentRow.description);
+  const handleEditClick = (id) => () => {
     setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.Edit } });
     setIsEditing(true);
   };
@@ -211,7 +261,7 @@ const CourseTypes = () => {
   };
 
   const handleRecoverClick = (id) => () => {
-    recoverCourseType(id);
+    handleRecover(id);
   };
 
   const handleCancelClick = (id) => () => {
@@ -226,136 +276,23 @@ const CourseTypes = () => {
     }
     setIsAdding(false);
     setIsEditing(false);
-    setError([]);
   };
-
-  function isValid(name, value) {
-    let isValid = true;
-    switch (name) {
-      case "name":
-        if (value.trim() === "") {
-          isValid = false;
-          let existed = error.filter((e) => e.key === 1);
-          if (existed.length === 0) {
-            setError((oldError) => [
-              ...oldError,
-              { key: 1, value: "Name is required" },
-            ]);
-          }
-        } else {
-          const removedError = error.filter((error) => error.key !== 1);
-          setError(removedError);
-        }
-        if (value.trim().length < 2 || value.trim().length.length > 256) {
-          isValid = false;
-          let existed = error.filter((e) => e.key === 2);
-          if (existed.length === 0) {
-            setError((oldError) => [
-              ...oldError,
-              { key: 2, value: "Length Name must be between 2 and 256" },
-            ]);
-          }
-        } else {
-          const removedError = error.filter((error) => error.key !== 2);
-          setError(removedError);
-        }
-        break;
-      case "description":
-        if (value.trim() === "") {
-          isValid = false;
-          let existed = error.filter((e) => e.key === 3);
-          if (existed.length === 0) {
-            setError((oldError) => [
-              ...oldError,
-              { key: 3, value: "Description is required" },
-            ]);
-          }
-        } else {
-          const removedError = error.filter((error) => error.key !== 3);
-          setError(removedError);
-        }
-        if (value.trim().length < 2 || value.trim().length.length > 512) {
-          isValid = false;
-          let existed = error.filter((e) => e.key === 4);
-          if (existed.length === 0) {
-            setError((oldError) => [
-              ...oldError,
-              { key: 4, value: "Length Description must be between 2 and 512" },
-            ]);
-          }
-        } else {
-          const removedError = error.filter((error) => error.key !== 4);
-          setError(removedError);
-        }
-        break;
-      default:
-        break;
-    }
-    setValid(isValid);
-    return isValid;
-  }
-
-  function computeMutation(newRow, oldRow) {
-    if (name !== oldRow.name) {
-      return `Name from '${oldRow.name}' to '${name}'`;
-    }
-    if (description !== oldRow.description) {
-      return `Description from '${oldRow.description}' to '${description}'`;
-    }
-    return null;
-  }
 
   const columns = [
     {
       field: "index",
       headerName: "No.",
-      renderCell: (index) => {
-        let id = index.api.getRowIndex(index?.row?.id) + 1;
-        return id;
-      },
-      flex: 0.15,
+      renderCell: (index) => index.api.getRowIndex(index.row.id) + 1,
+      flex: 0.2
     },
+    { field: "name", headerName: "Name", flex: 1, editable: true },
+    { field: "description", headerName: "Description", flex: 2, editable: true },
     {
-      field: "name",
-      headerName: "Name",
-      flex: 0.75,
-      editable: true,
-      renderEditCell: (params) => {
-        const handleChange = (event) => {
-          isValid("name", event.target.value);
-          setName(event.target.value);
-        };
-
-        return (
-          <TextField
-            error={error.length === 0 ? false : true}
-            type="string"
-            value={name}
-            onChange={handleChange}
-          />
-        );
-      },
-    },
-    {
-      field: "description",
-      headerName: "Description",
-      flex: 1,
-      editable: true,
-      renderEditCell: (params) => {
-        const handleChange = (event) => {
-          isValid("description", event.target.value);
-          setDescription(event.target.value);
-        };
-
-        return (
-          <TextField
-            error={error.length === 0 ? false : true}
-            type="string"
-            value={description}
-            onChange={handleChange}
-          />
-        );
-      },
+      field: "available",
+      headerName: "Available",
+      type: "boolean",
+      flex: 0.5,
+      editable: true
     },
     {
       field: "isDeleted",
@@ -374,14 +311,20 @@ const CourseTypes = () => {
         const id = currentRow.id;
         const name = currentRow.name;
         const isInEditMode = rowModesModel[id]?.mode === GridRowModes.Edit;
-        if (currentRow["isDeleted"]) {
+        if(currentRow["isDeleted"]) {
           return [
             <GridActionsCellItem
               icon={<RestoreIcon />}
               label="Restore"
               onClick={handleRecoverClick(id)}
             />,
-          ];
+            <GridActionsCellItem
+            icon={<DeleteIcon />}
+            label="Delete"
+            onClick={handleDeleteClick(id, name)}
+            color="inherit"
+          />,
+          ]
         }
 
         if (isInEditMode) {
@@ -390,7 +333,6 @@ const CourseTypes = () => {
               icon={<SaveIcon />}
               label="Save"
               onClick={handleSaveClick(currentRow)}
-              disabled={error.length !== 0 || !valid}
             />,
             <GridActionsCellItem
               icon={<CancelIcon />}
@@ -405,13 +347,20 @@ const CourseTypes = () => {
         if (isEditing && !isInEditMode) {
           return [];
         }
-
+        
         return [
+          <GridActionsCellItem
+            icon={<MenuBookIcon />}
+            label="View Menu"
+            className="textPrimary"
+            onClick={directToMenuFoods(id)}
+            color="inherit"
+          />,
           <GridActionsCellItem
             icon={<EditIcon />}
             label="Edit"
             className="textPrimary"
-            onClick={handleEditClick(currentRow)}
+            onClick={handleEditClick(id)}
             color="inherit"
           />,
           <GridActionsCellItem
@@ -422,32 +371,26 @@ const CourseTypes = () => {
           />,
         ];
       },
-      flex: 0.5,
+      flex: 1
     },
   ];
 
   const handleSearchChange = (event) => {
-    getCourseTypes(event.target.value);
+    setSearchValue(event.target.value);
   };
 
   const handleKeyDown = (event) => {
     if (event.key === "Enter") {
       event.preventDefault();
       event.stopPropagation();
-      getCourseTypes();
+      fetchData();
     }
   };
 
+
   return (
     <Box m="20px">
-      <Header title="COURSE TYPES" subtitle="List of Course Types" />
-      {error.length === 0
-        ? null
-        : error.map((message) => (
-            <Alert key={message.key} severity="error">
-              {message.value}
-            </Alert>
-          ))}
+      <Header title="Menus" subtitle="List of Menus" />
       {/* SEARCH BAR */}
       <Box
         display="flex"
@@ -460,7 +403,7 @@ const CourseTypes = () => {
           placeholder="Search name, description"
           onKeyPress={handleKeyDown}
         />
-        <IconButton onClick={getCourseTypes} sx={{ p: 1 }}>
+        <IconButton onClick={fetchData} sx={{ p: 1 }}>
           <SearchIcon />
         </IconButton>
       </Box>
@@ -496,10 +439,6 @@ const CourseTypes = () => {
           "& .MuiDataGrid-toolbarContainer .MuiButton-text": {
             color: `${colors.grey[100]} !important`,
           },
-          "& .Mui-error": {
-            backgroundColor: colors.redAccent[700],
-            color: `${colors.redAccent[100]} !important`,
-          },
         }}
       >
         <DataGrid
@@ -515,28 +454,14 @@ const CourseTypes = () => {
             Toolbar: EditToolbar,
           }}
           componentsProps={{
-            toolbar: {
-              rows,
-              setRows,
-              setRowModesModel,
-              isAdding,
-              setIsAdding,
-              name,
-              setName,
-              description,
-              setDescription,
-              valid,
-              setValid,
-            },
+            toolbar: { rows, setRows, setRowModesModel, isAdding, setIsAdding },
           }}
           experimentalFeatures={{ newEditingApi: true }}
           onProcessRowUpdateError={(error) => {
-            if (
-              error.message ===
-              "Cannot read properties of undefined (reading 'id')"
-            ) {
+            if(error.message === "Cannot read properties of undefined (reading 'id')") {
               window.location.reload();
-            } else {
+            }
+            else {
               console.log(error);
             }
           }}
@@ -551,4 +476,29 @@ const CourseTypes = () => {
   );
 };
 
-export default CourseTypes;
+function EditToolbar(props) {
+  const { rows, setRows, setRowModesModel, isAdding, setIsAdding } = props;
+
+  const handleClick = () => {
+    const id =  Math.max(...rows.map(o => o.id)) + 1;
+
+    setIsAdding(true);
+    setRows((oldRows) => [...oldRows, { id, name: "", description: "", Available: false, isDeleted: false, isNew: true }]);
+    setRowModesModel((oldModel) => ({
+      ...oldModel,
+      [id]: { mode: GridRowModes.Edit, fieldToFocus: "name" },
+    }));
+  };
+
+  if (!isAdding) {
+    return (
+      <GridToolbarContainer>
+        <Button color="primary" startIcon={<AddIcon />} onClick={handleClick}>
+          Add New Menu
+        </Button>
+      </GridToolbarContainer>
+    );
+  }
+}
+
+export default Menus;
