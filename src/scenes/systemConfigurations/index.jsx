@@ -6,11 +6,7 @@ import React, { useState } from "react";
 import EditIcon from "@mui/icons-material/Edit";
 import SaveIcon from "@mui/icons-material/Save";
 import CancelIcon from "@mui/icons-material/Close";
-import {
-  GridRowModes,
-  DataGrid,
-  GridActionsCellItem,
-} from "@mui/x-data-grid";
+import { GridRowModes, DataGrid, GridActionsCellItem } from "@mui/x-data-grid";
 import Dialog from "@mui/material/Dialog";
 import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
@@ -181,8 +177,7 @@ const SystemConfiguration = () => {
           return element.name === "EndTime";
         }).value;
         value >= endTime
-          ? (errorMessage =
-              "StartTime must start prior EndTime: " + endTime)
+          ? (errorMessage = "StartTime must start prior EndTime: " + endTime)
           : (errorMessage = "");
         break;
       case "EndTime":
@@ -190,8 +185,7 @@ const SystemConfiguration = () => {
           return element.name === "StartTime";
         }).value;
         value < startTime
-          ? (errorMessage =
-              "EndTime must start after StartTime: " + startTime)
+          ? (errorMessage = "EndTime must start after StartTime: " + startTime)
           : (errorMessage = "");
         break;
       case "MinReservationDuration":
@@ -236,12 +230,17 @@ const SystemConfiguration = () => {
         const name = params.row.name;
         switch (name) {
           case "MinReservationDuration":
+            return "Min Meal Duration (minutes)";
           case "MaxReservationDuration":
-            return name + " (minutes)";
+            return "Max Meal Duration (minutes)";
           case "MaxEdit":
-            return name + " (times)";
+            return "Max Reservation Edit (times)";
           case "ReservationTable":
-            return name + " (%)";
+            return "Available Tables For Reservation (%)";
+          case "StartTime":
+            return "Opening Time";
+          case "EndTime":
+            return "Closing Time";
           default:
             return name;
         }
@@ -258,7 +257,6 @@ const SystemConfiguration = () => {
         const currentRow = params.row;
         const name = currentRow.name;
         const handleChange = (event) => {
-
           setError(isValid(name, event.target.value));
           setValue(event.target.value);
         };

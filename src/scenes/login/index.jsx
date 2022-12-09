@@ -3,18 +3,19 @@ import { Formik } from "formik";
 import * as yup from "yup";
 import Header from "../../components/Header";
 import axios from "axios";
-import React, {useContext } from "react";
+import React, { useContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Grid from "@mui/material/Grid";
 import { UserContext } from "../../context/UserContext";
-import { useEffect } from "react";
+import Alert from "@mui/material/Alert";
 
 const Login = () => {
-  const {user} = useContext(UserContext);
+  const { user } = useContext(UserContext);
+  const [error, setError] = React.useState("");
 
   let navigate = useNavigate();
   const routeChange = () => {
-    if(user !== null) {
+    if (user !== null) {
       window.location.href = "/";
     }
   };
@@ -30,8 +31,11 @@ const Login = () => {
       .post("https://localhost:7246/api/v1/Authentication", requestBody)
       .then((response) => {
         const token = response["data"].data.jwtToken;
-        console.log({ token });
-        localStorage.setItem("token", token);
+        if (response.status === 200 && token !== null) {
+          localStorage.setItem("token", token);
+          return;
+        }
+        throw new Error("Something went wrong! Please try again");
       })
       .then(() => {
         values.email = "";
@@ -40,13 +44,22 @@ const Login = () => {
       .then(() => {
         window.location.href = "/";
       })
-      .catch((error) => console.log(error));
+      .catch((error) => {
+        if(error.response.status === 401) {
+          setError("Wrong username or password");
+        }
+        setError(error.response.data.message);
+      });
   };
 
-  
   return (
     <Box m="20px">
       <Header title="Sign In" subtitle="Login to OMS" />
+      {error === "" ? null : (
+        <Alert severity="error">
+          {error}
+        </Alert>
+      )}
       <Formik
         onSubmit={handleFormSubmit}
         initialValues={initialValues}

@@ -1,11 +1,7 @@
-import {
-  Box,
-  Typography,
-  useTheme,
-} from "@mui/material";
+import { Box, Typography, useTheme } from "@mui/material";
 import { tokens } from "../../theme";
 import { mockTransactions, mockTrendingFood } from "../../data/mockData";
-import ReceiptIcon from '@mui/icons-material/Receipt';
+import ReceiptIcon from "@mui/icons-material/Receipt";
 import FastfoodIcon from "@mui/icons-material/Fastfood";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import Header from "../../components/Header";
@@ -15,15 +11,13 @@ import * as React from "react";
 import { DataGrid } from "@mui/x-data-grid";
 
 const Dashboard = () => {
-  const host = `https://localhost:7246`
+  const host = `https://localhost:7246`;
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const [newCustomers, setNewCustomers] = React.useState("");
 
   const fetchData = async () => {
-    let response = await axios.get(
-      host + `/api/v1/Dashboard/Customers`
-    );
+    let response = await axios.get(host + `/api/v1/Dashboard/Customers`);
     setNewCustomers(response.data["data"]);
   };
 
@@ -244,7 +238,7 @@ const Dashboard = () => {
           >
           </Box>
         </Box> */}
-        
+
         {/* ROW 3 */}
         <Box
           gridColumn="span 8"
@@ -252,7 +246,10 @@ const Dashboard = () => {
           backgroundColor={colors.primary[400]}
           overflow="auto"
         >
-          <Header title="TOP LOYAL CUSTOMERS" subtitle="List of Monthly Royal Customers" />
+          <Header
+            title="TOP LOYAL CUSTOMERS"
+            subtitle="List of Monthly Royal Customers"
+          />
           <Box
             m="5px 0 0 0"
             display="flex"

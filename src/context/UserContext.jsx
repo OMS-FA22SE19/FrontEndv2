@@ -24,7 +24,11 @@ export const UserProvider = ({ children }) => {
         const user = response["data"].data;
         setUser(user);
       })
-      .catch(() => setUser(null));
+      .catch(() => {
+        localStorage.removeItem("token");
+        setUser(null);
+        window.location.href = "/login";
+      });
   };
 
   return (

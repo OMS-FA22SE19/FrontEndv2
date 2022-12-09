@@ -1,4 +1,4 @@
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
 import { ProSidebar, Menu, MenuItem } from "react-pro-sidebar";
 import { Box, IconButton, Typography, useTheme } from "@mui/material";
 import { Link } from "react-router-dom";
@@ -34,8 +34,25 @@ const Sidebar = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const [selected, setSelected] = useState("Dashboard");
-
+  const [selected, setSelected] = useState("");
+  useEffect(() => {
+    switch(user.role){
+      case "Administrator":
+        setSelected("Users");
+        break;
+        case "Restaurant Owner":
+          setSelected("Dashboard");
+          break;
+          case "Chef":
+        setSelected("Order Details");
+        break;
+        case "Staff":
+        setSelected("Reservations");
+        break;
+      default:
+        break;
+    }
+  }, [])
   return (
     <Box
       sx={{
@@ -119,7 +136,6 @@ const Sidebar = () => {
   function SideBarItem({ selected, setSelected }) {
     switch (user.role) {
       case "Administrator":
-        setSelected("Users");
         return (
           <>
             <Item
@@ -139,7 +155,6 @@ const Sidebar = () => {
           </>
         );
       case "Restaurant Owner":
-        setSelected("Dashboard");
         return (
           <>
             <Item
@@ -194,7 +209,6 @@ const Sidebar = () => {
           </>
         );
       case "Chef":
-        setSelected("Order Details");
         return (
           <>
             <Item
@@ -207,7 +221,6 @@ const Sidebar = () => {
           </>
         );
       case "Staff":
-        setSelected("Reservations");
         return (
           <>
             <Item
