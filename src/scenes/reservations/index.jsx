@@ -20,7 +20,8 @@ import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
 
 const Reservations = () => {
-  const host = `https://localhost:7246`
+  const localSt = localStorage.getItem("token");
+  const host = `https://localhost:7246`;
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const [rows, setRows] = React.useState([]);
@@ -56,8 +57,13 @@ const Reservations = () => {
   };
 
   const handleCancelReservation = async (id) => {
+    if(localSt === null) {
+      window.location.href = "/login";
+    }
     await axios
-      .delete(host + `/api/v1/Reservations/` + id)
+      .delete(host + `/api/v1/Reservations/` + id, {
+        headers: { Authorization: `Bearer ${localSt}` },
+      })
       .then((response) => {
         if (response.status === 204) {
           fetchData();
@@ -106,31 +112,45 @@ const Reservations = () => {
   };
 
   const fetchData = async () => {
+    if (localSt === null) {
+      window.location.href = "/login";
+    }
     const search = searchValue.trim();
     const searchByValue = searchBy.trim();
     let response = await axios.get(
-      host + `/api/v1/Reservations` +
+      host +
+        `/api/v1/Reservations` +
         `?status=` +
         status +
         `&searchBy=` +
         searchByValue +
         `&searchValue=` +
-        search
+        search,
+      {
+        headers: { Authorization: `Bearer ${localSt}` },
+      }
     );
     setRows(response.data["data"]);
   };
 
   const fetchDataWithStatus = async (status) => {
+    if (localSt === null) {
+      window.location.href = "/login";
+    }
     const search = searchValue.trim();
     const searchByValue = searchBy.trim();
     let response = await axios.get(
-      host + `/api/v1/Reservations` +
+      host +
+        `/api/v1/Reservations` +
         `?status=` +
         status +
         `&searchBy=` +
         searchByValue +
         `&searchValue=` +
-        search
+        search,
+      {
+        headers: { Authorization: `Bearer ${localSt}` },
+      }
     );
     setRows(response.data["data"]);
   };

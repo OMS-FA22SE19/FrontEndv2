@@ -18,6 +18,7 @@ const Users = () => {
   const [APIData, setAPIData] = useState([]);
   const [searchValue, setSearchValue] = React.useState("");
   const [searchBy, setSearchBy] = React.useState("Id");
+  const localSt = localStorage.getItem("token");
 
   let navigate = useNavigate();
 
@@ -26,6 +27,9 @@ const Users = () => {
   }, []);
 
   const fetchData = async () => {
+    if (localSt === null) {
+      window.location.href = "/login";
+    }
     const search = searchValue.trim();
     const searchByValue = searchBy.trim();
     let response = await axios.get(
@@ -34,13 +38,23 @@ const Users = () => {
         `?searchBy=` +
         searchByValue +
         `&searchValue=` +
-        search
+        search,
+        {
+          headers: { Authorization: `Bearer ${localSt}` },
+        }
     );
     setAPIData(response.data["data"]);
   };
 
   const deleteUser = async (id) => {
-    await axios.delete(host + `/api/v1/Users/` + id).finally(() => fetchData());
+    if (localSt === null) {
+      window.location.href = "/login";
+    }
+    await axios
+      .delete(host + `/api/v1/Users/` + id, {
+        headers: { Authorization: `Bearer ${localSt}` },
+      })
+      .finally(() => fetchData());
   };
 
   const directToCreateUser = () => {
@@ -94,6 +108,11 @@ const Users = () => {
       headerAlign: "right",
       align: "right",
       flex: 0.5,
+    },
+    {
+      field: "role",
+      headerName: "Role",
+      flex: 1,
     },
     {
       field: "isDeleted",

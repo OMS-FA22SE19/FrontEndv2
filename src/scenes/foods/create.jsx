@@ -18,7 +18,8 @@ import Chip from "@mui/material/Chip";
 
 const CreateFood = () => {
   const isNonMobile = useMediaQuery("(min-width:600px)");
-  const host = `https://localhost:7246`
+  const localSt = localStorage.getItem("token");
+  const host = `https://localhost:7246`;
   const [getCourseTypes, setCourseTypes] = useState([]);
   const [getFoodTypes, setFoodTypes] = useState([]);
   const [getCourseTypeId, setCourseTypeId] = React.useState("");
@@ -41,45 +42,61 @@ const CreateFood = () => {
   };
 
   const handleFormSubmit = async (values) => {
-		values.picture = selectedImage;
-		let formData = new FormData();
-		formData.append("name", values.name);
-		formData.append("description", values.description);
-		formData.append("ingredient", values.ingredient);
-		formData.append("available", values.available);
-		formData.append("picture", values.picture);
-		formData.append("courseTypeId", values.courseTypeId);
-		getFoodTypeIds.map((val) => {
-			formData.append("types", val);
-		})
+    if (localSt === null) {
+      window.location.href = "/login";
+    }
+    values.picture = selectedImage;
+    let formData = new FormData();
+    formData.append("name", values.name);
+    formData.append("description", values.description);
+    formData.append("ingredient", values.ingredient);
+    formData.append("available", values.available);
+    formData.append("picture", values.picture);
+    formData.append("courseTypeId", values.courseTypeId);
+    getFoodTypeIds.map((val) => {
+      formData.append("types", val);
+    });
     await axios({
-			method: "post",
-			url: "https://oms-fa22se19.herokuapp.com/api/v1/Foods",
-			data: formData,
-			headers: { "Content-Type": "multipart/form-data" },
-		})
-			.then(function (response) {
-				//handle success
-				console.log(response);
-			})
-			.catch(function (response) {
-				//handle error
-				console.log(response);
-			})
-			.finally(function () {
-				routeChange();
-			});
+      method: "post",
+      url: "https://oms-fa22se19.herokuapp.com/api/v1/Foods",
+      data: formData,
+      headers: {
+        "Content-Type": "multipart/form-data",
+        Authorization: `Bearer ${localSt}`,
+      },
+    })
+      .then(function (response) {
+        //handle success
+        console.log(response);
+      })
+      .catch(function (response) {
+        //handle error
+        console.log(response);
+      })
+      .finally(function () {
+        routeChange();
+      });
   };
 
   const fetchCourseTypes = async () => {
+    if (localSt === null) {
+      window.location.href = "/login";
+    }
     await axios
-      .get(host + `/api/v1/CourseTypes`)
+      .get(host + `/api/v1/CourseTypes`, {
+        headers: { Authorization: `Bearer ${localSt}` },
+      })
       .then((response) => setCourseTypes(response.data["data"]));
   };
 
   const fetchFoodTypes = async () => {
+    if (localSt === null) {
+      window.location.href = "/login";
+    }
     await axios
-      .get(host + `/api/v1/Types`)
+      .get(host + `/api/v1/Types`, {
+        headers: { Authorization: `Bearer ${localSt}` },
+      })
       .then((response) => setFoodTypes(response.data["data"]));
   };
 

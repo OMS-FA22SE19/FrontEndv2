@@ -13,27 +13,28 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 import { useParams } from "react-router-dom";
 
 const UpdateUser = () => {
-  const host = `https://localhost:7246`
+  const host = `https://localhost:7246`;
   const isNonMobile = useMediaQuery("(min-width:600px)");
   const { id } = useParams();
+  const localSt = localStorage.getItem("token");
 
   useEffect(() => {
     fetchData();
   }, []);
 
-
   const fetchData = async () => {
-    await axios
-      .get(host + `/api/v1/users/` + id)
-      .then((response) => {
-        const fullName = response.data["data"].fullName;
-        const email = response.data["data"].email;
-        const phoneNumber = response.data["data"].phoneNumber;
+    if (localSt === null) {
+      window.location.href = "/login";
+    }
+    await axios.get(host + `/api/v1/users/` + id).then((response) => {
+      const fullName = response.data["data"].fullName;
+      const email = response.data["data"].email;
+      const phoneNumber = response.data["data"].phoneNumber;
 
-        initialValues.email = email;
-        initialValues.fullName = fullName;
-        initialValues.phoneNumber = phoneNumber;
-      });
+      initialValues.email = email;
+      initialValues.fullName = fullName;
+      initialValues.phoneNumber = phoneNumber;
+    });
   };
 
   let navigate = useNavigate();
@@ -49,7 +50,9 @@ const UpdateUser = () => {
       role: values.role,
     };
     await axios
-      .put(host + `/api/v1/users/` + id, requestBody)
+      .put(host + `/api/v1/users/` + id, requestBody, {
+        headers: { Authorization: `Bearer ${localSt}` },
+      })
       .finally(() => routeChange());
   };
 

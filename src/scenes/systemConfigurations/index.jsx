@@ -18,6 +18,7 @@ import InputBase from "@mui/material/InputBase";
 import TextField from "@mui/material/TextField";
 
 const SystemConfiguration = () => {
+  const localSt = localStorage.getItem("token");
   const host = `https://localhost:7246`;
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
@@ -81,12 +82,17 @@ const SystemConfiguration = () => {
   };
 
   const handleUpdate = async (name, value) => {
+    if(localSt === null) {
+      window.location.href = "/login";
+    }
     const requestBody = {
       name: name,
       value: value,
     };
     await axios
-      .put(host + `/api/v1/AdminSettings/`, requestBody)
+      .put(host + `/api/v1/AdminSettings/`, requestBody, {
+        headers: { Authorization: `Bearer ${localSt}` },
+      })
       .then((response) => {
         if (response.status === 204) {
           fetchData();
@@ -128,9 +134,15 @@ const SystemConfiguration = () => {
   };
 
   const fetchData = async () => {
+    if(localSt === null) {
+      window.location.href = "/login";
+    }
     const search = searchValue.trim();
     let response = await axios.get(
-      host + `/api/v1/AdminSettings` + `?searchValue=` + search
+      host + `/api/v1/AdminSettings` + `?searchValue=` + search,
+      {
+        headers: { Authorization: `Bearer ${localSt}` },
+      }
     );
     setRows(response.data["data"]);
   };

@@ -13,6 +13,7 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 
 const CreateUser = () => {
   const isNonMobile = useMediaQuery("(min-width:600px)");
+  const localSt = localStorage.getItem("token");
   const host = `https://localhost:7246`
   let navigate = useNavigate();
   const routeChange = () => {
@@ -21,6 +22,9 @@ const CreateUser = () => {
   };
 
   const handleFormSubmit = async (values) => {
+    if(localSt === null) {
+      window.location.href = "/login";
+    }
     const requestBody = {
       fullName: values.fullName,
       email: values.email,
@@ -28,7 +32,10 @@ const CreateUser = () => {
       password: values.password,
       role: values.role,
     };
-    await axios.post(host + `/api/v1/Users`, requestBody);
+    await axios.post(host + `/api/v1/Users`, requestBody,
+    {
+      headers: { Authorization: `Bearer ${localSt}` },
+    });
     routeChange();
   };
 

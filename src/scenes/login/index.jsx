@@ -45,8 +45,10 @@ const Login = () => {
         window.location.href = "/";
       })
       .catch((error) => {
-        if(error.response.status === 401) {
+        console.log(error.request.status === 401);
+        if(error.response.status === 401 || error.request.status === 401) {
           setError("Wrong username or password");
+          return;
         }
         setError(error.response.data.message);
       });

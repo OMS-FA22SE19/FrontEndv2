@@ -23,6 +23,7 @@ import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
 
 const OrderDetails = () => {
+  const localSt = localStorage.getItem("token");
   const host = `https://localhost:7246`
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
@@ -40,6 +41,9 @@ const OrderDetails = () => {
   }, []);
 
   const fetchData = async () => {
+    if(localSt === null) {
+      window.location.href = "/login";
+    }
     const search = searchValue.trim();
     const searchByValue = searchBy.trim();
     let response = await axios.get(
@@ -49,7 +53,10 @@ const OrderDetails = () => {
         `&searchBy=` +
         searchByValue +
         `&searchValue=` +
-        search
+        search,
+        {
+          headers: { Authorization: `Bearer ${localSt}` },
+        }
     );
 
     console.log(status);
@@ -102,13 +109,19 @@ const OrderDetails = () => {
   };
 
   const fetchDataWithStatus = async (value) => {
+    if(localSt === null) {
+      window.location.href = "/login";
+    }
     const search = searchValue.trim();
     let response = await axios.get(
       host + `/api/v1/OrderDetails` +
         `?status=` +
         value +
         `&searchValue=` +
-        search
+        search,
+        {
+          headers: { Authorization: `Bearer ${localSt}` },
+        }
     );
 
     const data = response.data["data"];
@@ -229,9 +242,15 @@ const OrderDetails = () => {
   };
 
   const updateStatus = async (id, status) => {
+    if(localSt === null) {
+      window.location.href = "/login";
+    }
     let requestBody = { id: id, status: status };
     await axios
-      .put(host + `/api/v1/OrderDetails/` + id, requestBody)
+      .put(host + `/api/v1/OrderDetails/` + id, requestBody,
+      {
+        headers: { Authorization: `Bearer ${localSt}` },
+      })
       .then(() => fetchData());
   };
 

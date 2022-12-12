@@ -12,7 +12,8 @@ import InputBase from "@mui/material/InputBase";
 import SearchIcon from "@mui/icons-material/Search";
 
 const Foods = () => {
-  const host = `https://localhost:7246`
+  const localSt = localStorage.getItem("token");
+  const host = `https://localhost:7246`;
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const [APIData, setAPIData] = useState([]);
@@ -20,14 +21,21 @@ const Foods = () => {
   const [searchBy, setSearchBy] = React.useState("Name");
 
   const fetchData = async () => {
+    if (localSt === null) {
+      window.location.href = "/login";
+    }
     const search = searchValue.trim();
     const searchByValue = searchBy.trim();
     let response = await axios.get(
-      host + `/api/v1/Foods` +
+      host +
+        `/api/v1/Foods` +
         `?searchBy=` +
         searchByValue +
         `&searchValue=` +
-        search
+        search,
+      {
+        headers: { Authorization: `Bearer ${localSt}` },
+      }
     );
     setAPIData(response.data["data"]);
   };
@@ -39,8 +47,13 @@ const Foods = () => {
   let navigate = useNavigate();
 
   const deleteFood = async (id) => {
+    if (localSt === null) {
+      window.location.href = "/login";
+    }
     await axios
-      .delete(host + `/api/v1/Foods/` + id)
+      .delete(host + `/api/v1/Foods/` + id, {
+        headers: { Authorization: `Bearer ${localSt}` },
+      })
       .then()
       .finally((e) => {
         fetchData();
@@ -48,8 +61,14 @@ const Foods = () => {
   };
 
   const recoverFood = async (id) => {
+    if(localSt === null) {
+      window.location.href = "/login";
+    }
     await axios
-      .put(host + `/api/v1/Foods/` + id + `/recover`)
+      .put(host + `/api/v1/Foods/` + id + `/recover`,
+      {
+        headers: { Authorization: `Bearer ${localSt}` },
+      })
       .then()
       .finally((e) => {
         fetchData();

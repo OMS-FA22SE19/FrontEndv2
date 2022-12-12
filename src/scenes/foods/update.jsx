@@ -15,8 +15,9 @@ import { useNavigate, useParams } from "react-router-dom";
 import FormControlLabel from "@mui/material/FormControlLabel";
 
 const UpdateFood = () => {
+  const localSt = localStorage.getItem("token");
   const isNonMobile = useMediaQuery("(min-width:600px)");
-  const host = `https://localhost:7246`
+  const host = `https://localhost:7246`;
   const [getCourseTypes, setCourseTypes] = useState([]);
   const [getFoodTypes, setFoodTypes] = useState([]);
   const [getCourseTypeId, setCourseTypeId] = React.useState("");
@@ -31,8 +32,13 @@ const UpdateFood = () => {
   }, []);
 
   const fetchData = async () => {
+    if (localSt === null) {
+      window.location.href = "/login";
+    }
     await axios
-      .get(host + `/api/v1/Foods/` + id)
+      .get(host + `/api/v1/Foods/` + id, {
+        headers: { Authorization: `Bearer ${localSt}` },
+      })
       .then((response) => {
         const name = response.data["data"].name;
         const description = response.data["data"].description;
@@ -42,7 +48,7 @@ const UpdateFood = () => {
         const courseTypeId = response.data["data"].courseType.id;
         const typeIds = [];
         response.data["data"].types.map((val) => {
-            typeIds.push(val.id);
+          typeIds.push(val.id);
         });
 
         setFoodTypeIds(typeIds);
@@ -72,47 +78,62 @@ const UpdateFood = () => {
   };
 
   const handleFormSubmit = async (values) => {
-		values.picture = selectedImage;
-		let formData = new FormData();
+    if (localSt === null) {
+      window.location.href = "/login";
+    }
+    values.picture = selectedImage;
+    let formData = new FormData();
     formData.append("id", id);
-		formData.append("name", values.name);
-		formData.append("description", values.description);
-		formData.append("ingredient", values.ingredient);
-		formData.append("available", values.available);
-		formData.append("picture", values.picture);
-		formData.append("courseTypeId", values.courseTypeId);
-		getFoodTypeIds.map((val) => {
-			formData.append("types", val);
-		})
+    formData.append("name", values.name);
+    formData.append("description", values.description);
+    formData.append("ingredient", values.ingredient);
+    formData.append("available", values.available);
+    formData.append("picture", values.picture);
+    formData.append("courseTypeId", values.courseTypeId);
+    getFoodTypeIds.map((val) => {
+      formData.append("types", val);
+    });
     await axios({
-			method: "PUT",
-			url: "https://oms-fa22se19.herokuapp.com/api/v1/Foods/" + id,
-			data: formData,
-			headers: { "Content-Type": "multipart/form-data" },
-		})
-			.then(function (response) {
-				//handle success
-				console.log(response);
-			})
-			.catch(function (response) {
-				//handle error
-				console.log(response);
-			})
-			.finally(function () {
-				routeChange();
-			});
-
+      method: "PUT",
+      url: "https://oms-fa22se19.herokuapp.com/api/v1/Foods/" + id,
+      data: formData,
+      headers: {
+        "Content-Type": "multipart/form-data",
+        Authorization: `Bearer ${localSt}`,
+      },
+    })
+      .then(function (response) {
+        //handle success
+        console.log(response);
+      })
+      .catch(function (response) {
+        //handle error
+        console.log(response);
+      })
+      .finally(function () {
+        routeChange();
+      });
   };
 
   const fetchCourseTypes = async () => {
+    if (localSt === null) {
+      window.location.href = "/login";
+    }
     await axios
-      .get(host + `/api/v1/CourseTypes`)
+      .get(host + `/api/v1/CourseTypes`, {
+        headers: { Authorization: `Bearer ${localSt}` },
+      })
       .then((response) => setCourseTypes(response.data["data"]));
   };
 
   const fetchFoodTypes = async () => {
+    if(localSt === null) {
+      window.location.href = "/login";
+    }
     await axios
-      .get(host + `/api/v1/Types`)
+      .get(host + `/api/v1/Types`, {
+        headers: { Authorization: `Bearer ${localSt}` },
+      })
       .then((response) => setFoodTypes(response.data["data"]));
   };
 
@@ -127,7 +148,7 @@ const UpdateFood = () => {
 
   return (
     <Box m="20px">
-      <Header title="UPDATE FOOD" subtitle={"Update Food Id: " + id}/>
+      <Header title="UPDATE FOOD" subtitle={"Update Food Id: " + id} />
       <Formik
         onSubmit={handleFormSubmit}
         initialValues={initialValues}
@@ -295,7 +316,7 @@ const checkoutSchema = yup.object().shape({
   ingredient: yup.string().required("required"),
   available: yup.boolean().required("required"),
   courseTypeId: yup.number().required("required"),
-  types: yup.array().required("required")
+  types: yup.array().required("required"),
 });
 const initialValues = {
   name: "",
