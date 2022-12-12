@@ -18,6 +18,7 @@ import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
+import DoneIcon from '@mui/icons-material/Done';
 
 const Reservations = () => {
   const localSt = localStorage.getItem("token");
@@ -62,6 +63,22 @@ const Reservations = () => {
     }
     await axios
       .delete(host + `/api/v1/Reservations/` + id, {
+        headers: { Authorization: `Bearer ${localSt}` },
+      })
+      .then((response) => {
+        if (response.status === 204) {
+          fetchData();
+        }
+      })
+      .catch((error) => console.log(error));
+  };
+
+  const handleCheckinReservation = async (id) => {
+    if(localSt === null) {
+      window.location.href = "/login";
+    }
+    await axios
+      .delete(host + `/api/v1/Reservations/` + id + `/checkin`, {
         headers: { Authorization: `Bearer ${localSt}` },
       })
       .then((response) => {
@@ -279,10 +296,28 @@ const Reservations = () => {
         const status = currentRow.status;
 
         if (
-          status.toLowerCase() === "available" ||
+          status.toLowerCase() === "available"
+        ) {
+          return [
+            <GridActionsCellItem
+              icon={<PlaylistRemoveIcon />}
+              label="Delete"
+              onClick={handleDeleteClick(id, name)}
+              color="inherit"
+            />,
+          ];
+        }
+
+        if (
           status.toLowerCase() === "reserved"
         ) {
           return [
+            <GridActionsCellItem
+              icon={<DoneIcon />}
+              label="Delete"
+              onClick={handleCheckinReservation(id)}
+              color="inherit"
+            />,
             <GridActionsCellItem
               icon={<PlaylistRemoveIcon />}
               label="Delete"
