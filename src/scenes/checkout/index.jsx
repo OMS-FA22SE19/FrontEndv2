@@ -10,7 +10,8 @@ import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
 
 const Checkout = () => {
-  const host = `https://localhost:7246`
+  const localSt = localStorage.getItem("token");
+  const host = `https://localhost:7246`;
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const [APIData, setAPIData] = useState([]);
@@ -25,21 +26,32 @@ const Checkout = () => {
   }, []);
 
   const fetchData = async () => {
+    if (localSt === null) {
+      window.location.href = "/login";
+    }
     const search = searchValue.trim();
     const searchByValue = searchBy.trim();
     let processingResponse = await axios.get(
-      host + `/api/v1/Orders?Status=Processing` +
+      host +
+        `/api/v1/Orders?Status=Processing` +
         `&searchBy=` +
         searchByValue +
         `&searchValue=` +
-        search
+        search,
+      {
+        headers: { Authorization: `Bearer ${localSt}` },
+      }
     );
     let checkingResponse = await axios.get(
-      host + `/api/v1/Orders?Status=Checking` +
+      host +
+        `/api/v1/Orders?Status=Checking` +
         `&searchBy=` +
         searchByValue +
         `&searchValue=` +
-        search
+        search,
+              {
+        headers: { Authorization: `Bearer ${localSt}` },
+      }
     );
     setAPIData([
       ...processingResponse.data["data"],
@@ -49,7 +61,10 @@ const Checkout = () => {
 
   const confirm = async (id) => {
     await axios
-      .post(host + `/api/v1/Orders/` + id + "/Confirm")
+      .post(host + `/api/v1/Orders/` + id + "/Confirm",
+            {
+        headers: { Authorization: `Bearer ${localSt}` },
+      })
       .then(() => fetchData());
   };
 

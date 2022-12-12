@@ -22,6 +22,7 @@ import TextField from "@mui/material/TextField";
 import Checkbox from '@mui/material/Checkbox';
 
 const TableTypes = () => {
+  const localSt = localStorage.getItem("token");
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const [rows, setRows] = useState([]);
