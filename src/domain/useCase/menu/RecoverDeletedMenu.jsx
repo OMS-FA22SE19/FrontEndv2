@@ -1,5 +1,5 @@
 import { RecoverDeletedMenu } from "../../../data/Repository/MenuRepository";
 
-export async function RecoverMenusUseCase(id) {
+export async function RecoverMenuUseCase(id) {
     return await RecoverDeletedMenu(id);
 }

@@ -7,7 +7,6 @@ import {
 } from "@mui/x-data-grid";
 import { tokens } from "../../../theme";
 import Header from "../../../components/Header";
-import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import MenuBookIcon from '@mui/icons-material/MenuBook';
@@ -25,6 +24,7 @@ import Alert from "@mui/material/Alert";
 import Snackbar from "@mui/material/Snackbar";
 import SearchIcon from "@mui/icons-material/Search";
 import InputBase from "@mui/material/InputBase";
+import useViewModel from "./viewModel";
 
 const Menus = () => {
   const host = `https://localhost:7246`
@@ -39,6 +39,15 @@ const Menus = () => {
   const [isAdding, setIsAdding] = React.useState(false);
   const [snackbar, setSnackbar] = React.useState(null);
   const [searchValue, setSearchValue] = React.useState("");
+
+  const viewModelProps = { setRows, setSnackbar };
+  const {
+    getMenus,
+    addMenu,
+    updateMenu,
+    deleteMenu,
+    recoverMenu,
+  } = useViewModel(viewModelProps);
 
   const handleCloseSnackbar = () => setSnackbar(null);
 
@@ -72,7 +81,7 @@ const Menus = () => {
   let navigate = useNavigate();
 
   useEffect(() => {
-    fetchData();
+    getMenus();
   }, []);
 
   const handleUpdateNo = () => {
@@ -88,9 +97,9 @@ const Menus = () => {
       // Make the HTTP request to save in the backend
       let response;
       if(newRow.isNew !== undefined) {
-        response = await createMenu(newRow);
+        response = await addMenu(newRow);
       }else {
-        response = await handleUpdate(newRow);
+        response = await updateMenu(newRow);
       } 
       setSnackbar({
         children: "Menu successfully saved",
@@ -111,7 +120,7 @@ const Menus = () => {
 
     try {
       // Make the HTTP request to save in the backend
-      handleDelete(id);
+      deleteMenu(id);
       setDeleteArguments(null);
       setSnackbar({
         children: "Menu " + name + " successfully deleted",
@@ -122,35 +131,6 @@ const Menus = () => {
     }
   };
 
-  const handleDelete = async (id) => {
-    await axios
-      .delete(host + `/api/v1/Menus/` + id)
-      .then(response => {
-        if(response.status === 204) {
-          fetchData();
-        }
-      })
-      .catch(error => console.log(error));
-  };
-
-  const handleRecover = async (id) => {
-    await axios
-      .put(host + `/api/v1/Menus/` + id + `/recover`)
-      .then(response => {
-        if(response.status === 204) {
-          fetchData();
-        }
-      })
-      .catch(error => console.log(error));
-  };
-
-  const handleUpdate = async (currentRow) => {
-    const requestBody = {id: currentRow["id"], name: currentRow["name"], description: currentRow["description"]};
-    await axios.put(host + `/api/v1/Menus/` + currentRow["id"], requestBody)
-      .catch(() => {})
-      .finally(() => fetchData());
-  };
-
   const handleEntered = () => {
     // The `autoFocus` is not used because, if used, the same Enter that saves
     // the cell triggers "No". Instead, we manually focus the "No" button once
@@ -158,11 +138,7 @@ const Menus = () => {
     // noButtonRef.current?.focus();
   };
 
-  const fetchData = async () => {
-    const search = searchValue.trim();
-    let response = await axios.get(host + `/api/v1/Menus` + `?searchValue=` + search);
-    setRows(response.data["data"]);
-  };
+  
 
   const directToMenuFoods = (id) => () => {
     let path = `/Menus/` + id + '/foods';
@@ -229,13 +205,6 @@ const Menus = () => {
     );
   };
 
-  const createMenu = async (currentRow) => {
-    const requestBody = {name: currentRow["name"], description: currentRow["description"]};
-    await axios.post(host + `/api/v1/Menus/`, requestBody)
-      .catch(() => {})
-      .finally(() => fetchData());
-  };
-
   const handleRowEditStart = (params, event) => {
     event.defaultMuiPrevented = true;
   };
@@ -261,7 +230,7 @@ const Menus = () => {
   };
 
   const handleRecoverClick = (id) => () => {
-    handleRecover(id);
+    recoverMenu(id);
   };
 
   const handleCancelClick = (id) => () => {
@@ -383,7 +352,7 @@ const Menus = () => {
     if (event.key === "Enter") {
       event.preventDefault();
       event.stopPropagation();
-      fetchData();
+      getMenus();
     }
   };
 
@@ -403,7 +372,7 @@ const Menus = () => {
           placeholder="Search name, description"
           onKeyPress={handleKeyDown}
         />
-        <IconButton onClick={fetchData} sx={{ p: 1 }}>
+        <IconButton onClick={getMenus} sx={{ p: 1 }}>
           <SearchIcon />
         </IconButton>
       </Box>

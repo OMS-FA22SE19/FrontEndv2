@@ -2,28 +2,44 @@ import { host, version } from "./dataSource";
 import axios from "axios";
 
 const COLLECTION = "Menus";
+const localSt = localStorage.getItem("token");
 
 export async function GetAll(searchValue) {
+  if (localSt === null) {
+    window.location.href = "/login";
+  }
   const search = searchValue.trim();
   return await axios
     .get(
-      host + `/api/v` + version + `/` + COLLECTION + `?searchValue=` + search
+      host + `/api/v` + version + `/` + COLLECTION + `?searchValue=` + search,
+      {
+        headers: { Authorization: `Bearer ${localSt}` },
+      }
     )
     .then((response) => response.data);
 }
 
 export async function CreateMenu(newMenuData) {
+  if (localSt === null) {
+    window.location.href = "/login";
+  }
   const requestBody = {
     name: newMenuData["name"],
     description: newMenuData["description"],
   };
   return await axios.post(
     host + `/api/v` + version + `/` + COLLECTION,
-    requestBody
+    requestBody,
+    {
+      headers: { Authorization: `Bearer ${localSt}` },
+    }
   );
 }
 
 export async function UpdateMenu(newMenuData) {
+  if (localSt === null) {
+    window.location.href = "/login";
+  }
   const requestBody = {
     id: newMenuData["id"],
     name: newMenuData["name"],
@@ -32,13 +48,22 @@ export async function UpdateMenu(newMenuData) {
   };
   return await axios.put(
     host + `/api/v` + version + `/` + COLLECTION + "/" + newMenuData["id"],
-    requestBody
+    requestBody,
+    {
+      headers: { Authorization: `Bearer ${localSt}` },
+    }
   );
 }
 
 export async function DeleteMenu(id) {
+  if (localSt === null) {
+    window.location.href = "/login";
+  }
   return await axios.delete(
-    host + `/api/v` + version + `/` + COLLECTION + "/" + id
+    host + `/api/v` + version + `/` + COLLECTION + "/" + id,
+    {
+      headers: { Authorization: `Bearer ${localSt}` },
+    }
   );
 }
 
@@ -49,12 +74,21 @@ export async function RecoverMenu(id) {
 }
 
 export async function GetFoodFromMenu(menuId) {
+  if (localSt === null) {
+    window.location.href = "/login";
+  }
   return await axios.get(
-    host + `/api/v` + version + `/` + COLLECTION + "/" + menuId + "/Food/"
+    host + `/api/v` + version + `/` + COLLECTION + "/" + menuId + "/Food/",
+    {
+      headers: { Authorization: `Bearer ${localSt}` },
+    }
   );
 }
 
-export async function AddExistedFoodToMenu(newMenuFoodData) {
+export async function AddExistedFoodToMenu(menuId, newMenuFoodData) {
+  if(localSt === null) {
+    window.location.href = "/login";
+  }
   const requestBody = {
     price: newMenuFoodData["price"],
   };
@@ -65,34 +99,49 @@ export async function AddExistedFoodToMenu(newMenuFoodData) {
       `/` +
       COLLECTION +
       "/" +
-      newMenuFoodData["menuId"] +
+      menuId +
       "/Food/" +
       newMenuFoodData["foodId"],
-    requestBody
+    requestBody,
+    {
+      headers: { Authorization: `Bearer ${localSt}` },
+    }
   );
 }
 
 export async function AddNewFoodToMenu(menuId, formData) {
+  if(localSt === null) {
+    window.location.href = "/login";
+  }
   return await axios({
     method: "post",
     url:
       host + `/api/v` + version + `/` + COLLECTION + "/" + menuId + "/NewFood",
     data: formData,
-    headers: { "Content-Type": "multipart/form-data" },
+    headers: { "Content-Type": "multipart/form-data", Authorization: `Bearer ${localSt}` },
   });
 }
 
 export async function UpdatePriceFoodOfMenu(menuId, menuFoodData) {
+  if(localSt === null) {
+    window.location.href = "/login";
+  }
   const requestBody = {
     price: menuFoodData["price"],
   };
   await axios.put(
     host + `/api/v1/Menus/` + menuId + `/Food/` + menuFoodData["foodId"],
-    requestBody
+    requestBody,
+    {
+      headers: { Authorization: `Bearer ${localSt}` },
+    }
   );
 }
 
 export async function RemoveFoodFromMenu(menuId, foodId) {
+  if(localSt === null) {
+    window.location.href = "/login";
+  }
   return await axios.delete(
     host +
       `/api/v` +
@@ -102,6 +151,9 @@ export async function RemoveFoodFromMenu(menuId, foodId) {
       "/" +
       menuId +
       "/Food/" +
-      foodId
+      foodId,
+      {
+        headers: { Authorization: `Bearer ${localSt}` },
+      }
   );
 }

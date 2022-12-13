@@ -59,8 +59,6 @@ const OrderDetails = () => {
         }
     );
 
-    console.log(status);
-
     const data = response.data["data"];
     let result = [];
     data.forEach((detail) => {

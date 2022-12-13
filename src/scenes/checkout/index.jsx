@@ -49,7 +49,7 @@ const Checkout = () => {
         searchByValue +
         `&searchValue=` +
         search,
-              {
+      {
         headers: { Authorization: `Bearer ${localSt}` },
       }
     );
@@ -60,9 +60,11 @@ const Checkout = () => {
   };
 
   const confirm = async (id) => {
+    if (localSt === null) {
+      window.location.href = "/login";
+    }
     await axios
-      .post(host + `/api/v1/Orders/` + id + "/Confirm",
-            {
+      .post(host + `/api/v1/Orders/` + id + "/Confirm", null,{
         headers: { Authorization: `Bearer ${localSt}` },
       })
       .then(() => fetchData());

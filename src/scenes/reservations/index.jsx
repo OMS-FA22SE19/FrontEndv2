@@ -30,16 +30,16 @@ const Reservations = () => {
   const noButtonRef = React.useRef(null);
   const [deleteArguments, setDeleteArguments] = React.useState(null);
   const [snackbar, setSnackbar] = React.useState(null);
-  const [tabValue, setTabValue] = React.useState(0);
   const [searchValue, setSearchValue] = React.useState("");
-  const [status, setStatus] = React.useState("Reserved");
+  const [tabValue, setTabValue] = React.useState(0);
+  const [status, setStatus] = React.useState("Available");
   const [searchBy, setSearchBy] = React.useState("FullName");
 
   const handleCloseSnackbar = () => setSnackbar(null);
 
   React.useEffect(() => {
     fetchData();
-  });
+  }, []);
 
   const handleDeleteYes = async () => {
     const { id, name } = deleteArguments;
@@ -73,21 +73,21 @@ const Reservations = () => {
       .catch((error) => console.log(error));
   };
 
-  const handleCheckinReservation = async (id) => {
-    if(localSt === null) {
+  async function handleCheckinReservation(id) {
+    if (localSt === null) {
       window.location.href = "/login";
     }
     await axios
-      .delete(host + `/api/v1/Reservations/` + id + `/checkin`, {
+      .get(host + `/api/v1/Reservations/` + id + `/checkin`, {
         headers: { Authorization: `Bearer ${localSt}` },
       })
       .then((response) => {
-        if (response.status === 204) {
+        if (response.status === 200) {
           fetchData();
         }
       })
       .catch((error) => console.log(error));
-  };
+  }
 
   const handleEntered = () => {
     // The `autoFocus` is not used because, if used, the same Enter that saves
@@ -314,8 +314,8 @@ const Reservations = () => {
           return [
             <GridActionsCellItem
               icon={<DoneIcon />}
-              label="Delete"
-              onClick={handleCheckinReservation(id)}
+              label="CheckIn"
+              onClick={() => handleCheckinReservation(id)}
               color="inherit"
             />,
             <GridActionsCellItem
@@ -345,14 +345,14 @@ const Reservations = () => {
   };
 
   const handleTabChange = (event, newValue) => {
-    let status = "Reserved";
+    let status = "Available";
     switch (newValue) {
       case 0:
-        setStatus("Reserved");
+        setStatus("Available");
         break;
       case 1:
-        setStatus("Available");
-        status = "Available";
+        setStatus("Reserved");
+        status = "Reserved";
         break;
       case 2:
         setStatus("CheckIn");
@@ -379,10 +379,10 @@ const Reservations = () => {
           textColor="primary"
           onChange={handleTabChange}
         >
-          <Tab label="Reserved" />
-          <Tab label="Available" />
-          <Tab label="CheckIn" />
-          <Tab label="Cancelled" />
+          <Tab value={0} label="Available" />
+          <Tab value={1} label="Reserved" />
+          <Tab value={2} label="CheckIn" />
+          <Tab value={3} label="Cancelled" />
         </Tabs>
       </Box>
       {/* SEARCH BAR */}

@@ -1,5 +1,5 @@
 import { UpdateNewMenu } from "../../../data/Repository/MenuRepository";
 
-export async function UpdateMenusUseCase(newMenuData) {
+export async function UpdateMenuUseCase(newMenuData) {
     return await UpdateNewMenu(newMenuData);
 }
