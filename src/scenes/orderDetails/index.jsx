@@ -264,9 +264,9 @@ const OrderDetails = () => {
     {
       field: "tableId",
       headerName: "Table ID",
-      flex: 0.25,
-      headerAlign: "center",
-      align: "right",
+      flex: 0.7,
+      headerAlign: "left",
+      align: "left",
     },
     {
       field: "phoneNumber",
