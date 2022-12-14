@@ -3,7 +3,7 @@ import Button from "@mui/material/Button";
 import PlaylistRemoveIcon from "@mui/icons-material/PlaylistRemove";
 import { DataGrid, GridActionsCellItem } from "@mui/x-data-grid";
 import axios from "axios";
-import { Box, useTheme, IconButton } from "@mui/material";
+import { Box, useTheme, IconButton, Stack } from "@mui/material";
 import Header from "../../components/Header";
 import { tokens } from "../../theme";
 import Dialog from "@mui/material/Dialog";
@@ -19,6 +19,7 @@ import Tab from "@mui/material/Tab";
 import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
 import DoneIcon from '@mui/icons-material/Done';
+import QrCodeAction from "./qrCodeAction";
 
 const Reservations = () => {
   const localSt = localStorage.getItem("token");
@@ -371,7 +372,16 @@ const Reservations = () => {
 
   return (
     <Box m="20px">
+        <Stack
+  direction="row"
+  justifyContent="space-between"
+  alignItems="center"
+  spacing={2}
+>
+
       <Header title="RESERVATIONS" subtitle="List of Reservations" />
+      <QrCodeAction fetchData={fetchData} />
+</Stack>
       <Box sx={{ width: "100%", bgcolor: colors.blueAccent[700] }}>
         <Tabs
           value={tabValue}
