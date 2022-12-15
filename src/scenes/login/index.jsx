@@ -28,7 +28,7 @@ const Login = () => {
       Password: values.password,
     };
     await axios
-      .post("https://localhost:7246/api/v1/Authentication", requestBody)
+      .post("https://oms-fa22se19.azurewebsites.net/api/v1/Authentication", requestBody)
       .then((response) => {
         const token = response["data"].data.jwtToken;
         if (response.status === 200 && token !== null) {
