@@ -17,7 +17,7 @@ export const UserProvider = ({ children }) => {
       return;
     }
     await axios
-      .get("https://localhost:7246/api/v1/Authentication", {
+      .get("https://oms-fa22se19.azurewebsites.net/api/v1/Authentication", {
         headers: { Authorization: `Bearer ${localSt}` },
       })
       .then((response) => {
