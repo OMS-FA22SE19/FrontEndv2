@@ -11,7 +11,7 @@ import * as React from "react";
 import { DataGrid } from "@mui/x-data-grid";
 
 const Dashboard = () => {
-  const host = `https://localhost:7246`;
+  const host = `https://oms-fa22se19.azurewebsites.net`;
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const [newCustomers, setNewCustomers] = React.useState("");

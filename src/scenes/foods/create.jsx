@@ -13,13 +13,11 @@ import FormHelperText from "@mui/material/FormHelperText";
 import Checkbox from "@mui/material/Checkbox";
 import { useNavigate } from "react-router-dom";
 import FormControlLabel from "@mui/material/FormControlLabel";
-import OutlinedInput from "@mui/material/OutlinedInput";
-import Chip from "@mui/material/Chip";
 
 const CreateFood = () => {
   const isNonMobile = useMediaQuery("(min-width:600px)");
   const localSt = localStorage.getItem("token");
-  const host = `https://localhost:7246`;
+  const host = `https://oms-fa22se19.azurewebsites.net`;
   const [getCourseTypes, setCourseTypes] = useState([]);
   const [getFoodTypes, setFoodTypes] = useState([]);
   const [getCourseTypeId, setCourseTypeId] = React.useState("");

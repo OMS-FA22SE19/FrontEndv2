@@ -434,7 +434,6 @@ const CourseTypes = () => {
     if (event.key === "Enter") {
       event.preventDefault();
       event.stopPropagation();
-      getCourseTypes();
     }
   };
 

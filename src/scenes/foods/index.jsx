@@ -1,79 +1,39 @@
-import { Box, Stack, Button, IconButton } from "@mui/material";
+import { Box, Stack, Button, IconButton, useTheme } from "@mui/material";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import { tokens } from "../../theme";
 import Header from "../../components/Header";
-import { useTheme } from "@mui/material";
-import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
 import InputBase from "@mui/material/InputBase";
 import SearchIcon from "@mui/icons-material/Search";
+import Alert from "@mui/material/Alert";
+import Snackbar from "@mui/material/Snackbar";
+import useViewModel from "./viewModel";
 
 const Foods = () => {
-  const localSt = localStorage.getItem("token");
-  const host = `https://localhost:7246`;
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
-  const [APIData, setAPIData] = useState([]);
-  const [searchValue, setSearchValue] = React.useState("");
+  const [rows, setRows] = useState([]);
   const [searchBy, setSearchBy] = React.useState("Name");
+  const [snackbar, setSnackbar] = React.useState(null);
+  const handleCloseSnackbar = () => setSnackbar(null);
 
-  const fetchData = async () => {
-    if (localSt === null) {
-      window.location.href = "/login";
-    }
-    const search = searchValue.trim();
-    const searchByValue = searchBy.trim();
-    let response = await axios.get(
-      host +
-        `/api/v1/Foods` +
-        `?searchBy=` +
-        searchByValue +
-        `&searchValue=` +
-        search,
-      {
-        headers: { Authorization: `Bearer ${localSt}` },
-      }
-    );
-    setAPIData(response.data["data"]);
-  };
+  const viewModelProps = { setRows, setSnackbar };
+  const {
+    getFoods,
+    addFood,
+    updateFood,
+    deleteFood,
+    recoverFood
+  } = useViewModel(viewModelProps);
 
   useEffect(() => {
-    fetchData();
+    getFoods(searchBy, "");
   }, []);
 
   let navigate = useNavigate();
-
-  const deleteFood = async (id) => {
-    if (localSt === null) {
-      window.location.href = "/login";
-    }
-    await axios
-      .delete(host + `/api/v1/Foods/` + id, {
-        headers: { Authorization: `Bearer ${localSt}` },
-      })
-      .then()
-      .finally((e) => {
-        fetchData();
-      });
-  };
-
-  const recoverFood = async (id) => {
-    if(localSt === null) {
-      window.location.href = "/login";
-    }
-    await axios
-      .put(host + `/api/v1/Foods/` + id + `/recover`,
-      {
-        headers: { Authorization: `Bearer ${localSt}` },
-      })
-      .then()
-      .finally((e) => {
-        fetchData();
-      });
-  };
 
   const columns = [
     {
@@ -219,14 +179,13 @@ const Foods = () => {
   };
 
   const handleSearchChange = (event) => {
-    setSearchValue(event.target.value);
+    getFoods(searchBy, event.target.value);
   };
 
   const handleKeyDown = (event) => {
     if (event.key === "Enter") {
       event.preventDefault();
       event.stopPropagation();
-      fetchData();
     }
   };
 
@@ -269,7 +228,7 @@ const Foods = () => {
           placeholder="Search"
           onKeyPress={handleKeyDown}
         />
-        <IconButton onClick={fetchData} sx={{ p: 1 }}>
+        <IconButton onClick={() => getFoods(searchBy, "")} sx={{ p: 1 }}>
           <SearchIcon />
         </IconButton>
       </Box>
@@ -306,11 +265,16 @@ const Foods = () => {
         }}
       >
         <DataGrid
-          rows={APIData}
+          rows={rows}
           columns={columns}
           components={{ Toolbar: GridToolbar }}
         />
       </Box>
+      {!!snackbar && (
+        <Snackbar open onClose={handleCloseSnackbar} autoHideDuration={4000}>
+          <Alert {...snackbar} onClose={handleCloseSnackbar} />
+        </Snackbar>
+      )}
     </Box>
   );
 };

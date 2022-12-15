@@ -24,7 +24,7 @@ import MenuItem from "@mui/material/MenuItem";
 
 const OrderDetails = () => {
   const localSt = localStorage.getItem("token");
-  const host = `https://localhost:7246`
+  const host = `https://oms-fa22se19.azurewebsites.net`
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const [APIData, setAPIData] = useState([]);

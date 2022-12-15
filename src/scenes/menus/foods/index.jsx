@@ -2,7 +2,6 @@ import { Box, Stack, Button, useTheme, IconButton } from "@mui/material";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import { tokens } from "../../../theme";
 import Header from "../../../components/Header";
-import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import Snackbar from "@mui/material/Snackbar";
@@ -15,20 +14,26 @@ import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
 import InputBase from "@mui/material/InputBase";
 import SearchIcon from "@mui/icons-material/Search";
+import useViewModel from "./viewModel";
 
 const MenuFoods = () => {
-  const host = `https://localhost:7246`
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const [APIData, setAPIData] = useState([]);
   const { menuId } = useParams();
   const [menuName, setMenuName] = useState("");
-  const [searchValue, setSearchValue] = React.useState("");
   const [searchBy, setSearchBy] = React.useState("Name");
-
   const noButtonRef = React.useRef(null);
   const [promiseArguments, setPromiseArguments] = React.useState(null);
   const [snackbar, setSnackbar] = React.useState(null);
+  const viewModelProps = { setAPIData, setMenuName, setSnackbar };
+  const {
+    getMenuFoods,
+    getMenuById,
+    getFoods,
+    updateMenuFood,
+    removeFood,
+  } = useViewModel(viewModelProps);
 
   function computeMutation(newRow, oldRow) {
     if (newRow.price !== oldRow.price) {
@@ -64,7 +69,7 @@ const MenuFoods = () => {
 
     try {
       // Make the HTTP request to save in the backend
-      const response = await updatePrice(newRow);
+      const response = await updateMenuFood(newRow);
       setSnackbar({
         children: "Price successfully saved",
         severity: "success",
@@ -112,60 +117,12 @@ const MenuFoods = () => {
     );
   };
 
-  const fetchData = async () => {
-    const search = searchValue.trim();
-    const searchByValue = searchBy.trim();
-    let response = await axios.get(
-      host + `/api/v1/Menus/` +
-        menuId +
-        `/Food` +
-        `?searchBy=` +
-        searchByValue +
-        `&searchValue=` +
-        search
-    );
-    setAPIData(response.data["data"]);
-  };
-
-  const getMenuInfo = async () => {
-    let response = await axios.get(
-      host + `/api/v1/Menus/` + menuId
-    );
-    setMenuName(response.data["data"]["name"]);
-  };
-
   useEffect(() => {
-    fetchData();
-    getMenuInfo();
+    getMenuFoods(menuId, searchBy, "");
+    getMenuById(menuId);
   }, []);
 
   let navigate = useNavigate();
-
-  const updatePrice = async (menuId, currentRow) => {
-    const requestBody = {
-      price: currentRow["price"],
-    };
-    await axios
-      .put(
-        host + `/api/v1/Menus/` +
-          menuId +
-          `/Food/` +
-          currentRow["id"],
-        requestBody
-      )
-      .catch(() => {})
-      .finally(() => fetchData());
-  };
-
-  const deleteFood = async (id) => {
-    await axios
-      .delete(host + `/api/v1/Menus/` + menuId + `/Food/` + id)
-      .then()
-      .catch()
-      .finally((e) => {
-        fetchData();
-      });
-  };
 
   const columns = [
     {
@@ -257,7 +214,7 @@ const MenuFoods = () => {
             variant="outlined"
             color="error"
             size="small"
-            onClick={() => deleteFood(currentRow["id"])}
+            onClick={() => removeFood(menuId, currentRow["id"])}
           >
             Remove
           </Button>
@@ -279,16 +236,49 @@ const MenuFoods = () => {
   };
 
   const handleSearchChange = (event) => {
-    setSearchValue(event.target.value);
+    getMenuFoods(menuId, searchBy, event.target.value);
   };
 
   const handleKeyDown = (event) => {
     if (event.key === "Enter") {
       event.preventDefault();
       event.stopPropagation();
-      fetchData();
     }
   };
+
+  // function FoodSelect() {
+  //   return (
+  //     <Autocomplete
+  //       id="country-select-demo"
+  //       sx={{ width: 300 }}
+  //       options={getFoods}
+  //       autoHighlight
+  //       getOptionLabel={(option) => option.name}
+  //       renderOption={(props, option) => (
+  //         <Box component="li" sx={{ '& > img': { mr: 2, flexShrink: 0 } }} {...props}>
+  //           <img
+  //             loading="lazy"
+  //             width="20"
+  //             src={option.pictureUrl}
+  //             srcSet={option.pictureUrl +` 2x`}
+  //             alt=""
+  //           />
+  //           {option.name} ({option.id})
+  //         </Box>
+  //       )}
+  //       renderInput={(params) => (
+  //         <TextField
+  //           {...params}
+  //           label="Choose a food"
+  //           inputProps={{
+  //             ...params.inputProps,
+  //             autoComplete: 'new-password', // disable autocomplete and autofill
+  //           }}
+  //         />
+  //       )}
+  //     />
+  //   );
+  // }
 
   return (
     <Box m="20px">
@@ -302,6 +292,7 @@ const MenuFoods = () => {
       >
         Insert
       </Button>
+      {/* <FoodSelect/> */}
       {/* SEARCH BAR */}
       <Box
         display="flex"
@@ -330,7 +321,7 @@ const MenuFoods = () => {
           placeholder="Search"
           onKeyPress={handleKeyDown}
         />
-        <IconButton onClick={fetchData} sx={{ p: 1 }}>
+        <IconButton onClick={() => getMenuFoods(menuId, searchBy, "")} sx={{ p: 1 }}>
           <SearchIcon />
         </IconButton>
       </Box>
@@ -382,14 +373,5 @@ const MenuFoods = () => {
     </Box>
   );
 };
-
-function srcset(image, width, height, rows = 1, cols = 1) {
-  return {
-    src: `${image}?w=${width * cols}&h=${height * rows}&fit=crop&auto=format`,
-    srcSet: `${image}?w=${width * cols}&h=${
-      height * rows
-    }&fit=crop&auto=format&dpr=2 2x`,
-  };
-}
 
 export default MenuFoods;

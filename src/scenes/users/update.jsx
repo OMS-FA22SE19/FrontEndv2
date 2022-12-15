@@ -13,7 +13,7 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 import { useParams } from "react-router-dom";
 
 const UpdateUser = () => {
-  const host = `https://localhost:7246`;
+  const host = `https://oms-fa22se19.azurewebsites.net`;
   const isNonMobile = useMediaQuery("(min-width:600px)");
   const { id } = useParams();
   const localSt = localStorage.getItem("token");

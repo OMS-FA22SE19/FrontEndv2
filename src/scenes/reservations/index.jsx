@@ -23,7 +23,7 @@ import QrCodeAction from "./qrCodeAction";
 
 const Reservations = () => {
   const localSt = localStorage.getItem("token");
-  const host = `https://localhost:7246`;
+  const host = `https://oms-fa22se19.azurewebsites.net`;
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const [rows, setRows] = React.useState([]);

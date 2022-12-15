@@ -33,7 +33,6 @@ const FoodTypes = () => {
   const [isEditing, setIsEditing] = React.useState(false);
   const [isAdding, setIsAdding] = React.useState(false);
   const [snackbar, setSnackbar] = React.useState(null);
-  const [searchValue, setSearchValue] = React.useState("");
   const [error, setError] = React.useState([]);
   const [name, setName] = React.useState("");
   const [description, setDescription] = React.useState("");
@@ -437,7 +436,6 @@ const FoodTypes = () => {
     if (event.key === "Enter") {
       event.preventDefault();
       event.stopPropagation();
-      getFoodTypes();
     }
   };
 

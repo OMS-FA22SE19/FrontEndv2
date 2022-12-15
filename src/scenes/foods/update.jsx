@@ -17,7 +17,7 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 const UpdateFood = () => {
   const localSt = localStorage.getItem("token");
   const isNonMobile = useMediaQuery("(min-width:600px)");
-  const host = `https://localhost:7246`;
+  const host = `https://oms-fa22se19.azurewebsites.net`;
   const [getCourseTypes, setCourseTypes] = useState([]);
   const [getFoodTypes, setFoodTypes] = useState([]);
   const [getCourseTypeId, setCourseTypeId] = React.useState("");

@@ -19,6 +19,20 @@ export async function GetAll(searchValue) {
     .then((response) => response.data);
 }
 
+export async function GetById(menuId) {
+  if (localSt === null) {
+    window.location.href = "/login";
+  }
+  return await axios
+    .get(
+      host + `/api/v` + version + `/` + COLLECTION + `/` + menuId,
+      {
+        headers: { Authorization: `Bearer ${localSt}` },
+      }
+    )
+    .then((response) => response.data);
+}
+
 export async function CreateMenu(newMenuData) {
   if (localSt === null) {
     window.location.href = "/login";
@@ -68,17 +82,36 @@ export async function DeleteMenu(id) {
 }
 
 export async function RecoverMenu(id) {
-  return await axios.put(
-    host + `/api/v` + version + `/` + COLLECTION + "/" + id + "/recover"
-  );
-}
-
-export async function GetFoodFromMenu(menuId) {
   if (localSt === null) {
     window.location.href = "/login";
   }
+  return await axios.put(
+    host + `/api/v` + version + `/` + COLLECTION + "/" + id + "/recover",
+    null,
+    {
+      headers: { Authorization: `Bearer ${localSt}` },
+    }
+  );
+}
+
+export async function GetFoodFromMenu(menuId, searchBy, searchValue = "") {
+  if (localSt === null) {
+    window.location.href = "/login";
+  }
+  console.log("a");
+  const search = searchValue.trim();
   return await axios.get(
-    host + `/api/v` + version + `/` + COLLECTION + "/" + menuId + "/Food/",
+    host +
+      `/api/v` +
+      version +
+      `/` +
+      COLLECTION +
+      `/` +
+      menuId +
+      `/Food?SearchBy=` +
+      searchBy +
+      `&SearchValue=` +
+      search,
     {
       headers: { Authorization: `Bearer ${localSt}` },
     }
@@ -86,7 +119,7 @@ export async function GetFoodFromMenu(menuId) {
 }
 
 export async function AddExistedFoodToMenu(menuId, newMenuFoodData) {
-  if(localSt === null) {
+  if (localSt === null) {
     window.location.href = "/login";
   }
   const requestBody = {
@@ -110,7 +143,7 @@ export async function AddExistedFoodToMenu(menuId, newMenuFoodData) {
 }
 
 export async function AddNewFoodToMenu(menuId, formData) {
-  if(localSt === null) {
+  if (localSt === null) {
     window.location.href = "/login";
   }
   return await axios({
@@ -118,12 +151,15 @@ export async function AddNewFoodToMenu(menuId, formData) {
     url:
       host + `/api/v` + version + `/` + COLLECTION + "/" + menuId + "/NewFood",
     data: formData,
-    headers: { "Content-Type": "multipart/form-data", Authorization: `Bearer ${localSt}` },
+    headers: {
+      "Content-Type": "multipart/form-data",
+      Authorization: `Bearer ${localSt}`,
+    },
   });
 }
 
 export async function UpdatePriceFoodOfMenu(menuId, menuFoodData) {
-  if(localSt === null) {
+  if (localSt === null) {
     window.location.href = "/login";
   }
   const requestBody = {
@@ -139,7 +175,7 @@ export async function UpdatePriceFoodOfMenu(menuId, menuFoodData) {
 }
 
 export async function RemoveFoodFromMenu(menuId, foodId) {
-  if(localSt === null) {
+  if (localSt === null) {
     window.location.href = "/login";
   }
   return await axios.delete(
@@ -152,8 +188,8 @@ export async function RemoveFoodFromMenu(menuId, foodId) {
       menuId +
       "/Food/" +
       foodId,
-      {
-        headers: { Authorization: `Bearer ${localSt}` },
-      }
+    {
+      headers: { Authorization: `Bearer ${localSt}` },
+    }
   );
 }

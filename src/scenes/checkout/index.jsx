@@ -11,7 +11,7 @@ import MenuItem from "@mui/material/MenuItem";
 
 const Checkout = () => {
   const localSt = localStorage.getItem("token");
-  const host = `https://localhost:7246`;
+  const host = `https://oms-fa22se19.azurewebsites.net`;
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const [APIData, setAPIData] = useState([]);
@@ -89,9 +89,9 @@ const Checkout = () => {
     {
       field: "tableId",
       headerName: "Table ID",
-      headerAlign: "right",
-      align: "right",
-      flex: 0.25,
+      headerAlign: "left",
+      align: "left",
+      flex: 0.7,
     },
     {
       field: "fullName",

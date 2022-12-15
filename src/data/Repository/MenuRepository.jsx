@@ -9,6 +9,7 @@ import {
   AddNewFoodToMenu,
   UpdatePriceFoodOfMenu,
   RemoveFoodFromMenu,
+  GetById
 } from "../DataSource/MenuDataSource";
 
 export async function GetMenus(searchValue) {
@@ -31,8 +32,12 @@ export async function RecoverDeletedMenu(id) {
   return await RecoverMenu(id);
 }
 
-export async function GetAllFoodFromMenu(menuId) {
-  return await GetFoodFromMenu(menuId);
+export async function GetAllFoodFromMenu(menuId, searchBy, searchValue) {
+  return await GetFoodFromMenu(menuId, searchBy, searchValue);
+}
+
+export async function GetMenuByMenuId(menuId) {
+  return await GetById(menuId);
 }
 
 export async function AddFoodToMenu(menuId, newMenuFoodData) {

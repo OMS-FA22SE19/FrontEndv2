@@ -19,7 +19,7 @@ import TextField from "@mui/material/TextField";
 
 const SystemConfiguration = () => {
   const localSt = localStorage.getItem("token");
-  const host = `https://localhost:7246`;
+  const host = `https://oms-fa22se19.azurewebsites.net`;
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const [rows, setRows] = useState([]);
@@ -31,8 +31,6 @@ const SystemConfiguration = () => {
   const [searchValue, setSearchValue] = React.useState("");
   const [value, setValue] = React.useState(null);
   const [error, setError] = React.useState("");
-  const [startTime, setStartTime] = React.useState("00:00");
-  const [endTime, setEndTime] = React.useState("00:00");
 
   const handleCloseSnackbar = () => setSnackbar(null);
 
@@ -207,7 +205,7 @@ const SystemConfiguration = () => {
           : (errorMessage = "");
         break;
       case "MaxReservationDuration":
-        value > 180
+        value < 0 || value > 180
           ? (errorMessage =
               "MaxReservationDuration must not be more than 180 minutes")
           : (errorMessage = "");
@@ -218,11 +216,14 @@ const SystemConfiguration = () => {
           : (errorMessage = "");
         break;
       case "ReservationTable ":
-        value < 0
-          ? (errorMessage = "ReservationTable must be more than 0")
+        value < 0 || value > 100
+          ? (errorMessage = "ReservationTable must be more than 0 and less than 100")
           : (errorMessage = "");
         break;
       default:
+        value < 0
+        ? (errorMessage = "Value must be more than 0")
+        : (errorMessage = "");
         break;
     }
     return errorMessage;
@@ -253,6 +254,8 @@ const SystemConfiguration = () => {
             return "Opening Time";
           case "EndTime":
             return "Closing Time";
+          case "AtLeastDuration": 
+            return "Advanced Time For Reservation (minutes)";
           default:
             return name;
         }
@@ -289,10 +292,7 @@ const SystemConfiguration = () => {
                 />
               </Box>
             );
-          case "MinReservationDuration":
-          case "MaxReservationDuration":
-          case "MaxEdit":
-          case "ReservationTable ":
+          default:
             return (
               <TextField
                 error={error.length === 0 ? false : true}
@@ -301,8 +301,6 @@ const SystemConfiguration = () => {
                 onChange={handleChange}
               />
             );
-          default:
-            return null;
         }
       },
     },

@@ -27,7 +27,6 @@ import InputBase from "@mui/material/InputBase";
 import useViewModel from "./viewModel";
 
 const Menus = () => {
-  const host = `https://localhost:7246`
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const [rows, setRows] = useState([]);
@@ -38,7 +37,6 @@ const Menus = () => {
   const [isEditing, setIsEditing] = React.useState(false);
   const [isAdding, setIsAdding] = React.useState(false);
   const [snackbar, setSnackbar] = React.useState(null);
-  const [searchValue, setSearchValue] = React.useState("");
 
   const viewModelProps = { setRows, setSnackbar };
   const {
@@ -345,14 +343,13 @@ const Menus = () => {
   ];
 
   const handleSearchChange = (event) => {
-    setSearchValue(event.target.value);
+    getMenus(event.target.value);
   };
 
   const handleKeyDown = (event) => {
     if (event.key === "Enter") {
       event.preventDefault();
       event.stopPropagation();
-      getMenus();
     }
   };
 

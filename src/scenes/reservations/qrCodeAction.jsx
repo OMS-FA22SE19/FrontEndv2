@@ -19,7 +19,7 @@ const style = {
 
 const QrCodeAction = ({ fetchData }) => {
     const localSt = localStorage.getItem("token");
-    const host = `https://localhost:7246`;
+    const host = `https://oms-fa22se19.azurewebsites.net`;
 
     const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
