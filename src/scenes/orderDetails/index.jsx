@@ -21,10 +21,10 @@ import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
+import { host, version } from "../../data/DataSource/dataSource";
 
 const OrderDetails = () => {
   const localSt = localStorage.getItem("token");
-  const host = `https://oms-fa22se19.azurewebsites.net`
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const [APIData, setAPIData] = useState([]);
@@ -47,7 +47,7 @@ const OrderDetails = () => {
     const search = searchValue.trim();
     const searchByValue = searchBy.trim();
     let response = await axios.get(
-      host + `/api/v1/OrderDetails` +
+      host + `/api/` + version + `/OrderDetails` +
         `?status=` +
         status +
         `&searchBy=` +
@@ -112,7 +112,7 @@ const OrderDetails = () => {
     }
     const search = searchValue.trim();
     let response = await axios.get(
-      host + `/api/v1/OrderDetails` +
+      host + `/api/` + version +`/OrderDetails` +
         `?status=` +
         value +
         `&searchValue=` +
@@ -245,7 +245,7 @@ const OrderDetails = () => {
     }
     let requestBody = { id: id, status: status };
     await axios
-      .put(host + `/api/v1/OrderDetails/` + id, requestBody,
+      .put(host + `/api/` + version + `/OrderDetails/` + id, requestBody,
       {
         headers: { Authorization: `Bearer ${localSt}` },
       })

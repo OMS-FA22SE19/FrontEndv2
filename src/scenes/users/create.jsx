@@ -6,15 +6,16 @@ import * as yup from "yup";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import Header from "../../components/Header";
 import axios from "axios";
-import React, { useEffect, useState } from "react";
-import Checkbox from "@mui/material/Checkbox";
+import React, {  } from "react";
 import { useNavigate } from "react-router-dom";
-import FormControlLabel from "@mui/material/FormControlLabel";
+import InputLabel from "@mui/material/InputLabel";
+import FormControl from "@mui/material/FormControl";
+import FormHelperText from "@mui/material/FormHelperText";
+import { host, version } from "../../data/DataSource/dataSource";
 
 const CreateUser = () => {
   const isNonMobile = useMediaQuery("(min-width:600px)");
   const localSt = localStorage.getItem("token");
-  const host = `https://oms-fa22se19.azurewebsites.net`
   let navigate = useNavigate();
   const routeChange = () => {
     let path = `/users`;
@@ -32,7 +33,7 @@ const CreateUser = () => {
       password: values.password,
       role: values.role,
     };
-    await axios.post(host + `/api/v1/Users`, requestBody,
+    await axios.post(host + `/api/` + version + `/Users`, requestBody,
     {
       headers: { Authorization: `Bearer ${localSt}` },
     });
@@ -77,19 +78,33 @@ const CreateUser = () => {
                 helperText={touched.email && errors.email}
                 sx={{ gridColumn: "span 2" }}
               />
-              <TextField
-                fullWidth
-                variant="filled"
-                type="string"
-                label="Role"
-                onBlur={handleBlur}
-                onChange={handleChange}
-                value={values.role}
-                name="role"
-                error={!!touched.role && !!errors.role}
-                helperText={touched.role && errors.role}
-                sx={{ gridColumn: "span 2" }}
-              />
+              <FormControl fullWidth>
+                <InputLabel id="role-select-label">Role</InputLabel>
+                <Select
+                  labelId="role-label"
+                  id="role"
+                  value={values.role}
+                  label="Role"
+                  onChange={handleChange}
+                >
+                  <MenuItem value="Administrator" key="Administrator">
+                    Administrator
+                  </MenuItem>
+                  <MenuItem value="Restaurant Owner" key="Restaurant Owner">
+                    Restaurant Owner
+                  </MenuItem>
+                  <MenuItem value="Staff" key="Staff">
+                    Staff
+                  </MenuItem>
+                  <MenuItem value="Chef" key="Chef">
+                    Chef
+                  </MenuItem>
+                  <MenuItem value="Customer" key="Customer">
+                    Customer
+                  </MenuItem>
+                </Select>
+                <FormHelperText hidden>Required</FormHelperText>
+              </FormControl>
               <TextField
                 fullWidth
                 variant="filled"

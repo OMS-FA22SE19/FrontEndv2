@@ -14,12 +14,12 @@ import Checkbox from "@mui/material/Checkbox";
 import { useNavigate } from "react-router-dom";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import { useParams } from "react-router-dom";
+import { host, version } from "../../../data/DataSource/dataSource";
 
 const AddFood = () => {
-  const host = `https://oms-fa22se19.azurewebsites.net`
   const isNonMobile = useMediaQuery("(min-width:600px)");
   const { menuId } = useParams();
-  
+
   const [getCourseTypes, setCourseTypes] = useState([]);
   const [getFoodTypes, setFoodTypes] = useState([]);
   const [getCourseTypeId, setCourseTypeId] = React.useState("");
@@ -37,7 +37,7 @@ const AddFood = () => {
 
   let navigate = useNavigate();
   const routeChange = () => {
-    let path = `/menus/` + menuId + '/foods/';
+    let path = `/menus/` + menuId + "/foods/";
     navigate(path);
   };
 
@@ -56,7 +56,7 @@ const AddFood = () => {
     formData.append("price", values.price);
     await axios({
       method: "post",
-      url: "https://oms-fa22se19.herokuapp.com/api/v1/Menus/" + menuId +"/NewFood",
+      url: host + "/api/" + version + "/Menus/" + menuId + "/NewFood",
       data: formData,
       headers: { "Content-Type": "multipart/form-data" },
     })
@@ -75,13 +75,13 @@ const AddFood = () => {
 
   const fetchCourseTypes = async () => {
     await axios
-      .get(host + `/api/v1/CourseTypes`)
+      .get(host + `/api/` + version + `/CourseTypes`)
       .then((response) => setCourseTypes(response.data["data"]));
   };
 
   const fetchFoodTypes = async () => {
     await axios
-      .get(host + `/api/v1/Types`)
+      .get(host + `/api/` + version + `/Types`)
       .then((response) => setFoodTypes(response.data["data"]));
   };
 
@@ -96,7 +96,10 @@ const AddFood = () => {
 
   return (
     <Box m="20px">
-      <Header title="CREATE NEW FOOD" subtitle={"Create New Food to Menu Id: " + menuId }/>
+      <Header
+        title="CREATE NEW FOOD"
+        subtitle={"Create New Food to Menu Id: " + menuId}
+      />
       <Formik
         onSubmit={handleFormSubmit}
         initialValues={initialValues}
@@ -287,7 +290,7 @@ const initialValues = {
   picture: null,
   courseTypeId: "",
   types: [],
-  price: 0
+  price: 0,
 };
 
 export default AddFood;

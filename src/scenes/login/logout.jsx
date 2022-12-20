@@ -5,6 +5,7 @@ const Logout = () => {
   let navigate = useNavigate();
   async function ClearToken() {
     localStorage.removeItem("token");
+    localStorage.removeItem("user");
   }
 
   async function routeChange() {

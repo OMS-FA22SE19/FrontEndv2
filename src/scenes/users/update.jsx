@@ -1,19 +1,20 @@
 import { Box, Button, TextField } from "@mui/material";
-import MenuItem from "@mui/material/MenuItem";
-import Select from "@mui/material/Select";
 import { Formik } from "formik";
 import * as yup from "yup";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import Header from "../../components/Header";
 import axios from "axios";
-import React, { useEffect, useState } from "react";
-import Checkbox from "@mui/material/Checkbox";
+import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import FormControlLabel from "@mui/material/FormControlLabel";
 import { useParams } from "react-router-dom";
+import Select from "@mui/material/Select";
+import MenuItem from "@mui/material/MenuItem";
+import InputLabel from "@mui/material/InputLabel";
+import FormControl from "@mui/material/FormControl";
+import FormHelperText from "@mui/material/FormHelperText";
+import { host, version } from "../../data/DataSource/dataSource";
 
 const UpdateUser = () => {
-  const host = `https://oms-fa22se19.azurewebsites.net`;
   const isNonMobile = useMediaQuery("(min-width:600px)");
   const { id } = useParams();
   const localSt = localStorage.getItem("token");
@@ -26,15 +27,21 @@ const UpdateUser = () => {
     if (localSt === null) {
       window.location.href = "/login";
     }
-    await axios.get(host + `/api/v1/users/` + id).then((response) => {
-      const fullName = response.data["data"].fullName;
-      const email = response.data["data"].email;
-      const phoneNumber = response.data["data"].phoneNumber;
+    await axios
+      .get(host + `/api/` + version + `/users/` + id, {
+        headers: { Authorization: `Bearer ${localSt}` },
+      })
+      .then((response) => {
+        const fullName = response.data["data"].fullName;
+        const email = response.data["data"].email;
+        const phoneNumber = response.data["data"].phoneNumber;
+        const role = response.data["data"].role;
 
-      initialValues.email = email;
-      initialValues.fullName = fullName;
-      initialValues.phoneNumber = phoneNumber;
-    });
+        initialValues.email = email;
+        initialValues.fullName = fullName;
+        initialValues.phoneNumber = phoneNumber;
+        initialValues.role = role;
+      });
   };
 
   let navigate = useNavigate();
@@ -49,8 +56,9 @@ const UpdateUser = () => {
       phoneNumber: values.phoneNumber,
       role: values.role,
     };
+    console.log({ requestBody });
     await axios
-      .put(host + `/api/v1/users/` + id, requestBody, {
+      .put(host + `/api/` + version + `/users/` + id, requestBody, {
         headers: { Authorization: `Bearer ${localSt}` },
       })
       .finally(() => routeChange());
@@ -81,19 +89,33 @@ const UpdateUser = () => {
                 "& > div": { gridColumn: isNonMobile ? undefined : "span 4" },
               }}
             >
-              <TextField
-                fullWidth
-                variant="filled"
-                type="string"
-                label="Role"
-                onBlur={handleBlur}
-                onChange={handleChange}
-                value={values.role}
-                name="role"
-                error={!!touched.role && !!errors.role}
-                helperText={touched.role && errors.role}
-                sx={{ gridColumn: "span 2" }}
-              />
+              <FormControl fullWidth>
+                <InputLabel id="role-select-label">Role</InputLabel>
+                <Select
+                  labelId="role-label"
+                  id="role"
+                  value={values.role}
+                  label="Role"
+                  onChange={handleChange}
+                >
+                  <MenuItem value="Administrator" key="Administrator">
+                    Administrator
+                  </MenuItem>
+                  <MenuItem value="Restaurant Owner" key="Restaurant Owner">
+                    Restaurant Owner
+                  </MenuItem>
+                  <MenuItem value="Staff" key="Staff">
+                    Staff
+                  </MenuItem>
+                  <MenuItem value="Chef" key="Chef">
+                    Chef
+                  </MenuItem>
+                  <MenuItem value="Customer" key="Customer">
+                    Customer
+                  </MenuItem>
+                </Select>
+                <FormHelperText hidden>Required</FormHelperText>
+              </FormControl>
               <TextField
                 fullWidth
                 variant="filled"
@@ -122,8 +144,8 @@ const UpdateUser = () => {
               />
             </Box>
             <Box display="flex" justifyContent="end" mt="20px">
-              <Button type="submit" color="secondary" variant="contained">
-                Create New User
+              <Button type="submit" color="warning" variant="contained">
+                Update User
               </Button>
             </Box>
           </form>

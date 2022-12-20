@@ -13,11 +13,11 @@ import FormHelperText from "@mui/material/FormHelperText";
 import Checkbox from "@mui/material/Checkbox";
 import { useNavigate } from "react-router-dom";
 import FormControlLabel from "@mui/material/FormControlLabel";
+import { host, version } from "../../data/DataSource/dataSource";
 
 const CreateFood = () => {
   const isNonMobile = useMediaQuery("(min-width:600px)");
   const localSt = localStorage.getItem("token");
-  const host = `https://oms-fa22se19.azurewebsites.net`;
   const [getCourseTypes, setCourseTypes] = useState([]);
   const [getFoodTypes, setFoodTypes] = useState([]);
   const [getCourseTypeId, setCourseTypeId] = React.useState("");
@@ -56,7 +56,7 @@ const CreateFood = () => {
     });
     await axios({
       method: "post",
-      url: "https://oms-fa22se19.herokuapp.com/api/v1/Foods",
+      url: host + "/api/" + version + "/Foods",
       data: formData,
       headers: {
         "Content-Type": "multipart/form-data",
@@ -81,7 +81,7 @@ const CreateFood = () => {
       window.location.href = "/login";
     }
     await axios
-      .get(host + `/api/v1/CourseTypes`, {
+      .get(host + `/api/` + version + `/CourseTypes`, {
         headers: { Authorization: `Bearer ${localSt}` },
       })
       .then((response) => setCourseTypes(response.data["data"]));
@@ -92,7 +92,7 @@ const CreateFood = () => {
       window.location.href = "/login";
     }
     await axios
-      .get(host + `/api/v1/Types`, {
+      .get(host + `/api/` + version + `/Types`, {
         headers: { Authorization: `Bearer ${localSt}` },
       })
       .then((response) => setFoodTypes(response.data["data"]));

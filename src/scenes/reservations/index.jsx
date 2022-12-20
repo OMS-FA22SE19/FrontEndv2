@@ -18,12 +18,12 @@ import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
-import DoneIcon from '@mui/icons-material/Done';
+import DoneIcon from "@mui/icons-material/Done";
 import QrCodeAction from "./qrCodeAction";
+import { host, version } from "../../data/DataSource/dataSource";
 
 const Reservations = () => {
   const localSt = localStorage.getItem("token");
-  const host = `https://oms-fa22se19.azurewebsites.net`;
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const [rows, setRows] = React.useState([]);
@@ -59,11 +59,11 @@ const Reservations = () => {
   };
 
   const handleCancelReservation = async (id) => {
-    if(localSt === null) {
+    if (localSt === null) {
       window.location.href = "/login";
     }
     await axios
-      .delete(host + `/api/v1/Reservations/` + id, {
+      .delete(host + `/api/` + version + `/Reservations/` + id, {
         headers: { Authorization: `Bearer ${localSt}` },
       })
       .then((response) => {
@@ -79,7 +79,7 @@ const Reservations = () => {
       window.location.href = "/login";
     }
     await axios
-      .get(host + `/api/v1/Reservations/` + id + `/checkin`, {
+      .get(host + `/api/` + version + `/Reservations/` + id + `/checkin`, {
         headers: { Authorization: `Bearer ${localSt}` },
       })
       .then((response) => {
@@ -137,7 +137,9 @@ const Reservations = () => {
     const searchByValue = searchBy.trim();
     let response = await axios.get(
       host +
-        `/api/v1/Reservations` +
+        `/api/` +
+        version +
+        `/Reservations` +
         `?status=` +
         status +
         `&searchBy=` +
@@ -159,7 +161,9 @@ const Reservations = () => {
     const searchByValue = searchBy.trim();
     let response = await axios.get(
       host +
-        `/api/v1/Reservations` +
+        `/api/` +
+        version +
+        `/Reservations` +
         `?status=` +
         status +
         `&searchBy=` +
@@ -203,7 +207,7 @@ const Reservations = () => {
       flex: 1,
       renderCell: (params) => {
         const currentRow = params.row;
-        return currentRow["user"]["fullName"];
+        return currentRow["fullName"];
       },
     },
     {
@@ -214,7 +218,7 @@ const Reservations = () => {
       flex: 0.5,
       renderCell: (params) => {
         const currentRow = params.row;
-        return currentRow["user"]["phoneNumber"];
+        return currentRow["phoneNumber"];
       },
     },
     {
@@ -245,6 +249,12 @@ const Reservations = () => {
       headerAlign: "right",
       align: "right",
       flex: 0.3,
+    },
+    {
+      field: "tableId",
+      headerName: "Table ID",
+      hide: tabValue !== 2,
+      flex: 0.4,
     },
     {
       field: "prePaid",
@@ -295,10 +305,8 @@ const Reservations = () => {
         const id = currentRow.id;
         const name = currentRow.name;
         const status = currentRow.status;
-
-        if (
-          status.toLowerCase() === "available"
-        ) {
+        const newDate = new Date(new Date().getTime() + 15*60000);
+        if (status.toLowerCase() === "available") {
           return [
             <GridActionsCellItem
               icon={<PlaylistRemoveIcon />}
@@ -309,16 +317,25 @@ const Reservations = () => {
           ];
         }
 
-        if (
-          status.toLowerCase() === "reserved"
-        ) {
+        if (status.toLowerCase() === "reserved") {
+          const value = newDate.getTime() > new Date(currentRow.startTime).getTime();
+          if(value) {
+            return [
+              <GridActionsCellItem
+                icon={<DoneIcon />}
+                label="CheckIn"
+                onClick={() => handleCheckinReservation(id)}
+                color="inherit"
+              />,
+              <GridActionsCellItem
+                icon={<PlaylistRemoveIcon />}
+                label="Delete"
+                onClick={handleDeleteClick(id, name)}
+                color="inherit"
+              />,
+            ];    
+          }
           return [
-            <GridActionsCellItem
-              icon={<DoneIcon />}
-              label="CheckIn"
-              onClick={() => handleCheckinReservation(id)}
-              color="inherit"
-            />,
             <GridActionsCellItem
               icon={<PlaylistRemoveIcon />}
               label="Delete"
@@ -346,42 +363,41 @@ const Reservations = () => {
   };
 
   const handleTabChange = (event, newValue) => {
-    let status = "Available";
+    let statusValue = "Available";
     switch (newValue) {
       case 0:
         setStatus("Available");
         break;
       case 1:
         setStatus("Reserved");
-        status = "Reserved";
+        statusValue = "Reserved";
         break;
       case 2:
         setStatus("CheckIn");
-        status = "CheckIn";
+        statusValue = "CheckIn";
         break;
       case 3:
         setStatus("Cancelled");
-        status = "Cancelled";
+        statusValue = "Cancelled";
         break;
       default:
         break;
     }
     setTabValue(newValue);
-    fetchDataWithStatus(status);
+    fetchDataWithStatus(statusValue);
   };
 
   return (
     <Box m="20px">
-        <Stack
-  direction="row"
-  justifyContent="space-between"
-  alignItems="center"
-  spacing={2}
->
-
-      <Header title="RESERVATIONS" subtitle="List of Reservations" />
-      <QrCodeAction fetchData={fetchData} />
-</Stack>
+      <Stack
+        direction="row"
+        justifyContent="space-between"
+        alignItems="center"
+        spacing={2}
+      >
+        <Header title="RESERVATIONS" subtitle="List of Reservations" />
+        <QrCodeAction fetchData={fetchData} />
+      </Stack>
       <Box sx={{ width: "100%", bgcolor: colors.blueAccent[700] }}>
         <Tabs
           value={tabValue}

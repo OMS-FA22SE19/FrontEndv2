@@ -9,16 +9,38 @@ import StatBox from "../../components/StatBox";
 import axios from "axios";
 import * as React from "react";
 import { DataGrid } from "@mui/x-data-grid";
+import { host, version } from "../../data/DataSource/dataSource";
+import { GetCustomerStatisticUseCase } from "../../domain/useCase/dashboard/GetCustomerStatistic";
+import { GetFoodStatisticUseCase } from "../../domain/useCase/dashboard/GetFoodStatistic";
+import { GetMonthlyOrdersReservationsUseCase } from "../../domain/useCase/dashboard/GetMonthlyOrdersReservations";
+import { GetRoyalCustomersUseCase } from "../../domain/useCase/dashboard/GetRoyalCustomers";
+import { GetTrendingFoodUseCase } from "../../domain/useCase/dashboard/GetTrendingFood";
 
 const Dashboard = () => {
-  const host = `https://oms-fa22se19.azurewebsites.net`;
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
-  const [newCustomers, setNewCustomers] = React.useState("");
+  const [newCustomers, setNewCustomers] = React.useState([]);
+  const [newFoods, setNewFoods] = React.useState([]);
+  const [ordersReservations, setOrdersReservations] = React.useState([]);
+  const [royalCustomers, setRoyalCustomers] = React.useState([]);
+  const [trendingFood, setTrendingFood] = React.useState([]);
 
   const fetchData = async () => {
-    let response = await axios.get(host + `/api/v1/Dashboard/Customers`);
-    setNewCustomers(response.data["data"]);
+    const customerStatistic = await GetCustomerStatisticUseCase();
+    setNewCustomers(customerStatistic.data);
+
+    const foodStatistic = await GetFoodStatisticUseCase();
+    setNewFoods(foodStatistic.data);
+
+    const monthlyOrdersReservation = await GetMonthlyOrdersReservationsUseCase();
+    setOrdersReservations(monthlyOrdersReservation.data);
+
+    const royalCustomerList = await GetRoyalCustomersUseCase();
+    setRoyalCustomers(royalCustomerList.data);
+
+    const trendingFood = await GetTrendingFoodUseCase();
+    console.log(trendingFood.data);
+    setTrendingFood(trendingFood.data);
   };
 
   React.useEffect(() => {
@@ -29,9 +51,9 @@ const Dashboard = () => {
     {
       field: "id",
       headerName: "No.",
-      renderCell: (index) => index.api.getRowIndex(index.row.id) + 1,
+      renderCell: (index) => index.api.getRowIndex(index.row.phoneNumber) + 1,
     },
-    { field: "user", headerName: "Customer Name" },
+    { field: "name", headerName: "Customer Name" },
     {
       field: "phoneNumber",
       headerName: "Phone Number",
@@ -84,9 +106,9 @@ const Dashboard = () => {
               Monthly Trending Food
             </Typography>
           </Box>
-          {mockTrendingFood.map((food, i) => (
+          {trendingFood.map((food, i) => (
             <Box
-              key={`${food.no}-${i}`}
+              key={`${food.name}-${i}`}
               display="flex"
               justifyContent="space-between"
               alignItems="center"
@@ -95,7 +117,7 @@ const Dashboard = () => {
             >
               <Box gridColumn="span 4">
                 <Typography variant="h6" color={colors.grey[100]}>
-                  {food.no}
+                  #{i+1}
                 </Typography>
                 <Typography
                   color={colors.greenAccent[500]}
@@ -116,25 +138,6 @@ const Dashboard = () => {
             </Box>
           ))}
         </Box>
-        {/* <Box
-          gridColumn="span 3"
-          backgroundColor={colors.primary[400]}
-          display="flex"
-          alignItems="center"
-          justifyContent="center"
-        >
-          <StatBox
-            title="431,225 VND"
-            subtitle="Sales Obtained"
-            progress="0.50"
-            increase="+21%"
-            icon={
-              <PointOfSaleIcon
-                sx={{ color: colors.greenAccent[600], fontSize: "26px" }}
-              />
-            }
-          />
-        </Box> */}
         <Box
           gridColumn="span 3"
           backgroundColor={colors.primary[400]}
@@ -142,22 +145,11 @@ const Dashboard = () => {
           alignItems="center"
           justifyContent="center"
         >
-          {/* <StatBox
+          <StatBox
             title={newCustomers.customers}
             subtitle="New Customers"
             progress="0.30"
             increase={"+" + newCustomers.increase}
-            icon={
-              <PersonAddIcon
-                sx={{ color: colors.greenAccent[600], fontSize: "26px" }}
-              />
-            }
-          /> */}
-          <StatBox
-            title="251"
-            subtitle="Customers"
-            progress="0.30"
-            increase="+15%"
             icon={
               <PersonAddIcon
                 sx={{ color: colors.greenAccent[600], fontSize: "26px" }}
@@ -173,10 +165,10 @@ const Dashboard = () => {
           justifyContent="center"
         >
           <StatBox
-            title="40"
+            title={newFoods.food}
             subtitle="Food"
             progress="0.75"
-            increase="+14%"
+            increase={"+" + newFoods.increase}
             icon={
               <FastfoodIcon
                 sx={{ color: colors.greenAccent[600], fontSize: "26px" }}
@@ -192,10 +184,10 @@ const Dashboard = () => {
           justifyContent="center"
         >
           <StatBox
-            title="40/20"
+            title={ ordersReservations.orders + " / " + ordersReservations.reservations}
             subtitle="Monthly Orders/Reservations"
             progress="0.75"
-            increase="+14%"
+            increase={"+" + ordersReservations.increase}
             icon={
               <ReceiptIcon
                 sx={{ color: colors.greenAccent[600], fontSize: "26px" }}
@@ -203,41 +195,6 @@ const Dashboard = () => {
             }
           />
         </Box>
-        {/* <Box
-          gridColumn="span 3"
-          backgroundColor={colors.primary[400]}
-          display="flex"
-          alignItems="center"
-          justifyContent="center"
-        >
-          <StatBox
-            title="1,325,134"
-            subtitle="Traffic Received"
-            progress="0.80"
-            increase="+43%"
-            icon={
-              <TrafficIcon
-                sx={{ color: colors.greenAccent[600], fontSize: "26px" }}
-              />
-            }
-          />
-        </Box> */}
-
-        {/* ROW 2 */}
-        {/* <Box
-          gridColumn="span 8"
-          gridRow="span 2"
-          backgroundColor={colors.primary[400]}
-        >
-          <Box
-            mt="25px"
-            p="0 30px"
-            display="flex "
-            justifyContent="space-between"
-            alignItems="center"
-          >
-          </Box>
-        </Box> */}
 
         {/* ROW 3 */}
         <Box
@@ -286,42 +243,9 @@ const Dashboard = () => {
               },
             }}
           >
-            <DataGrid rows={mockTransactions} columns={columns} />
+            <DataGrid getRowId={(row) => row.phoneNumber} rows={royalCustomers} columns={columns} />
           </Box>
         </Box>
-        {/* <Box
-          gridColumn="span 4"
-          gridRow="span 2"
-          backgroundColor={colors.primary[400]}
-        >
-          <Typography
-            variant="h5"
-            fontWeight="600"
-            sx={{ padding: "30px 30px 0 30px" }}
-          >
-            Sales Quantity
-          </Typography>
-          <Box height="250px" mt="-20px">
-            <BarChart isDashboard={true} />
-          </Box>
-        </Box>
-        <Box
-          gridColumn="span 4"
-          gridRow="span 2"
-          backgroundColor={colors.primary[400]}
-          padding="30px"
-        >
-          <Typography
-            variant="h5"
-            fontWeight="600"
-            sx={{ marginBottom: "15px" }}
-          >
-            Geography Based Traffic
-          </Typography>
-          <Box height="200px">
-            <GeographyChart isDashboard={true} />
-          </Box>
-        </Box> */}
       </Box>
     </Box>
   );

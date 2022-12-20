@@ -10,15 +10,17 @@ import SearchIcon from "@mui/icons-material/Search";
 import InputBase from "@mui/material/InputBase";
 import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
+import { host, version } from "../../data/DataSource/dataSource";
+import { UserContext } from "../../context/UserContext";
 
 const Users = () => {
-  const host = `https://oms-fa22se19.azurewebsites.net`;
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const [APIData, setAPIData] = useState([]);
   const [searchValue, setSearchValue] = React.useState("");
   const [searchBy, setSearchBy] = React.useState("Id");
   const localSt = localStorage.getItem("token");
+  const { user } = React.useContext(UserContext);
 
   let navigate = useNavigate();
 
@@ -34,7 +36,7 @@ const Users = () => {
     const searchByValue = searchBy.trim();
     let response = await axios.get(
       host +
-        `/api/v1/Users` +
+        `/api/`+ version +`/Users` +
         `?searchBy=` +
         searchByValue +
         `&searchValue=` +
@@ -51,7 +53,7 @@ const Users = () => {
       window.location.href = "/login";
     }
     await axios
-      .delete(host + `/api/v1/Users/` + id, {
+      .delete(host + `/api/` + version +`/Users/` + id, {
         headers: { Authorization: `Bearer ${localSt}` },
       })
       .finally(() => fetchData());
@@ -139,7 +141,7 @@ const Users = () => {
           </Button>
         );
 
-        if (!currentRow["isDeleted"]) {
+        if (!currentRow["isDeleted"] && user.id != currentRow["id"]) {
           deleteButton = (
             <Button
               variant="outlined"

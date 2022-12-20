@@ -12,7 +12,7 @@ export async function GetAll(searchBy, searchValue) {
   return await axios
     .get(
       host +
-        `/api/v` +
+        `/api/` +
         version +
         `/` +
         COLLECTION +
@@ -33,7 +33,7 @@ export async function CreateFood(formData) {
   }
   return await axios({
     method: "post",
-    url: host + `/api/v` + version + `/` + COLLECTION,
+    url: host + `/api/` + version + `/` + COLLECTION,
     data: formData,
     headers: {
       "Content-Type": "multipart/form-data",
@@ -48,7 +48,7 @@ export async function UpdateFood(formData) {
   }
   return await axios({
     method: "PUT",
-    url: host + `/api/v` + version + `/` + COLLECTION + formData.id,
+    url: host + `/api/` + version + `/` + COLLECTION + formData.id,
     data: formData,
     headers: {
       "Content-Type": "multipart/form-data",
@@ -62,7 +62,7 @@ export async function DeleteFood(id) {
     window.location.href = "/login";
   }
   return await axios.delete(
-    host + `/api/v` + version + `/` + COLLECTION + "/" + id,
+    host + `/api/` + version + `/` + COLLECTION + "/" + id,
     {
       headers: { Authorization: `Bearer ${localSt}` },
     }
@@ -74,7 +74,7 @@ export async function RecoverFood(id) {
     window.location.href = "/login";
   }
   return await axios.put(
-    host + `/api/v` + version + `/` + COLLECTION + "/" + id + "/recover",
+    host + `/api/` + version + `/` + COLLECTION + "/" + id + "/recover",
     null,
     {
       headers: { Authorization: `Bearer ${localSt}` },

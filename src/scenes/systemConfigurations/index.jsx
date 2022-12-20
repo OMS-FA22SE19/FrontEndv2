@@ -16,10 +16,10 @@ import Snackbar from "@mui/material/Snackbar";
 import SearchIcon from "@mui/icons-material/Search";
 import InputBase from "@mui/material/InputBase";
 import TextField from "@mui/material/TextField";
+import { host, version } from "../../data/DataSource/dataSource";
 
 const SystemConfiguration = () => {
   const localSt = localStorage.getItem("token");
-  const host = `https://oms-fa22se19.azurewebsites.net`;
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const [rows, setRows] = useState([]);
@@ -80,7 +80,7 @@ const SystemConfiguration = () => {
   };
 
   const handleUpdate = async (name, value) => {
-    if(localSt === null) {
+    if (localSt === null) {
       window.location.href = "/login";
     }
     const requestBody = {
@@ -88,7 +88,7 @@ const SystemConfiguration = () => {
       value: value,
     };
     await axios
-      .put(host + `/api/v1/AdminSettings/`, requestBody, {
+      .put(host + `/api/` + version + `/AdminSettings/`, requestBody, {
         headers: { Authorization: `Bearer ${localSt}` },
       })
       .then((response) => {
@@ -132,12 +132,12 @@ const SystemConfiguration = () => {
   };
 
   const fetchData = async () => {
-    if(localSt === null) {
+    if (localSt === null) {
       window.location.href = "/login";
     }
     const search = searchValue.trim();
     let response = await axios.get(
-      host + `/api/v1/AdminSettings` + `?searchValue=` + search,
+      host + `/api/` + version + `/AdminSettings` + `?searchValue=` + search,
       {
         headers: { Authorization: `Bearer ${localSt}` },
       }
@@ -217,13 +217,14 @@ const SystemConfiguration = () => {
         break;
       case "ReservationTable ":
         value < 0 || value > 100
-          ? (errorMessage = "ReservationTable must be more than 0 and less than 100")
+          ? (errorMessage =
+              "ReservationTable must be more than 0 and less than 100")
           : (errorMessage = "");
         break;
       default:
         value < 0
-        ? (errorMessage = "Value must be more than 0")
-        : (errorMessage = "");
+          ? (errorMessage = "Value must be more than 0")
+          : (errorMessage = "");
         break;
     }
     return errorMessage;
@@ -254,7 +255,7 @@ const SystemConfiguration = () => {
             return "Opening Time";
           case "EndTime":
             return "Closing Time";
-          case "AtLeastDuration": 
+          case "AtLeastDuration":
             return "Advanced Time For Reservation (minutes)";
           default:
             return name;

@@ -25,11 +25,12 @@ import Snackbar from "@mui/material/Snackbar";
 import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
 import PropTypes from "prop-types";
+import { host, version } from "../../data/DataSource/dataSource";
 
 const Tables = () => {
-  const host = `https://oms-fa22se19.azurewebsites.net`
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
+  const localSt = localStorage.getItem("token");
   const [rows, setRows] = useState([]);
   const [rowModesModel, setRowModesModel] = React.useState({});
   const noButtonRef = React.useRef(null);
@@ -63,7 +64,9 @@ const Tables = () => {
 
   const fetchTableTypes = async () => {
     await axios
-      .get(host + `/api/v1/TableTypes`)
+      .get(host + `/api/` + version + `/TableTypes`, {
+        headers: { Authorization: `Bearer ${localSt}` },
+      })
       .then((response) => setTableTypes(response.data["data"]));
   };
 
@@ -116,7 +119,9 @@ const Tables = () => {
 
   const handleDelete = async (id) => {
     await axios
-      .delete(host + `/api/v1/Tables/` + id)
+      .delete(host + `/api/` + version + `/Tables/` + id, {
+        headers: { Authorization: `Bearer ${localSt}` },
+      })
       .then((response) => {
         if (response.status === 204) {
           fetchData();
@@ -127,7 +132,9 @@ const Tables = () => {
 
   const handleRecover = async (id) => {
     await axios
-      .put(host + `/api/v1/Tables/` + id + `/recover`)
+      .put(host + `/api/v1/Tables/` + id + `/recover`, {
+        headers: { Authorization: `Bearer ${localSt}` },
+      })
       .then((response) => {
         if (response.status === 204) {
           fetchData();
@@ -141,13 +148,12 @@ const Tables = () => {
       id: currentRow["id"],
       numOfSeats: currentRow["numOfSeats"],
       status: currentRow["status"],
-      tableTypeId: currentRow["tableTypeId"]
+      tableTypeId: currentRow["tableTypeId"],
     };
     await axios
-      .put(
-        host + `/api/v1/Tables/` + currentRow["id"],
-        requestBody
-      )
+      .put(host + `/api/v1/Tables/` + currentRow["id"], requestBody, {
+        headers: { Authorization: `Bearer ${localSt}` },
+      })
       .then((response) => {
         if (response.status === 204) {
           fetchData();
@@ -221,7 +227,9 @@ const Tables = () => {
   };
 
   const fetchData = async () => {
-    let response = await axios.get(host + `/api/v1/Tables`);
+    let response = await axios.get(host + `/api/` + version + `/Tables`, {
+      headers: { Authorization: `Bearer ${localSt}` },
+    });
     setRows(response.data["data"]);
   };
 
@@ -231,7 +239,9 @@ const Tables = () => {
       chargePerSeat: currentRow["chargePerSeat"],
     };
     await axios
-      .post(host + `/api/v1/Tables/`, requestBody)
+      .post(host + `/api/v1/Tables/`, requestBody, {
+        headers: { Authorization: `Bearer ${localSt}` },
+      })
       .catch(() => {})
       .finally(() => fetchData());
   };
@@ -334,12 +344,16 @@ const Tables = () => {
   function SelectEditInputStatusCell(props) {
     const { id, value, field } = props;
     const apiRef = useGridApiContext();
-  
+
     const handleChange = async (event) => {
-      await apiRef.current.setEditCellValue({ id, field, value: event.target.value });
+      await apiRef.current.setEditCellValue({
+        id,
+        field,
+        value: event.target.value,
+      });
       apiRef.current.stopCellEditMode({ id, field });
     };
-  
+
     return (
       <Select
         value={value}
@@ -355,7 +369,7 @@ const Tables = () => {
       </Select>
     );
   }
-  
+
   SelectEditInputStatusCell.propTypes = {
     /**
      * The column field of the cell that triggered the event.
@@ -371,7 +385,7 @@ const Tables = () => {
      */
     value: PropTypes.any,
   };
-  
+
   const renderSelectEditInputStatusCell = (params) => {
     return <SelectEditInputStatusCell {...params} />;
   };
@@ -431,11 +445,11 @@ const Tables = () => {
               onClick={handleRecoverClick(id)}
             />,
             <GridActionsCellItem
-            icon={<DeleteIcon />}
-            label="Delete"
-            onClick={handleDeleteClick(id, name)}
-            color="inherit"
-          />,
+              icon={<DeleteIcon />}
+              label="Delete"
+              onClick={handleDeleteClick(id, name)}
+              color="inherit"
+            />,
           ];
         }
 

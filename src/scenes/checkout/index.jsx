@@ -8,10 +8,10 @@ import SearchIcon from "@mui/icons-material/Search";
 import InputBase from "@mui/material/InputBase";
 import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
+import { host, version } from "../../data/DataSource/dataSource";
 
 const Checkout = () => {
   const localSt = localStorage.getItem("token");
-  const host = `https://oms-fa22se19.azurewebsites.net`;
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const [APIData, setAPIData] = useState([]);
@@ -33,7 +33,7 @@ const Checkout = () => {
     const searchByValue = searchBy.trim();
     let processingResponse = await axios.get(
       host +
-        `/api/v1/Orders?Status=Processing` +
+        `/api/`+ version + `/Orders?Status=Processing` +
         `&searchBy=` +
         searchByValue +
         `&searchValue=` +
@@ -44,7 +44,7 @@ const Checkout = () => {
     );
     let checkingResponse = await axios.get(
       host +
-        `/api/v1/Orders?Status=Checking` +
+        `/api/` + version + `/Orders?Status=Checking` +
         `&searchBy=` +
         searchByValue +
         `&searchValue=` +
@@ -64,7 +64,7 @@ const Checkout = () => {
       window.location.href = "/login";
     }
     await axios
-      .post(host + `/api/v1/Orders/` + id + "/Confirm", null,{
+      .post(host + `/api/` + version + `/Orders/` + id + "/Confirm", null,{
         headers: { Authorization: `Bearer ${localSt}` },
       })
       .then(() => fetchData());

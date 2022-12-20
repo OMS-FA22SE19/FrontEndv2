@@ -11,7 +11,7 @@ export async function GetAll(searchValue) {
   const search = searchValue.trim();
   return await axios
     .get(
-      host + `/api/v` + version + `/` + COLLECTION + `?searchValue=` + search,
+      host + `/api/` + version + `/` + COLLECTION + `?searchValue=` + search,
       {
         headers: { Authorization: `Bearer ${localSt}` },
       }
@@ -29,7 +29,7 @@ export async function CreateTableType(newTableTypeData) {
     canBeCombined: newTableTypeData["canBeCombined"],
   };
   return await axios.post(
-    host + `/api/v` + version + `/` + COLLECTION,
+    host + `/api/` + version + `/` + COLLECTION,
     requestBody,
     {
       headers: { Authorization: `Bearer ${localSt}` },
@@ -48,7 +48,7 @@ export async function UpdateTableType(newTableTypeData) {
     canBeCombined: newTableTypeData["canBeCombined"],
   };
   return await axios.put(
-    host + `/api/v` + version + `/` + COLLECTION + "/" + newTableTypeData["id"],
+    host + `/api/` + version + `/` + COLLECTION + "/" + newTableTypeData["id"],
     requestBody,
     {
       headers: { Authorization: `Bearer ${localSt}` },
@@ -61,7 +61,7 @@ export async function DeleteTableType(id) {
     window.location.href = "/login";
   }
   return await axios.delete(
-    host + `/api/v` + version + `/` + COLLECTION + "/" + id,
+    host + `/api/` + version + `/` + COLLECTION + "/" + id,
     {
       headers: { Authorization: `Bearer ${localSt}` },
     }
@@ -73,7 +73,7 @@ export async function RecoverTableType(id) {
     window.location.href = "/login";
   }
   return await axios.put(
-    host + `/api/v` + version + `/` + COLLECTION + "/" + id + "/recover",
+    host + `/api/` + version + `/` + COLLECTION + "/" + id + "/recover",
     {
       headers: { Authorization: `Bearer ${localSt}` },
     }

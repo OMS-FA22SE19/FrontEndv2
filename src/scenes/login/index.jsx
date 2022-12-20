@@ -8,6 +8,7 @@ import { useNavigate } from "react-router-dom";
 import Grid from "@mui/material/Grid";
 import { UserContext } from "../../context/UserContext";
 import Alert from "@mui/material/Alert";
+import { host, version } from "../../data/DataSource/dataSource";
 
 const Login = () => {
   const { user } = useContext(UserContext);
@@ -28,7 +29,7 @@ const Login = () => {
       Password: values.password,
     };
     await axios
-      .post("https://oms-fa22se19.azurewebsites.net/api/v1/Authentication", requestBody)
+      .post(host + "/api/" + version + "/Authentication", requestBody)
       .then((response) => {
         const token = response["data"].data.jwtToken;
         if (response.status === 200 && token !== null) {

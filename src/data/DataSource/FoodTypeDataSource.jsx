@@ -11,7 +11,7 @@ export async function GetAll(searchValue) {
   const search = searchValue.trim();
   return await axios
     .get(
-      host + `/api/v` + version + `/` + COLLECTION + `?searchValue=` + search,
+      host + `/api/` + version + `/` + COLLECTION + `?searchValue=` + search,
       {
         headers: { Authorization: `Bearer ${localSt}` },
       }
@@ -28,7 +28,7 @@ export async function CreateFoodType(newFoodTypeData) {
     description: newFoodTypeData["description"],
   };
   return await axios.post(
-    host + `/api/v` + version + `/` + COLLECTION,
+    host + `/api/` + version + `/` + COLLECTION,
     requestBody,
     {
       headers: { Authorization: `Bearer ${localSt}` },
@@ -47,7 +47,7 @@ export async function UpdateFoodType(newFoodTypeData) {
   };
   return await axios.put(
     host +
-      `/api/v` +
+      `/api/` +
       version +
       `/` +
       COLLECTION +
@@ -65,7 +65,7 @@ export async function DeleteFoodType(id) {
     window.location.href = "/login";
   }
   return await axios.delete(
-    host + `/api/v` + version + `/` + COLLECTION + "/" + id,
+    host + `/api/` + version + `/` + COLLECTION + "/" + id,
     {
       headers: { Authorization: `Bearer ${localSt}` },
     }
@@ -77,7 +77,7 @@ export async function RecoverFoodType(id) {
     window.location.href = "/login";
   }
   return await axios.put(
-    host + `/api/v` + version + `/` + COLLECTION + "/" + id + "/recover",
+    host + `/api/` + version + `/` + COLLECTION + "/" + id + "/recover",
     {
       headers: { Authorization: `Bearer ${localSt}` },
     }
