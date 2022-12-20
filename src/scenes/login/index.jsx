@@ -31,6 +31,8 @@ const Login = () => {
     await axios
       .post(host + "/api/" + version + "/Authentication", requestBody)
       .then((response) => {
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
         const token = response["data"].data.jwtToken;
         if (response.status === 200 && token !== null) {
           localStorage.setItem("token", token);
@@ -47,7 +49,7 @@ const Login = () => {
       })
       .catch((error) => {
         console.log(error.request.status === 401);
-        if(error.response.status === 401 || error.request.status === 401) {
+        if (error.response.status === 401 || error.request.status === 401) {
           setError("Wrong username or password");
           return;
         }
@@ -58,11 +60,7 @@ const Login = () => {
   return (
     <Box m="20px">
       <Header title="Sign In" subtitle="Login to OMS" />
-      {error === "" ? null : (
-        <Alert severity="error">
-          {error}
-        </Alert>
-      )}
+      {error === "" ? null : <Alert severity="error">{error}</Alert>}
       <Formik
         onSubmit={handleFormSubmit}
         initialValues={initialValues}

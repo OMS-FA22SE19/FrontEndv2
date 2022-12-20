@@ -39,7 +39,6 @@ const Dashboard = () => {
     setRoyalCustomers(royalCustomerList.data);
 
     const trendingFood = await GetTrendingFoodUseCase();
-    console.log(trendingFood.data);
     setTrendingFood(trendingFood.data);
   };
 

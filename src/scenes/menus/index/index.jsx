@@ -25,6 +25,7 @@ import Snackbar from "@mui/material/Snackbar";
 import SearchIcon from "@mui/icons-material/Search";
 import InputBase from "@mui/material/InputBase";
 import useViewModel from "./viewModel";
+import DomainVerificationIcon from '@mui/icons-material/DomainVerification';
 
 const Menus = () => {
   const theme = useTheme();
@@ -216,6 +217,11 @@ const Menus = () => {
     setIsEditing(true);
   };
 
+  const handleEnableClick = (currentRow) => () => {
+    currentRow.available = true;
+    updateMenu(currentRow);
+  };
+
   const handleSaveClick = (currentRow) => () => {
     const id = currentRow.id;
     setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.View } });
@@ -259,7 +265,6 @@ const Menus = () => {
       headerName: "Available",
       type: "boolean",
       flex: 0.5,
-      editable: true
     },
     {
       field: "isDeleted",
@@ -314,7 +319,31 @@ const Menus = () => {
         if (isEditing && !isInEditMode) {
           return [];
         }
-        
+
+        if(currentRow.available) {
+          return [
+            <GridActionsCellItem
+              icon={<MenuBookIcon />}
+              label="View Menu"
+              className="textPrimary"
+              onClick={directToMenuFoods(id)}
+              color="inherit"
+            />,
+            <GridActionsCellItem
+              icon={<EditIcon />}
+              label="Edit"
+              className="textPrimary"
+              onClick={handleEditClick(id)}
+              color="inherit"
+            />,
+            <GridActionsCellItem
+              icon={<DeleteIcon />}
+              label="Delete"
+              onClick={handleDeleteClick(id, name)}
+              color="inherit"
+            />,
+          ];
+        }
         return [
           <GridActionsCellItem
             icon={<MenuBookIcon />}
@@ -328,6 +357,13 @@ const Menus = () => {
             label="Edit"
             className="textPrimary"
             onClick={handleEditClick(id)}
+            color="inherit"
+          />,
+          <GridActionsCellItem
+            icon={<DomainVerificationIcon />}
+            label="Enable"
+            className="textPrimary"
+            onClick={handleEnableClick(currentRow)}
             color="inherit"
           />,
           <GridActionsCellItem
