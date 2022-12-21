@@ -61,12 +61,15 @@ const Dashboard = () => {
     {
       field: "quantity",
       headerName: "Order Times",
+      type: "number",
       flex: 2,
     },
     {
       field: "cost",
       headerName: "Cost",
       flex: 1,
+      type: "number",
+      alignItems: "right",
     },
   ];
 
@@ -102,7 +105,7 @@ const Dashboard = () => {
             p="15px"
           >
             <Typography color={colors.grey[100]} variant="h5" fontWeight="600">
-              Monthly Trending Food
+              Monthly Top Food
             </Typography>
           </Box>
           {trendingFood.map((food, i) => (
@@ -132,7 +135,7 @@ const Dashboard = () => {
                 p="5px 10px"
                 borderRadius="4px"
               >
-                Order {food.quantity}x
+                {food.quantity}0
               </Box>
             </Box>
           ))}
@@ -146,7 +149,7 @@ const Dashboard = () => {
         >
           <StatBox
             title={newCustomers.customers}
-            subtitle="New Customers"
+            subtitle="Customers"
             progress="0.30"
             increase={"+" + newCustomers.increase}
             icon={
@@ -204,7 +207,7 @@ const Dashboard = () => {
         >
           <Header
             title="TOP LOYAL CUSTOMERS"
-            subtitle="List of Monthly Royal Customers"
+            subtitle="List of Royal Customers"
           />
           <Box
             m="5px 0 0 0"

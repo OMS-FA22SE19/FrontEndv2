@@ -36,14 +36,16 @@ const Users = () => {
     const searchByValue = searchBy.trim();
     let response = await axios.get(
       host +
-        `/api/`+ version +`/Users` +
+        `/api/` +
+        version +
+        `/Users` +
         `?searchBy=` +
         searchByValue +
         `&searchValue=` +
         search,
-        {
-          headers: { Authorization: `Bearer ${localSt}` },
-        }
+      {
+        headers: { Authorization: `Bearer ${localSt}` },
+      }
     );
     setAPIData(response.data["data"]);
   };
@@ -53,7 +55,18 @@ const Users = () => {
       window.location.href = "/login";
     }
     await axios
-      .delete(host + `/api/` + version +`/Users/` + id, {
+      .delete(host + `/api/` + version + `/Users/` + id, {
+        headers: { Authorization: `Bearer ${localSt}` },
+      })
+      .finally(() => fetchData());
+  };
+
+  const recoverUser = async (id) => {
+    if (localSt === null) {
+      window.location.href = "/login";
+    }
+    await axios
+      .delete(host + `/api/` + version + `/Users/` + id, {
         headers: { Authorization: `Bearer ${localSt}` },
       })
       .finally(() => fetchData());
@@ -118,47 +131,70 @@ const Users = () => {
     },
     {
       field: "isDeleted",
-      headerName: "Is Deleted",
+      headerName: "Status",
       type: "boolean",
       flex: 0.5,
+      renderCell: (params) => {
+        const currentRow = params.row;
+        if (currentRow.isDeleted) {
+          return "Disabled";
+        }
+        return "Active";
+      },
     },
     {
       field: "options",
       headerName: "Options",
       renderCell: (params) => {
         const currentRow = params.row;
-        let updateButton = <Button></Button>;
-        let deleteButton = <Button></Button>;
-
-        updateButton = (
-          <Button
-            variant="outlined"
-            color="warning"
-            size="small"
-            onClick={() => directToUpdateUser(currentRow["id"])}
-          >
-            Update
-          </Button>
-        );
 
         if (!currentRow["isDeleted"] && user.id != currentRow["id"]) {
-          deleteButton = (
-            <Button
-              variant="outlined"
-              color="error"
-              size="small"
-              onClick={() => deleteUser(currentRow["id"])}
-            >
-              Delete
-            </Button>
+          return (
+            <Stack direction="row" spacing={2}>
+              <Button
+                variant="outlined"
+                color="warning"
+                size="small"
+                onClick={() => directToUpdateUser(currentRow["id"])}
+              >
+                Update
+              </Button>
+              <Button
+                variant="outlined"
+                color="error"
+                size="small"
+                onClick={() => deleteUser(currentRow["id"])}
+              >
+                Delete
+              </Button>
+            </Stack>
           );
-        } else {
-          deleteButton = null;
+        }
+
+        if (currentRow["isDeleted"]) {
+          return (
+            <Stack direction="row" spacing={2}>
+              <Button
+                variant="outlined"
+                color="warning"
+                size="small"
+                onClick={() => recoverUser(currentRow["id"])}
+              >
+                Recover
+              </Button>
+            </Stack>
+          );
         }
         return (
           <Stack direction="row" spacing={2}>
-            {updateButton}
-            {deleteButton}
+            <Button
+              variant="outlined"
+              color="warning"
+              size="small"
+              onClick={() => directToUpdateUser(currentRow["id"])}
+            >
+              Update
+            </Button>
           </Stack>
         );
       },

@@ -477,6 +477,11 @@ const OrderDetails = () => {
           rows={APIData}
           columns={columns}
           components={{ Toolbar: GridToolbar }}
+          initialState={{
+            sorting: {
+              sortModel: [{ field: 'date' }],
+            },
+          }}
         />
       </Box>
     </Box>

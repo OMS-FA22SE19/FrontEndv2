@@ -327,6 +327,11 @@ const Checkout = () => {
           rows={APIData}
           columns={orderColumns}
           components={{ Toolbar: GridToolbar }}
+          initialState={{
+            sorting: {
+              sortModel: [{ field: 'status' }],
+            },
+          }}
         />
       </Box>
       <br />

@@ -485,6 +485,11 @@ const Reservations = () => {
           columns={columns}
           editMode="row"
           rowModesModel={rowModesModel}
+          initialState={{
+            sorting: {
+              sortModel: [{ field: 'startTime' }],
+            },
+          }}
           onRowModesModelChange={(newModel) => setRowModesModel(newModel)}
           onRowEditStart={handleRowEditStart}
           onRowEditStop={handleRowEditStop}
