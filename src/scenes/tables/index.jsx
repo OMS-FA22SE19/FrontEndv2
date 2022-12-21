@@ -235,8 +235,8 @@ const Tables = () => {
 
   const handleAdd = async (currentRow) => {
     const requestBody = {
-      name: currentRow["name"],
-      chargePerSeat: currentRow["chargePerSeat"],
+      numOfSeats: currentRow["numOfSeats"],
+      tableTypeId: currentRow["tableTypeId"],
     };
     await axios
       .post(host + `/api/v1/Tables/`, requestBody, {
@@ -416,6 +416,7 @@ const Tables = () => {
       editable: true,
       renderCell: (params) => {
         const currentRow = params.row;
+        console.log(currentRow);
         return currentRow["tableType"]["name"];
       },
       renderEditCell: renderSelectEditInputTableTypeCell,
@@ -577,11 +578,11 @@ function EditToolbar(props) {
     setIsAdding(true);
     setRows((oldRows) => [
       ...oldRows,
-      { id, numOfSeats: 1, status: "Available", isNew: true },
+      { id, numOfSeats: 1, status: "Available", tableType:{name: "Indoor"}, isNew: true },
     ]);
     setRowModesModel((oldModel) => ({
       ...oldModel,
-      [id]: { mode: GridRowModes.Edit, fieldToFocus: "name" },
+      [id]: { mode: GridRowModes.Edit, fieldToFocus: "numOfSeats" },
     }));
   };
 

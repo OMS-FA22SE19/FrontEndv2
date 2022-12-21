@@ -135,7 +135,7 @@ const Dashboard = () => {
                 p="5px 10px"
                 borderRadius="4px"
               >
-                {food.quantity}0
+                {food.quantity}
               </Box>
             </Box>
           ))}
@@ -150,7 +150,6 @@ const Dashboard = () => {
           <StatBox
             title={newCustomers.customers}
             subtitle="Customers"
-            progress="0.30"
             increase={"+" + newCustomers.increase}
             icon={
               <PersonAddIcon
@@ -169,7 +168,6 @@ const Dashboard = () => {
           <StatBox
             title={newFoods.food}
             subtitle="Food"
-            progress="0.75"
             increase={"+" + newFoods.increase}
             icon={
               <FastfoodIcon
@@ -188,7 +186,6 @@ const Dashboard = () => {
           <StatBox
             title={ ordersReservations.orders + " / " + ordersReservations.reservations}
             subtitle="Monthly Orders/Reservations"
-            progress="0.75"
             increase={"+" + ordersReservations.increase}
             icon={
               <ReceiptIcon
