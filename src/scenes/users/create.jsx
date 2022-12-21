@@ -16,6 +16,7 @@ import { host, version } from "../../data/DataSource/dataSource";
 const CreateUser = () => {
   const isNonMobile = useMediaQuery("(min-width:600px)");
   const localSt = localStorage.getItem("token");
+  const [role, setRole] = React.useState("Administrator");
   let navigate = useNavigate();
   const routeChange = () => {
     let path = `/users`;
@@ -31,7 +32,7 @@ const CreateUser = () => {
       email: values.email,
       phoneNumber: values.phoneNumber,
       password: values.password,
-      role: values.role,
+      role: role,
     };
     await axios.post(host + `/api/` + version + `/Users`, requestBody,
     {
@@ -83,9 +84,9 @@ const CreateUser = () => {
                 <Select
                   labelId="role-label"
                   id="role"
-                  value={values.role}
+                  value={role}
                   label="Role"
-                  onChange={handleChange}
+                  onChange={(event) => setRole(event.target.value)}
                 >
                   <MenuItem value="Administrator" key="Administrator">
                     Administrator
@@ -164,7 +165,7 @@ const CreateUser = () => {
               />
             </Box>
             <Box display="flex" justifyContent="end" mt="20px">
-              <Button type="submit" color="secondary" variant="contained">
+              <Button onClick={() => handleFormSubmit(values)} type="submit" color="secondary" variant="contained">
                 Create New User
               </Button>
             </Box>
