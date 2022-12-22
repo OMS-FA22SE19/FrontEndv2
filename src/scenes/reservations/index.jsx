@@ -432,6 +432,7 @@ const Reservations = () => {
           <MenuItem value="NumOfPeople">People</MenuItem>
           <MenuItem value="TableType">Table Type</MenuItem>
           <MenuItem value="NumOfSeats">Seat</MenuItem>
+          <MenuItem value="Date">Date</MenuItem>
         </Select>
         <InputBase
           onChange={handleSearchChange}

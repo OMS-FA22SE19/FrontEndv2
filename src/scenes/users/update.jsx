@@ -18,6 +18,7 @@ const UpdateUser = () => {
   const isNonMobile = useMediaQuery("(min-width:600px)");
   const { id } = useParams();
   const localSt = localStorage.getItem("token");
+  const [role, setRole] = React.useState("Administrator");
 
   useEffect(() => {
     fetchData();
@@ -35,12 +36,13 @@ const UpdateUser = () => {
         const fullName = response.data["data"].fullName;
         const email = response.data["data"].email;
         const phoneNumber = response.data["data"].phoneNumber;
-        const role = response.data["data"].role;
+        const roleValue = response.data["data"].role;
 
         initialValues.email = email;
         initialValues.fullName = fullName;
         initialValues.phoneNumber = phoneNumber;
-        initialValues.role = role;
+        initialValues.role = roleValue;
+        setRole(roleValue);
       });
   };
 
@@ -94,9 +96,9 @@ const UpdateUser = () => {
                 <Select
                   labelId="role-label"
                   id="role"
-                  value={values.role}
+                  value={role}
                   label="Role"
-                  onChange={handleChange}
+                  onChange={(event) => setRole(event.target.value)}
                 >
                   <MenuItem value="Administrator" key="Administrator">
                     Administrator

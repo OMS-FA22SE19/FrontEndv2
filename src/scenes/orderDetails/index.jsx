@@ -22,8 +22,10 @@ import Tab from "@mui/material/Tab";
 import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
 import { host, version } from "../../data/DataSource/dataSource";
+import { UserContext } from "../../context/UserContext";
 
 const OrderDetails = () => {
+  const { user } = React.useContext(UserContext);
   const localSt = localStorage.getItem("token");
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
@@ -317,7 +319,7 @@ const OrderDetails = () => {
       renderCell: (params) => {
         const currentRow = params.row;
         let optionButton = <Button></Button>;
-        if (currentRow["status"] === "Received") {
+        if (currentRow["status"] === "Received" && user.role === "Chef") {
           optionButton = (
             <Button
               variant="outlined"
@@ -332,7 +334,7 @@ const OrderDetails = () => {
             </Button>
           );
         }
-        if (currentRow["status"] === "Processing") {
+        if (currentRow["status"] === "Processing" && user.role === "Staff") {
           optionButton = (
             <Button
               variant="outlined"
